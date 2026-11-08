@@ -258,6 +258,18 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
       </div>
     </section>
 
+    <!-- ENTREGADORES -->
+    <section class="sec" data-sec="entregadores">
+      <div class="sec-tit"><div><h2>Entregadores</h2><p>Convide seus motoboys. Eles recebem as entregas no app do celular.</p></div>
+        <button class="btn btn-pri" id="btConvidar">+ Convidar entregador</button></div>
+      <div class="card" style="margin-bottom:14px">
+        <h3>📲 Como funciona</h3>
+        <p style="color:var(--cinza);font-size:.9rem">1. Toque em <b>Convidar entregador</b> e mande o link pra ele no WhatsApp.<br>2. Ele abre o link, cria a conta com o WhatsApp dele e aceita o convite.<br>3. Quando um pedido sair, toque em <b>Enviar p/ entregador</b> no pedido. Ele recebe no app, com o endereço e o WhatsApp do cliente.</p>
+      </div>
+      <div id="listaEnt"></div>
+      <div id="listaConvites"></div>
+    </section>
+
     <!-- PLANO -->
     <section class="sec" data-sec="plano">
       <div class="sec-tit"><div><h2>Meu plano</h2><p>Sua mensalidade e pagamentos.</p></div></div>
@@ -316,6 +328,27 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
   </form>
 </div></div>
 
+<!-- MODAL CONVITE -->
+<div class="modal" id="mConvite"><div class="modal-box" style="text-align:center">
+  <button class="fechar" data-fecha>✕</button>
+  <div style="font-size:2.6rem">🛵</div>
+  <h2 style="padding:0;margin:6px 0">Convite de entregador</h2>
+  <p style="color:var(--cinza);margin-bottom:14px">Mande este link para o entregador. Cada link serve para <b>1 entregador</b>.</p>
+  <input id="linkConvite" readonly style="margin-bottom:10px;text-align:center">
+  <div style="display:grid;gap:8px">
+    <a class="btn btn-zap" id="btConvZap" target="_blank">Mandar no WhatsApp</a>
+    <button class="btn btn-sec" id="btConvShare">📤 Compartilhar (e-mail, Telegram...)</button>
+    <button class="btn btn-sec" id="btConvCopia">📋 Copiar link</button>
+  </div>
+</div></div>
+
+<!-- MODAL ENVIAR PARA ENTREGADOR -->
+<div class="modal" id="mEnviar"><div class="modal-box">
+  <button class="fechar" data-fecha>✕</button>
+  <h2 id="tEnviar">Enviar para entregador</h2>
+  <div id="escolheEnt"></div>
+</div></div>
+
 <!-- MODAL PIX -->
 <div class="modal" id="mPix"><div class="modal-box" style="max-width:420px;text-align:center">
   <button class="fechar" data-fecha>✕</button>
@@ -331,10 +364,11 @@ import { auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel
   erroAmigavel, marcaHTML, linkLoja, linkPedido } from "./js/base.js";
 
 let user, uid, loja = null, produtos = [], cupons = [], pedidos = [], secAtual = "pedidos";
+let entregadoresLoja = [], entregasPorPedido = {}, convitesLoja = [];
 const lojaRef = () => F.doc(db, "lojas", uid);
 
 // ================= navegação
-const SECOES = [["pedidos", "📋", "Pedidos"], ["cardapio", "🍔", "Cardápio"], ["cupons", "🏷️", "Cupons"], ["entrega", "🛵", "Entrega e pagamento"], ["loja", "🎨", "Minha loja"], ["divulgar", "📣", "Divulgar"], ["plano", "💳", "Meu plano"]];
+const SECOES = [["pedidos", "📋", "Pedidos"], ["cardapio", "🍔", "Cardápio"], ["cupons", "🏷️", "Cupons"], ["entrega", "🛵", "Entrega e pagamento"], ["entregadores", "🏍️", "Entregadores"], ["loja", "🎨", "Minha loja"], ["divulgar", "📣", "Divulgar"], ["plano", "💳", "Meu plano"]];
 $("#marca").outerHTML = marcaHTML;
 const navHTML = SECOES.map(([s, i, n]) => `<button class="nav-b" data-ir="${s}">${i} ${n}${s === "pedidos" ? '<span class="qt oculto" data-qt></span>' : ""}</button>`).join("");
 $("#navBotoes").innerHTML = navHTML; $("#menuMob").innerHTML = navHTML;
@@ -393,6 +427,21 @@ F.onAuthStateChanged(auth, async u => {
     }
     primeiraLeva = false;
     desenhaPedidos();
+  });
+  F.onSnapshot(F.collection(db, "lojas", uid, "entregadores"), snap => {
+    entregadoresLoja = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
+    desenhaEntregadores();
+  });
+  F.onSnapshot(F.query(F.collection(db, "entregas"), F.where("loja", "==", uid)), snap => {
+    const antes = { ...entregasPorPedido };
+    entregasPorPedido = {};
+    snap.docs.forEach(d => { const x = { id: d.id, ...d.data({ serverTimestamps: "estimate" }) }; entregasPorPedido[x.pedidoId] = x; });
+    Object.values(entregasPorPedido).forEach(x => { const a = antes[x.pedidoId]; if (a && a.status !== x.status) toast(`🛵 ${x.entregadorNome}: pedido #${x.numero} ${({ aceito: "aceito", recusado: "RECUSADO", saiu: "saiu para entrega", chegou: "chegou no cliente", entregue: "entregue ✅" })[x.status] || x.status}`, x.status === "recusado" ? "erro" : "ok"); });
+    desenhaPedidos(); desenhaEntregadores();
+  });
+  F.onSnapshot(F.query(F.collection(db, "convites"), F.where("loja", "==", uid)), snap => {
+    convitesLoja = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
+    desenhaEntregadores();
   });
   carregaPagamentos();
 });
@@ -492,6 +541,11 @@ function desenhaPedidos() {
     if (p.status === "novo") ac = `<button class="btn btn-zap btn-mini" data-ac="aceitar" data-id="${p.id}">✓ Aceitar e avisar</button><button class="btn btn-perigo btn-mini" data-ac="recusar" data-id="${p.id}">Recusar</button>`;
     else if (p.status === "preparo") ac = p.tipo === "entrega" ? `<button class="btn btn-pri btn-mini" data-ac="entrega" data-id="${p.id}">🛵 Saiu para entrega</button>` : `<button class="btn btn-pri btn-mini" data-ac="pronto" data-id="${p.id}">✅ Pronto para retirar</button>`;
     else if (p.status === "entrega" || p.status === "pronto") ac = `<button class="btn btn-escuro btn-mini" data-ac="concluir" data-id="${p.id}">✓ Concluir</button>`;
+    const en = entregasPorPedido[p.id];
+    const ENST = { enviado: ["aguardando aceitar", "b-novo"], aceito: ["aceitou", "b-prep"], saiu: ["a caminho", "b-prep"], chegou: ["chegou no cliente", "b-ok"], entregue: ["entregou ✓", "b-ok"], recusado: ["recusou", "b-erro"], cancelado: ["cancelada", "b-cinza"] };
+    const podeEnviar = p.tipo === "entrega" && ["preparo", "entrega"].includes(p.status) && (!en || ["recusado", "cancelado"].includes(en.status));
+    const linhaEnt = en && en.status !== "cancelado" ? `<div style="font-size:.84rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap">🏍️ <b>${esc(en.entregadorNome)}</b> <span class="badge ${ENST[en.status][1]}">${ENST[en.status][0]}</span></div>` : "";
+    if (podeEnviar) ac = `<button class="btn btn-escuro btn-mini" data-ac="enviarEnt" data-id="${p.id}">🏍️ Enviar p/ entregador</button>` + ac;
     const extra = `<button class="ico-btn" title="Conversar no WhatsApp" data-ac="zap" data-id="${p.id}">💬</button><button class="ico-btn" title="Imprimir" data-ac="imprimir" data-id="${p.id}">🖨️</button>` +
       (["preparo", "entrega", "pronto"].includes(p.status) ? `<button class="ico-btn" title="Cancelar" data-ac="cancelar" data-id="${p.id}">✕</button>` : "");
     return `<div class="ped ${p.status === "novo" ? "novo" : ""}">
@@ -502,6 +556,7 @@ function desenhaPedidos() {
       <div class="ped-it">${it}</div>
       <div style="font-size:.84rem;color:var(--cinza)">Subtotal ${R(p.subtotal)}${p.tipo === "entrega" ? " · Entrega " + (p.taxa ? R(p.taxa) : "grátis") : ""}${p.desconto ? ` · Cupom ${esc(p.cupom)} -${R(p.desconto)}` : ""}</div>
       <div class="ped-tot"><span>Total</span><span>${R(p.total)}</span></div>
+      ${linhaEnt}
       <div class="ped-acoes">${ac}${extra}</div></div>`;
   }).join("");
 }
@@ -523,12 +578,15 @@ document.addEventListener("click", async e => {
   const ref = F.doc(db, "lojas", uid, "pedidos", p.id);
   if (ac === "zap") return void window.open(zapLink(p.cliente.tel, `Olá, ${p.cliente.nome.split(" ")[0]}! Sobre seu pedido #${p.numero} na ${loja.nome}:`), "_blank");
   if (ac === "imprimir") return imprimir(p);
+  if (ac === "enviarEnt") return abreEnviar(p);
   if ((ac === "recusar" || ac === "cancelar") && !confirmaSimples(b)) return;
   const novoSt = { aceitar: "preparo", entrega: "entrega", pronto: "pronto", concluir: "concluido", recusar: "cancelado", cancelar: "cancelado" }[ac];
   const texto = msgCliente(p, ac);
   if (texto) window.open(zapLink(p.cliente.tel, texto), "_blank");
   try {
     await F.updateDoc(ref, { status: novoSt });
+    const en = entregasPorPedido[p.id];
+    if (novoSt === "cancelado" && en && !["entregue", "cancelado", "recusado"].includes(en.status)) F.updateDoc(F.doc(db, "entregas", en.id), { status: "cancelado", atualizadoEm: F.serverTimestamp() }).catch(() => {});
     if (ac === "aceitar") baixaEstoque(p);
     toast("Pedido #" + p.numero + ": " + ST[novoSt][0]);
   } catch (er) { toast(erroAmigavel(er), "erro"); }
@@ -556,6 +614,68 @@ function imprimir(p) {
   <div style="font-size:15px"><b>TOTAL <span style="float:right">${R(p.total)}</span></b></div><hr><div>Pagamento: ${esc(p.pagamento)}${p.troco ? " (troco p/ " + R(p.troco) + ")" : ""}</div>${p.obs ? `<div>Obs: ${esc(p.obs)}</div>` : ""}
   <script>window.onload=()=>{window.print()}<\/script></body></html>`);
   w.document.close();
+}
+
+// ================= entregadores
+function desenhaEntregadores() {
+  const conta = id => Object.values(entregasPorPedido).filter(x => x.entregadorUid === id && x.status === "entregue").length;
+  const ativas = id => Object.values(entregasPorPedido).filter(x => x.entregadorUid === id && ["enviado", "aceito", "saiu", "chegou"].includes(x.status)).length;
+  $("#listaEnt").innerHTML = entregadoresLoja.length ? `<div class="peds">` + entregadoresLoja.map(e => `<div class="card" style="margin:0">
+      <div style="display:flex;align-items:center;gap:12px"><div class="sem-logo" style="width:46px;height:46px;border-radius:50%;background:var(--cor);color:#fff">${esc((e.nome || "?").slice(0, 1).toUpperCase())}</div>
+      <div style="flex:1;min-width:0"><b style="color:var(--escuro)">${esc(e.nome)}</b><br><small style="color:var(--cinza)">${esc(fmtTel(e.tel))}</small></div>
+      ${ativas(e.id) ? `<span class="badge b-prep">${ativas(e.id)} em rota</span>` : '<span class="badge b-ok">Livre</span>'}</div>
+      <p style="color:var(--cinza);font-size:.84rem;margin:10px 0">${conta(e.id)} entrega(s) feita(s)</p>
+      <div style="display:flex;gap:6px"><a class="btn btn-zap btn-mini" target="_blank" href="${zapLink(e.tel, "Olá, " + (e.nome || "").split(" ")[0] + "!")}">WhatsApp</a><button class="btn btn-perigo btn-mini" data-tira="${e.id}">Remover</button></div></div>`).join("") + "</div>"
+    : `<div class="card vazio"><div class="ic">🏍️</div><b>Nenhum entregador ainda</b><p>Toque em <b>+ Convidar entregador</b> e mande o link pro seu motoboy.</p></div>`;
+  const pend = convitesLoja.filter(c => !c.usado);
+  $("#listaConvites").innerHTML = pend.length ? `<div class="card" style="margin-top:14px"><h3>⏳ Convites esperando aceitar</h3>` + pend.map(c => `<div class="chave"><div><b>${linkConvite(c.id).replace("https://", "")}</b><small>Criado em ${dataBR(ms(c.criadoEm))}</small></div><div style="display:flex;gap:6px"><button class="btn btn-sec btn-mini" data-rever="${c.id}">Mandar de novo</button><button class="ico-btn" data-apaga="${c.id}" title="Apagar">🗑</button></div></div>`).join("") + "</div>" : "";
+}
+const linkConvite = id => new URL("entregador.html?c=" + id, location.href).href;
+function mostraConvite(id) {
+  const link = linkConvite(id), txt = `Olá! Você foi convidado para ser entregador da *${loja.nome}* 🛵\n\nToque no link, crie sua conta e aceite o convite:\n${link}`;
+  $("#linkConvite").value = link;
+  $("#btConvZap").href = "https://wa.me/?text=" + encodeURIComponent(txt);
+  $("#btConvCopia").onclick = () => copiar(link);
+  $("#btConvShare").onclick = async () => { try { await navigator.share({ title: "Convite Pedeki Entregador", text: txt.replace(link, "").trim(), url: link }); } catch (e) { if (e && e.name !== "AbortError") copiar(link); } };
+  abrir("mConvite");
+}
+$("#btConvidar").onclick = async () => {
+  const id = Array.from(crypto.getRandomValues(new Uint8Array(9)), b => "abcdefghijkmnpqrstuvwxyz23456789"[b % 32]).join("");
+  try { await F.setDoc(F.doc(db, "convites", id), { loja: uid, lojaNome: loja.nome, criadoEm: F.serverTimestamp(), usado: false }); mostraConvite(id); }
+  catch (er) { toast(erroAmigavel(er), "erro"); }
+};
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-tira]"), r = e.target.closest("[data-rever]"), a = e.target.closest("[data-apaga]"), es = e.target.closest("[data-escolhe]");
+  if (t) { if (!confirmaSimples(t)) return; await F.deleteDoc(F.doc(db, "lojas", uid, "entregadores", t.dataset.tira)).catch(er => toast(erroAmigavel(er), "erro")); toast("Entregador removido."); }
+  if (r) mostraConvite(r.dataset.rever);
+  if (a) { await F.deleteDoc(F.doc(db, "convites", a.dataset.apaga)).catch(() => {}); toast("Convite apagado."); }
+  if (es) enviarPara(es.dataset.escolhe);
+});
+let pedEnviar = null;
+function abreEnviar(p) {
+  pedEnviar = p;
+  $("#tEnviar").textContent = `Enviar pedido #${p.numero}`;
+  $("#escolheEnt").innerHTML = entregadoresLoja.length ? entregadoresLoja.map(e => {
+    const emRota = Object.values(entregasPorPedido).filter(x => x.entregadorUid === e.id && ["enviado", "aceito", "saiu", "chegou"].includes(x.status)).length;
+    return `<button class="btn btn-sec btn-bloco" style="justify-content:space-between;margin-bottom:8px;padding:14px" data-escolhe="${e.id}"><span>🏍️ <b>${esc(e.nome)}</b></span><span class="badge ${emRota ? "b-prep" : "b-ok"}">${emRota ? emRota + " em rota" : "Livre"}</span></button>`;
+  }).join("") : `<div class="vazio"><div class="ic">🏍️</div><p>Você ainda não tem entregadores.</p><button class="btn btn-pri" data-ir="entregadores" data-fecha>Convidar entregador</button></div>`;
+  abrir("mEnviar");
+}
+async function enviarPara(eid) {
+  const p = pedEnviar, e = entregadoresLoja.find(x => x.id === eid); if (!p || !e) return;
+  try {
+    const b = F.writeBatch(db);
+    b.set(F.doc(db, "entregas", p.id), {
+      loja: uid, lojaNome: loja.nome, lojaTel: loja.whatsapp, pedidoId: p.id, numero: p.numero,
+      entregadorUid: e.id, entregadorNome: e.nome,
+      cliente: { nome: p.cliente.nome, tel: p.cliente.tel, endereco: p.cliente.endereco },
+      itens: p.itens.map(i => i.qtd + "x " + i.nome), total: p.total, pagamento: p.pagamento, troco: p.troco || 0, taxa: p.taxa || 0, obs: p.obs || "",
+      status: "enviado", criadoEm: F.serverTimestamp(), atualizadoEm: F.serverTimestamp()
+    });
+    b.update(F.doc(db, "lojas", uid, "pedidos", p.id), { entregadorUid: e.id, entregadorNome: e.nome });
+    await b.commit();
+    fechar("mEnviar"); toast(`Pedido #${p.numero} enviado para ${e.nome} 🏍️`);
+  } catch (er) { toast(erroAmigavel(er), "erro"); }
 }
 
 // ================= categorias

@@ -1,7 +1,7 @@
 rules_version = '2';
 // =====================================================
 //  REGRAS DE SEGURANÇA DO PEDEKI
-//  Troque SEU_EMAIL_AQUI pelo seu e-mail de administrador.
+//  Administrador: davidsoars2266@gmail.com
 // =====================================================
 service cloud.firestore {
   match /databases/{db}/documents {
@@ -9,7 +9,7 @@ service cloud.firestore {
     function logado() { return request.auth != null; }
     function eu(uid) { return logado() && request.auth.uid == uid; }
     function admin() {
-      return logado() && request.auth.token.email == "SEU_EMAIL_AQUI"
+      return logado() && request.auth.token.email == "davidsoars2266@gmail.com"
         && request.auth.token.email_verified == true;
     }
     // loja dentro do teste grátis ou do plano pago
@@ -41,6 +41,11 @@ service cloud.firestore {
             || (d.testeDias == 7
                 && !exists(wp) && getAfter(wp).data.uid == uid
                 && !exists(cp) && getAfter(cp).data.uid == uid));
+    }
+
+    function conviteOk(l, e) {
+      let p = /databases/$(db)/documents/convites/$(request.resource.data.convite);
+      return get(p).data.loja == l && get(p).data.usado == false && getAfter(p).data.usadoPor == e;
     }
 
     function pedidoOk(uid) {
@@ -116,7 +121,19 @@ service cloud.firestore {
         allow get: if true;
         allow list: if eu(uid) || admin();
         allow create: if ativa(uid) && pedidoOk(uid);
-        allow update, delete: if eu(uid);
+        allow update: if eu(uid)
+          || (logado() && resource.data.entregadorUid == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+              && request.resource.data.status in ['entrega', 'concluido']);
+        allow delete: if eu(uid);
+      }
+      // entregadores da loja (entram só com convite válido)
+      match /entregadores/{e} {
+        allow read: if eu(uid) || (logado() && request.auth.uid == e);
+        allow create: if logado() && request.auth.uid == e && conviteOk(uid, e);
+        allow update: if eu(uid)
+          || (logado() && request.auth.uid == e && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome', 'tel']));
+        allow delete: if eu(uid) || (logado() && request.auth.uid == e);
       }
     }
 
@@ -129,6 +146,41 @@ service cloud.firestore {
     }
 
     // ---------- pagamentos (só o Worker grava) ----------
+    // ---------- convites de entregador ----------
+    match /convites/{c} {
+      allow get: if true;
+      allow list: if logado() && resource.data.loja == request.auth.uid;
+      allow create: if logado() && request.resource.data.loja == request.auth.uid
+        && exists(/databases/$(db)/documents/lojas/$(request.auth.uid))
+        && request.resource.data.usado == false
+        && request.resource.data.keys().hasOnly(['loja', 'lojaNome', 'criadoEm', 'usado']);
+      allow update: if (logado() && resource.data.loja == request.auth.uid)
+        || (logado() && resource.data.usado == false
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usado', 'usadoPor'])
+            && request.resource.data.usado == true && request.resource.data.usadoPor == request.auth.uid);
+      allow delete: if logado() && resource.data.loja == request.auth.uid;
+    }
+
+    // ---------- perfil do entregador ----------
+    match /entregadores/{e} {
+      allow read: if logado();
+      allow write: if logado() && request.auth.uid == e;
+    }
+
+    // ---------- entregas (pedido enviado ao entregador) ----------
+    match /entregas/{id} {
+      allow read: if logado() && (resource.data.loja == request.auth.uid || resource.data.entregadorUid == request.auth.uid);
+      allow create: if logado() && request.resource.data.loja == request.auth.uid
+        && exists(/databases/$(db)/documents/lojas/$(request.auth.uid)/entregadores/$(request.resource.data.entregadorUid));
+      allow update: if logado() && (
+        (resource.data.loja == request.auth.uid && request.resource.data.loja == request.auth.uid
+          && exists(/databases/$(db)/documents/lojas/$(request.auth.uid)/entregadores/$(request.resource.data.entregadorUid)))
+        || (resource.data.entregadorUid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'atualizadoEm'])
+            && request.resource.data.status in ['aceito', 'recusado', 'saiu', 'chegou', 'entregue']));
+      allow delete: if logado() && resource.data.loja == request.auth.uid;
+    }
+
     match /pagamentos/{id} {
       allow read: if admin() || (logado() && resource.data.loja == request.auth.uid);
       allow write: if false;

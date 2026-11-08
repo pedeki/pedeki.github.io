@@ -1,0 +1,17 @@
+{
+  "name": "Pedeki Entregador",
+  "short_name": "Entregador",
+  "description": "Receba as entregas das lojas Pedeki no seu celular.",
+  "lang": "pt-BR",
+  "start_url": "entregador.html",
+  "scope": "entregador",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17151F",
+  "theme_color": "#17151F",
+  "icons": [
+    { "src": "icones/entregador-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icones/entregador-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icones/entregador-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
