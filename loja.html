@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Cardápio</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{background:#F7F5F2;padding-bottom:110px}
+.wrap{max-width:760px;margin:0 auto}
+.capa{height:190px;background:linear-gradient(135deg,#2B1A12,#5A2E18 60%,var(--cor)) center/cover;position:relative}
+@media(min-width:760px){.capa{height:240px;border-radius:0 0 28px 28px}}
+.cab{background:#fff;margin:-44px 14px 0;border-radius:22px;padding:16px;position:relative;box-shadow:0 10px 30px -16px rgba(0,0,0,.25);display:flex;gap:14px;align-items:center}
+.cab .lg{width:76px;height:76px;border-radius:20px;object-fit:cover;flex-shrink:0;border:3px solid #fff;margin-top:-34px;box-shadow:0 6px 16px -6px rgba(0,0,0,.3);background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800;font-size:1.5rem}
+.cab h1{font-size:1.3rem;letter-spacing:-.03em;color:var(--escuro);line-height:1.15}
+.cab p{color:var(--cinza);font-size:.86rem}
+.infos{display:flex;gap:8px;flex-wrap:wrap;margin:12px 14px 0}
+.infos span{background:#fff;border:1px solid var(--linha);border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:600;color:var(--texto)}
+.aviso-loja{margin:12px 14px 0}
+.busca{margin:14px 14px 0;position:relative}
+.busca input{padding-left:40px;border-radius:14px;background:#fff}
+.busca::before{content:"🔍";position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:.9rem}
+.cats{position:sticky;top:0;z-index:20;background:#F7F5F2;padding:12px 14px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cats button{white-space:nowrap;padding:8px 15px;border-radius:999px;background:#fff;border:1px solid var(--linha);font-weight:700;font-size:.85rem;color:var(--cinza);cursor:pointer}
+.cats button.on{background:var(--escuro);color:#fff;border-color:var(--escuro)}
+.secao{padding:10px 14px 0;scroll-margin-top:60px}
+.secao h2{font-size:1.15rem;color:var(--escuro);margin:8px 0 10px;letter-spacing:-.02em}
+.prod{background:#fff;border-radius:18px;padding:12px;display:flex;gap:12px;margin-bottom:10px;cursor:pointer;border:1px solid transparent;transition:border .15s,transform .1s}
+.prod:hover{border-color:var(--linha)}
+.prod:active{transform:scale(.99)}
+.prod .tx{flex:1;min-width:0}
+.prod h3{font-size:.98rem;color:var(--escuro)}
+.prod p{font-size:.83rem;color:var(--cinza);line-height:1.4;margin:3px 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.preco{font-weight:800;color:var(--escuro)}
+.preco s{color:var(--cinza);font-weight:500;font-size:.82rem;margin-left:5px}
+.preco .off{background:var(--verde-claro);color:var(--verde);font-size:.72rem;padding:2px 7px;border-radius:6px;margin-left:6px}
+.prod .ft{width:96px;height:96px;border-radius:14px;object-fit:cover;flex-shrink:0;background:#F3EFEA;display:grid;place-items:center;font-size:2rem}
+.prod.esg{opacity:.5;cursor:default}
+.barra{position:fixed;left:0;right:0;bottom:0;padding:12px 14px calc(12px + env(safe-area-inset-bottom));z-index:50;transform:translateY(130%);transition:transform .3s}
+.barra.on{transform:none}
+.barra button{max-width:732px;margin:0 auto;width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--cor);color:#fff;border:0;border-radius:18px;padding:15px 18px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 14px 30px -12px var(--cor)}
+.barra .q{background:rgba(255,255,255,.25);border-radius:9px;padding:2px 9px;margin-right:10px}
+/* produto modal */
+.p-foto{height:220px;margin:-24px -24px 16px;background:#F3EFEA center/cover;border-radius:24px 24px 0 0;display:grid;place-items:center;font-size:3rem}
+.grp{margin:16px 0}
+.grp-t{display:flex;justify-content:space-between;align-items:center;background:#F7F5F2;margin:0 -24px 8px;padding:10px 24px}
+.grp-t b{color:var(--escuro)}
+.grp-t small{color:var(--cinza)}
+.op{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--linha);cursor:pointer}
+.op span{flex:1}
+.op small{color:var(--cinza)}
+.op input{width:20px;height:20px;accent-color:var(--cor);flex-shrink:0}
+.qtd{display:flex;align-items:center;gap:4px;border:1.5px solid var(--linha);border-radius:14px;padding:4px}
+.qtd button{width:36px;height:36px;border:0;background:none;font-size:1.3rem;color:var(--cor);cursor:pointer;font-weight:700}
+.qtd b{min-width:26px;text-align:center}
+.rod-modal{display:flex;gap:10px;margin-top:18px;position:sticky;bottom:-24px;background:#fff;padding:12px 0 4px}
+.rod-modal .btn{flex:1;justify-content:space-between}
+/* carrinho */
+.it-car{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--linha)}
+.it-car .tx{flex:1;min-width:0}
+.it-car .tx b{color:var(--escuro)}
+.it-car .tx small{display:block;color:var(--cinza);font-size:.8rem}
+.it-car .qtd{height:fit-content}
+.it-car .qtd button{width:30px;height:30px;font-size:1.1rem}
+.resumo div{display:flex;justify-content:space-between;padding:4px 0;font-size:.92rem}
+.resumo .tot{font-weight:800;font-size:1.1rem;color:var(--escuro);border-top:1px dashed var(--linha);margin-top:6px;padding-top:10px}
+.bloco-t{font-weight:800;color:var(--escuro);margin:20px 0 10px;font-size:1rem}
+.rodape{text-align:center;color:var(--cinza);font-size:.8rem;margin:30px 0 10px}
+.rodape a{text-decoration:none;font-weight:700;color:var(--escuro)}
+.fora{max-width:420px;margin:80px auto;text-align:center;padding:20px}
+.fora .ic{font-size:3rem;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="carregando" id="carregando"><div class="giro"></div></div>
+<div id="app" class="oculto">
+  <div class="capa" id="capa"></div>
+  <div class="wrap">
+    <div class="cab"><div id="logo"></div><div style="min-width:0"><h1 id="nome"></h1><p id="desc"></p></div></div>
+    <div class="infos" id="infos"></div>
+    <div class="aviso-loja" id="avisoLoja"></div>
+    <div class="busca"><input id="busca" placeholder="Buscar no cardápio" autocomplete="off"></div>
+    <nav class="cats" id="cats"></nav>
+    <div id="cardapio"></div>
+    <p class="rodape">Cardápio digital por <a href="index.html">Pedeki</a></p>
+  </div>
+</div>
+<div id="foraDoAr" class="fora oculto"></div>
+
+<div class="barra" id="barra"><button id="btCarrinho"><span><span class="q" id="qCar">0</span>Ver carrinho</span><span id="tCar">R$ 0,00</span></button></div>
+
+<!-- produto -->
+<div class="modal" id="mProd"><div class="modal-box" id="boxProd"></div></div>
+<!-- carrinho -->
+<div class="modal" id="mCar"><div class="modal-box">
+  <button class="fechar" data-fecha>✕</button>
+  <h2>Seu pedido</h2>
+  <div id="itensCar"></div>
+  <form id="fPed">
+    <div class="bloco-t">Como você quer receber?</div>
+    <div class="pilulas" id="tipos"></div>
+    <div class="bloco-t">Seus dados</div>
+    <div class="linha2"><div class="campo"><label>Nome</label><input name="nome" required maxlength="60" autocomplete="name"></div>
+      <div class="campo"><label>WhatsApp</label><input name="tel" required inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000"></div></div>
+    <div id="blocoEnd">
+      <div class="linha2"><div class="campo"><label>Rua</label><input name="rua" maxlength="80" autocomplete="address-line1"></div><div class="campo"><label>Número</label><input name="numero" maxlength="10"></div></div>
+      <div class="linha2"><div class="campo"><label>Bairro</label><input name="bairro" maxlength="50"></div><div class="campo"><label>Complemento / referência</label><input name="comp" maxlength="80"></div></div>
+    </div>
+    <div class="bloco-t">Pagamento</div>
+    <div class="pilulas" id="pags"></div>
+    <div class="campo oculto" id="blocoTroco" style="margin-top:12px"><label>Troco para quanto? (deixe vazio se não precisar)</label><input name="troco" inputmode="decimal" placeholder="Ex.: 100,00"></div>
+    <div class="aviso amarelo oculto" id="infoPix" style="margin-top:12px"></div>
+    <div class="bloco-t">Cupom de desconto</div>
+    <div style="display:flex;gap:8px"><input id="cupomIn" placeholder="Digite o código" style="text-transform:uppercase"><button type="button" class="btn btn-escuro" id="btCupom">Aplicar</button></div>
+    <div id="cupomMsg" style="font-size:.84rem;margin-top:6px;min-height:18px"></div>
+    <div class="campo" style="margin-top:6px"><label>Observação do pedido (opcional)</label><input name="obs" maxlength="140" placeholder="Ex.: interfone quebrado, chamar no portão"></div>
+    <div class="resumo" id="resumo"></div>
+    <div id="erroPed" class="aviso vermelho oculto" style="margin-top:12px"></div>
+    <button class="btn btn-zap btn-bloco" id="btConfirmar" style="margin-top:16px;padding:16px;font-size:1.02rem">Confirmar pedido no WhatsApp</button>
+  </form>
+</div></div>
+
+<script src="config.js"></script>
+<script type="module">
+import { db, F, $, $$, R, esc, toast, soNum, zapNum, num, mascaraTel, lojaAtiva, abertaAgora, proximaAbertura, linkPedido } from "./js/base.js";
+
+const slug = new URLSearchParams(location.search).get("l") || "";
+let uid, loja, produtos = [], car = [], cupom = null, tipo = "entrega";
+const chaveCar = () => "pdk_car_" + uid;
+const salvaCar = () => { try { localStorage.setItem(chaveCar(), JSON.stringify(car)); } catch {} };
+
+function foraDoAr(ic, t, p) {
+  $("#carregando")?.remove(); $("#app").classList.add("oculto"); $("#barra").classList.remove("on");
+  $("#foraDoAr").innerHTML = `<div class="ic">${ic}</div><h2 style="color:var(--escuro);margin-bottom:8px">${t}</h2><p style="color:var(--cinza)">${p}</p>`;
+  $("#foraDoAr").classList.remove("oculto");
+}
+
+(async function inicio() {
+  try {
+    if (!slug) return foraDoAr("🔎", "Loja não encontrada", "Confira o link que você recebeu.");
+    const s = await F.getDoc(F.doc(db, "slugs", slug));
+    if (!s.exists()) return foraDoAr("🔎", "Loja não encontrada", "Confira o link que você recebeu.");
+    uid = s.data().uid;
+    try { car = JSON.parse(localStorage.getItem(chaveCar()) || "[]"); } catch { car = []; }
+    const ps = await F.getDocs(F.query(F.collection(db, "lojas", uid, "produtos"), F.orderBy("ordem")));
+    produtos = ps.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.ativo !== false);
+    F.onSnapshot(F.doc(db, "lojas", uid), snap => {
+      loja = snap.data({ serverTimestamps: "estimate" });
+      if (!lojaAtiva(loja)) return foraDoAr("🚧", "Loja indisponível no momento", "Volte mais tarde ou fale com a loja.");
+      $("#foraDoAr").classList.add("oculto"); $("#app").classList.remove("oculto"); $("#carregando")?.remove();
+      desenhaLoja();
+    });
+  } catch (e) { foraDoAr("⚠️", "Não foi possível abrir o cardápio", "Verifique sua internet e tente de novo."); }
+})();
+
+function desenhaLoja() {
+  document.title = loja.nome + " — Cardápio";
+  document.documentElement.style.setProperty("--cor", loja.cor || "#FF5A1F");
+  $("#capa").style.backgroundImage = loja.capa ? `url(${loja.capa})` : "";
+  $("#logo").innerHTML = loja.logo ? `<img class="lg" src="${loja.logo}" alt="">` : `<div class="lg">${esc(loja.nome.slice(0, 2).toUpperCase())}</div>`;
+  $("#nome").textContent = loja.nome;
+  $("#desc").textContent = loja.descricao || loja.endereco || "";
+  const ab = abertaAgora(loja);
+  $("#infos").innerHTML = `<span style="color:${ab ? "var(--verde)" : "var(--vermelho)"}">● ${ab ? "Aberto agora" : "Fechado"}</span>` +
+    (loja.entregaAtiva !== false ? `<span>🛵 ${loja.taxaEntrega ? "Entrega " + R(loja.taxaEntrega) : "Entrega grátis"}</span>` : "") +
+    (loja.tempoEntrega ? `<span>⏱ ${esc(loja.tempoEntrega)}</span>` : "") +
+    (loja.retiradaAtiva !== false ? "<span>🏪 Retirada</span>" : "") +
+    (loja.pedidoMinimo ? `<span>Mínimo ${R(loja.pedidoMinimo)}</span>` : "");
+  $("#avisoLoja").innerHTML = ab ? "" : `<div class="aviso amarelo">A loja está fechada agora${loja.abertoModo === "fechado" ? "" : (proximaAbertura(loja) ? " · abre " + proximaAbertura(loja) : "")}. Você pode olhar o cardápio, mas não dá para pedir.</div>`;
+  desenhaCardapio(); atualizaBarra();
+}
+
+function cats() {
+  const ord = [...(loja.categorias || [])];
+  const temPromo = produtos.some(p => p.precoDe > p.preco);
+  produtos.forEach(p => { if (!ord.includes(p.categoria)) ord.push(p.categoria); });
+  return (temPromo ? ["🔥 Promoções"] : []).concat(ord.filter(c => produtos.some(p => p.categoria === c)));
+}
+function cardProd(p) {
+  const esg = p.estoque === 0, promo = p.precoDe > p.preco;
+  return `<div class="prod ${esg ? "esg" : ""}" data-p="${p.id}">
+    <div class="tx"><h3>${esc(p.nome)}</h3><p>${esc(p.descricao || "")}</p>
+    <div class="preco">${esg ? '<span style="color:var(--vermelho)">Esgotado</span>' : R(p.preco) + (promo ? `<s>${R(p.precoDe)}</s><span class="off">-${Math.round((1 - p.preco / p.precoDe) * 100)}%</span>` : "")}</div></div>
+    ${p.foto ? `<img class="ft" src="${p.foto}" alt="" loading="lazy">` : '<div class="ft">🍽️</div>'}</div>`;
+}
+function desenhaCardapio() {
+  const termo = $("#busca").value.trim().toLowerCase();
+  const lista = termo ? produtos.filter(p => (p.nome + " " + (p.descricao || "")).toLowerCase().includes(termo)) : produtos;
+  const cs = cats();
+  $("#cats").innerHTML = cs.map((c, i) => `<button data-c="${i}">${esc(c)}</button>`).join("");
+  if (!produtos.length) { $("#cardapio").innerHTML = `<div class="vazio"><div class="ic">🍽️</div>O cardápio ainda está sendo montado.</div>`; return; }
+  if (termo) { $("#cardapio").innerHTML = `<div class="secao"><h2>Resultados</h2>${lista.map(cardProd).join("") || '<p style="color:var(--cinza)">Nada encontrado.</p>'}</div>`; return; }
+  $("#cardapio").innerHTML = cs.map((c, i) => {
+    const ps = c === "🔥 Promoções" ? produtos.filter(p => p.precoDe > p.preco) : produtos.filter(p => p.categoria === c);
+    return `<div class="secao" id="sec${i}"><h2>${esc(c)}</h2>${ps.map(cardProd).join("")}</div>`;
+  }).join("");
+}
+$("#busca").oninput = desenhaCardapio;
+$("#cats").onclick = e => { const b = e.target.closest("[data-c]"); if (!b) return; $$("#cats button").forEach(x => x.classList.toggle("on", x === b)); document.getElementById("sec" + b.dataset.c)?.scrollIntoView({ behavior: "smooth" }); };
+$("#cardapio").onclick = e => { const c = e.target.closest("[data-p]"); if (c) abreProd(produtos.find(p => p.id === c.dataset.p)); };
+const obs = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { const i = x.target.id.slice(3); $$("#cats button").forEach(b => b.classList.toggle("on", b.dataset.c === i)); } }), { rootMargin: "-40% 0px -55% 0px" });
+new MutationObserver(() => $$(".secao[id]").forEach(s => obs.observe(s))).observe($("#cardapio"), { childList: true });
+
+// ===== produto
+let pAtual, qtd = 1, escolhas = {};
+function abreProd(p) {
+  if (!p || p.estoque === 0) return;
+  pAtual = p; qtd = 1; escolhas = {};
+  const gs = p.adicionais || [];
+  $("#boxProd").innerHTML = `<button class="fechar" data-fecha>✕</button>
+    <div class="p-foto" style="${p.foto ? `background-image:url(${p.foto})` : ""}">${p.foto ? "" : "🍽️"}</div>
+    <h2 style="padding:0;margin-bottom:6px">${esc(p.nome)}</h2>
+    <p style="color:var(--cinza);margin-bottom:8px">${esc(p.descricao || "")}</p>
+    <div class="preco" style="font-size:1.15rem">${R(p.preco)}${p.precoDe > p.preco ? `<s>${R(p.precoDe)}</s>` : ""}</div>
+    ${gs.map((g, gi) => `<div class="grp"><div class="grp-t"><div><b>${esc(g.nome)}</b><br><small>${g.max === 1 ? "Escolha 1" : "Escolha até " + g.max}</small></div>${g.min > 0 ? '<span class="badge b-escuro" style="background:var(--escuro);color:#fff">Obrigatório</span>' : ""}</div>
+      ${g.opcoes.map((o, oi) => `<label class="op"><span>${esc(o.nome)}${o.preco ? `<br><small>+ ${R(o.preco)}</small>` : ""}</span><input type="${g.max === 1 ? "radio" : "checkbox"}" name="g${gi}" data-g="${gi}" data-o="${oi}"></label>`).join("")}</div>`).join("")}
+    <div class="campo" style="margin-top:14px"><label>Alguma observação?</label><input id="obsItem" maxlength="100" placeholder="Ex.: sem cebola, ponto da carne..."></div>
+    <div class="rod-modal"><div class="qtd"><button type="button" id="qMenos">−</button><b id="qVal">1</b><button type="button" id="qMais">+</button></div>
+    <button class="btn btn-pri" id="btAdd"><span>Adicionar</span><span id="vAdd"></span></button></div>`;
+  $("#mProd").classList.add("on");
+  const atual = () => {
+    const extra = Object.entries(escolhas).reduce((s, [g, os]) => s + os.reduce((t, o) => t + (gs[g].opcoes[o].preco || 0), 0), 0);
+    $("#vAdd").textContent = R((p.preco + extra) * qtd); $("#qVal").textContent = qtd;
+  };
+  $("#boxProd").onchange = e => {
+    const i = e.target; if (i.dataset.g === undefined) return;
+    const g = +i.dataset.g, max = gs[g].max;
+    const marcados = $$(`#boxProd input[data-g="${g}"]:checked`);
+    if (i.type === "checkbox" && marcados.length > max) { i.checked = false; toast(`Escolha no máximo ${max}.`, "erro"); return; }
+    escolhas[g] = $$(`#boxProd input[data-g="${g}"]:checked`).map(x => +x.dataset.o);
+    atual();
+  };
+  $("#qMenos").onclick = () => { if (qtd > 1) { qtd--; atual(); } };
+  $("#qMais").onclick = () => { if (typeof p.estoque === "number" && qtd >= p.estoque) return toast("Só temos " + p.estoque + " em estoque.", "erro"); qtd++; atual(); };
+  $("#btAdd").onclick = () => {
+    for (let gi = 0; gi < gs.length; gi++) if ((escolhas[gi] || []).length < (gs[gi].min || 0)) return toast(`Escolha uma opção em "${gs[gi].nome}".`, "erro");
+    const ads = []; Object.entries(escolhas).forEach(([g, os]) => os.forEach(o => ads.push({ grupo: gs[g].nome, nome: gs[g].opcoes[o].nome, preco: gs[g].opcoes[o].preco || 0 })));
+    const unit = p.preco + ads.reduce((s, a) => s + a.preco, 0);
+    car.push({ pid: p.id, nome: p.nome, qtd, unit, adicionais: ads, obs: $("#obsItem").value.trim() });
+    salvaCar(); atualizaBarra(); $("#mProd").classList.remove("on"); toast("Adicionado ao carrinho ✓");
+  };
+  atual();
+}
+document.addEventListener("click", e => { if (e.target.closest("[data-fecha]") || e.target.classList.contains("modal")) e.target.closest(".modal")?.classList.remove("on"); });
+
+// ===== carrinho
+function limpaCar() { car = car.filter(i => produtos.some(p => p.id === i.pid && p.estoque !== 0)); }
+function atualizaBarra() {
+  limpaCar();
+  const q = car.reduce((s, i) => s + i.qtd, 0), t = car.reduce((s, i) => s + i.unit * i.qtd, 0);
+  $("#qCar").textContent = q; $("#tCar").textContent = R(t);
+  $("#barra").classList.toggle("on", q > 0 && !!loja && lojaAtiva(loja));
+}
+$("#btCarrinho").onclick = abreCar;
+const fp = $("#fPed");
+mascaraTel(fp.tel);
+try { const c = JSON.parse(localStorage.getItem("pdk_cliente") || "{}"); ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => { if (c[k]) fp[k].value = c[k]; }); } catch {}
+function abreCar() {
+  const tipos = [];
+  if (loja.entregaAtiva !== false) tipos.push(["entrega", "🛵 Entrega"]);
+  if (loja.retiradaAtiva !== false) tipos.push(["retirada", "🏪 Retirar na loja"]);
+  if (!tipos.some(t => t[0] === tipo)) tipo = tipos[0]?.[0] || "retirada";
+  $("#tipos").innerHTML = tipos.map(([v, n]) => `<label><input type="radio" name="tipo" value="${v}" ${v === tipo ? "checked" : ""}><span>${n}</span></label>`).join("");
+  const pags = loja.pagamentos?.length ? loja.pagamentos : ["Pix", "Dinheiro"];
+  $("#pags").innerHTML = pags.map((p, i) => `<label><input type="radio" name="pag" value="${esc(p)}" ${i === 0 ? "checked" : ""}><span>${esc(p)}</span></label>`).join("");
+  desenhaCar(); $("#mCar").classList.add("on");
+}
+function totais() {
+  const sub = car.reduce((s, i) => s + i.unit * i.qtd, 0);
+  const taxa = tipo === "entrega" ? (loja.taxaEntrega || 0) : 0;
+  let desc = 0;
+  if (cupom) {
+    if (sub < (cupom.minimo || 0)) desc = 0;
+    else desc = cupom.tipo === "pct" ? sub * cupom.valor / 100 : Math.min(cupom.valor, sub);
+  }
+  desc = Math.round(desc * 100) / 100;
+  return { sub, taxa, desc, tot: Math.max(0, sub + taxa - desc) };
+}
+function desenhaCar() {
+  limpaCar();
+  if (!car.length) { $("#mCar").classList.remove("on"); atualizaBarra(); return; }
+  $("#itensCar").innerHTML = car.map((i, k) => `<div class="it-car"><div class="tx"><b>${esc(i.nome)}</b>${i.adicionais.map(a => `<small>+ ${esc(a.nome)}</small>`).join("")}${i.obs ? `<small>📝 ${esc(i.obs)}</small>` : ""}<div class="preco" style="margin-top:4px">${R(i.unit * i.qtd)}</div></div>
+    <div class="qtd"><button type="button" data-cm="${k}">${i.qtd === 1 ? "🗑" : "−"}</button><b>${i.qtd}</b><button type="button" data-cp="${k}">+</button></div></div>`).join("");
+  $("#blocoEnd").classList.toggle("oculto", tipo !== "entrega");
+  ["rua", "numero", "bairro"].forEach(k => fp[k].required = tipo === "entrega");
+  const pag = fp.querySelector("[name=pag]:checked")?.value || "";
+  $("#blocoTroco").classList.toggle("oculto", pag !== "Dinheiro");
+  $("#infoPix").classList.toggle("oculto", !(pag === "Pix" && loja.chavePix));
+  $("#infoPix").innerHTML = `Chave Pix da loja: <b>${esc(loja.chavePix || "")}</b><br><small>Mande o comprovante no WhatsApp junto com o pedido.</small>`;
+  const t = totais();
+  const falta = (loja.pedidoMinimo || 0) - t.sub;
+  $("#resumo").innerHTML = `<div style="margin-top:18px"><span>Subtotal</span><span>${R(t.sub)}</span></div>` +
+    (tipo === "entrega" ? `<div><span>Taxa de entrega</span><span>${t.taxa ? R(t.taxa) : "Grátis"}</span></div>` : "") +
+    (t.desc ? `<div style="color:var(--verde)"><span>Cupom ${esc(cupom.codigo)}</span><span>- ${R(t.desc)}</span></div>` : "") +
+    `<div class="tot"><span>Total</span><span>${R(t.tot)}</span></div>` +
+    (falta > 0 ? `<div style="color:var(--vermelho);font-size:.84rem">Pedido mínimo: ${R(loja.pedidoMinimo)} (faltam ${R(falta)})</div>` : "");
+  const ab = abertaAgora(loja);
+  $("#btConfirmar").disabled = !ab || falta > 0;
+  $("#btConfirmar").textContent = ab ? "Confirmar pedido no WhatsApp" : "Loja fechada no momento";
+  atualizaBarra();
+}
+$("#itensCar").onclick = e => {
+  const m = e.target.closest("[data-cm]"), p = e.target.closest("[data-cp]");
+  if (m) { const i = car[m.dataset.cm]; i.qtd > 1 ? i.qtd-- : car.splice(m.dataset.cm, 1); }
+  if (p) { const i = car[p.dataset.cp], pr = produtos.find(x => x.id === i.pid); const total = car.filter(x => x.pid === i.pid).reduce((s, x) => s + x.qtd, 0); if (pr && typeof pr.estoque === "number" && total >= pr.estoque) return toast("Estoque máximo atingido.", "erro"); i.qtd++; }
+  if (m || p) { salvaCar(); desenhaCar(); }
+};
+fp.addEventListener("change", e => { if (e.target.name === "tipo") tipo = e.target.value; if (["tipo", "pag"].includes(e.target.name)) desenhaCar(); });
+$("#btCupom").onclick = async () => {
+  const cod = $("#cupomIn").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const msg = $("#cupomMsg");
+  if (!cod) return;
+  try {
+    const s = await F.getDoc(F.doc(db, "lojas", uid, "cupons", cod));
+    if (!s.exists() || !s.data().ativo) { cupom = null; msg.innerHTML = '<span style="color:var(--vermelho)">Cupom inválido.</span>'; }
+    else {
+      const c = s.data(); const t = totais();
+      if (c.minimo && t.sub < c.minimo) { cupom = null; msg.innerHTML = `<span style="color:var(--vermelho)">Esse cupom vale para pedidos acima de ${R(c.minimo)}.</span>`; }
+      else { cupom = { codigo: cod, ...c }; msg.innerHTML = `<span style="color:var(--verde)">✓ Cupom aplicado!</span>`; }
+    }
+  } catch { msg.textContent = "Não foi possível validar o cupom."; }
+  desenhaCar();
+};
+fp.onsubmit = async e => {
+  e.preventDefault();
+  const erro = m => { const b = $("#erroPed"); b.textContent = m; b.classList.remove("oculto"); };
+  $("#erroPed").classList.add("oculto");
+  if (!abertaAgora(loja)) return erro("A loja está fechada agora.");
+  const tel = soNum(fp.tel.value);
+  if (fp.nome.value.trim().length < 2) return erro("Digite seu nome.");
+  if (tel.length < 10) return erro("Digite seu WhatsApp com DDD.");
+  if (tipo === "entrega" && (!fp.rua.value.trim() || !fp.numero.value.trim() || !fp.bairro.value.trim())) return erro("Preencha o endereço de entrega.");
+  const pag = fp.querySelector("[name=pag]:checked")?.value || "";
+  const t = totais();
+  if (cupom && cupom.minimo && t.sub < cupom.minimo) cupom = null;
+  const troco = pag === "Dinheiro" ? num(fp.troco.value) : 0;
+  if (troco && troco < t.tot) return erro("O troco precisa ser maior que o total.");
+  const endereco = tipo === "entrega" ? `${fp.rua.value.trim()}, ${fp.numero.value.trim()} — ${fp.bairro.value.trim()}${fp.comp.value.trim() ? " (" + fp.comp.value.trim() + ")" : ""}` : "";
+  try { localStorage.setItem("pdk_cliente", JSON.stringify({ nome: fp.nome.value.trim(), tel: fp.tel.value, rua: fp.rua.value, numero: fp.numero.value, bairro: fp.bairro.value, comp: fp.comp.value })); } catch {}
+  const bt = $("#btConfirmar"); bt.disabled = true; bt.textContent = "Enviando pedido…";
+  try {
+    const cRef = F.doc(db, "contadores", uid), pRef = F.doc(F.collection(db, "lojas", uid, "pedidos"));
+    await F.runTransaction(db, async tx => {
+      const c = await tx.get(cRef);
+      const n = (c.exists() ? c.data().n : 0) + 1;
+      tx.update(cRef, { n });
+      tx.set(pRef, {
+        numero: n, status: "novo", criadoEm: F.serverTimestamp(), tipo,
+        itens: car.map(i => ({ pid: i.pid, nome: i.nome, qtd: i.qtd, unit: i.unit, adicionais: i.adicionais, obs: i.obs })),
+        subtotal: t.sub, taxa: t.taxa, desconto: t.desc, total: t.tot, cupom: t.desc ? cupom.codigo : "",
+        cliente: { nome: fp.nome.value.trim(), tel, endereco }, pagamento: pag, troco, obs: fp.obs.value.trim()
+      });
+    });
+    car = []; salvaCar(); cupom = null;
+    location.href = linkPedido(uid, pRef.id) + "&z=1";
+  } catch (er) {
+    erro("Não conseguimos enviar seu pedido. Tente de novo." + (er.code === "permission-denied" ? " (loja indisponível)" : ""));
+    bt.disabled = false; bt.textContent = "Confirmar pedido no WhatsApp";
+  }
+};
+</script>
+</body>
+</html>

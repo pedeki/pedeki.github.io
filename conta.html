@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar ou criar loja — Pedeki</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.lado{background:linear-gradient(150deg,#17151F,#3a1d10 70%,#FF5A1F);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between}
+.lado .marca{color:#fff}
+.lado h1{font-size:2.4rem;line-height:1.1;letter-spacing:-.04em;margin:20px 0 14px}
+.lado p{color:#e8dcd4;font-size:1.05rem;max-width:420px}
+.lado ul{list-style:none;display:grid;gap:12px;margin-top:28px}
+.lado li{display:flex;gap:10px;font-weight:600}
+.lado li::before{content:"✓";color:#7CF0A9}
+.form-area{display:flex;align-items:center;justify-content:center;padding:32px 20px}
+.form-box{width:100%;max-width:440px}
+.abas{display:flex;background:#EFEAE5;border-radius:14px;padding:4px;margin-bottom:24px}
+.abas button{flex:1;border:0;background:transparent;padding:11px;border-radius:11px;font-weight:700;cursor:pointer;color:var(--cinza)}
+.abas button.on{background:#fff;color:var(--escuro);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
+.sub{color:var(--cinza);margin-bottom:22px}
+.link{color:var(--cor);font-weight:700;cursor:pointer;background:none;border:0}
+.status-slug{font-size:.78rem;margin-top:5px;min-height:16px}
+.topo-mob{display:none}
+@media(max-width:860px){body{grid-template-columns:1fr}.lado{display:none}.topo-mob{display:block;margin-bottom:22px}}
+</style>
+</head>
+<body>
+<aside class="lado">
+  <a href="index.html" class="marca" id="marcaLado"></a>
+  <div>
+    <h1>Sua loja vendendo pelo WhatsApp hoje mesmo.</h1>
+    <p>Crie seu cardápio digital, receba pedidos organizados e controle tudo pelo celular.</p>
+    <ul><li>7 dias grátis, sem cartão</li><li>Sem taxa por pedido</li><li>Pronto em 10 minutos</li></ul>
+  </div>
+  <small style="opacity:.6">© Pedeki</small>
+</aside>
+
+<main class="form-area">
+  <div class="form-box">
+    <div class="topo-mob"><a href="index.html" id="marcaMob"></a></div>
+
+    <div id="avisoConfig" class="aviso vermelho oculto" style="margin-bottom:16px">⚠️ O site ainda não foi configurado (arquivo config.js).</div>
+
+    <div class="abas" id="abas">
+      <button data-aba="entrar">Entrar</button>
+      <button data-aba="cadastro">Criar loja grátis</button>
+    </div>
+
+    <!-- ENTRAR -->
+    <form id="fEntrar" class="aba" data-aba="entrar">
+      <h2>Bem-vindo de volta 👋</h2>
+      <p class="sub">Entre para ver os pedidos da sua loja.</p>
+      <div class="campo"><label>E-mail</label><input name="email" type="email" required autocomplete="email"></div>
+      <div class="campo"><label>Senha</label><input name="senha" type="password" required autocomplete="current-password"></div>
+      <button class="btn btn-pri btn-bloco" type="submit">Entrar</button>
+      <p style="text-align:center;margin-top:16px"><button type="button" class="link" data-ir="esqueci">Esqueci minha senha</button></p>
+    </form>
+
+    <!-- ESQUECI -->
+    <form id="fEsqueci" class="aba oculto" data-aba="esqueci">
+      <h2>Recuperar senha</h2>
+      <p class="sub">Vamos mandar um link para você criar uma senha nova.</p>
+      <div class="campo"><label>E-mail</label><input name="email" type="email" required></div>
+      <button class="btn btn-pri btn-bloco" type="submit">Enviar link</button>
+      <p style="text-align:center;margin-top:16px"><button type="button" class="link" data-ir="entrar">← Voltar</button></p>
+    </form>
+
+    <!-- CADASTRO -->
+    <form id="fCadastro" class="aba oculto" data-aba="cadastro" novalidate>
+      <h2>Crie sua loja 🚀</h2>
+      <p class="sub">7 dias grátis com tudo liberado.</p>
+      <div class="campo"><label>Nome da loja</label><input name="nome" required maxlength="60" placeholder="Ex.: Burger da Vila"></div>
+      <div class="campo"><label>Link da sua loja</label>
+        <div class="prefixo"><span>pedeki/</span><input name="slug" required maxlength="30" placeholder="burger-da-vila"></div>
+        <div class="status-slug" id="stSlug"></div>
+      </div>
+      <div class="campo"><label>WhatsApp da loja (onde chegam os pedidos)</label><input name="whats" required inputmode="tel" placeholder="(00) 00000-0000"></div>
+      <div class="linha2">
+        <div class="campo"><label>Seu nome</label><input name="dono" required maxlength="60"></div>
+        <div class="campo"><label>CPF</label><input name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></div>
+      </div>
+      <div id="blocoLogin">
+        <div class="campo"><label>E-mail</label><input name="email" type="email" required autocomplete="email"></div>
+        <div class="campo"><label>Senha</label><input name="senha" type="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></div>
+      </div>
+      <div id="erroCad" class="aviso vermelho oculto" style="margin-bottom:12px"></div>
+      <button class="btn btn-pri btn-bloco" type="submit" id="btCad">Criar minha loja grátis</button>
+      <p style="font-size:.78rem;color:var(--cinza);text-align:center;margin-top:12px">O teste grátis é 1 por WhatsApp e por CPF.</p>
+    </form>
+
+    <div id="jaLogado" class="card oculto" style="margin-top:18px;text-align:center">
+      <p style="margin-bottom:12px">Você já está conectado como <b id="emailLog"></b>.</p>
+      <a href="painel.html" class="btn btn-pri">Ir para o painel</a>
+      <button class="btn btn-sec" id="btSair">Sair</button>
+    </div>
+  </div>
+</main>
+
+<script src="config.js"></script>
+<script type="module">
+import { auth, db, F, $, $$, toast, soNum, zapNum, cpfValido, slugify, mascaraTel, erroAmigavel, configurado, marcaHTML, horariosPadrao } from "./js/base.js";
+
+$("#marcaLado").outerHTML = marcaHTML.replace("marca", "marca\" style=\"color:#fff");
+$("#marcaMob").innerHTML = marcaHTML;
+if (!configurado) $("#avisoConfig").classList.remove("oculto");
+
+// ---- abas
+function ir(aba) {
+  $$(".aba").forEach(f => f.classList.toggle("oculto", f.dataset.aba !== aba));
+  $$("#abas button").forEach(b => b.classList.toggle("on", b.dataset.aba === aba));
+  history.replaceState(null, "", "#" + aba);
+}
+$$("#abas button").forEach(b => b.onclick = () => ir(b.dataset.aba));
+$$("[data-ir]").forEach(b => b.onclick = () => ir(b.dataset.ir));
+ir(["cadastro", "esqueci", "entrar"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "entrar");
+
+// ---- estado de login
+let temLoja = false;
+F.onAuthStateChanged(auth, async u => {
+  if (!u) { $("#jaLogado").classList.add("oculto"); $("#blocoLogin").classList.remove("oculto"); return; }
+  const s = await F.getDoc(F.doc(db, "lojas", u.uid)).catch(() => null);
+  temLoja = !!(s && s.exists());
+  if (temLoja) {
+    $("#emailLog").textContent = u.email;
+    $("#jaLogado").classList.remove("oculto");
+  } else {
+    // logado mas sem loja: termina o cadastro
+    $("#blocoLogin").classList.add("oculto");
+    ir("cadastro");
+  }
+});
+$("#btSair").onclick = () => F.signOut(auth).then(() => location.reload());
+
+// ---- entrar
+$("#fEntrar").onsubmit = async e => {
+  e.preventDefault();
+  const f = e.target, bt = f.querySelector("button[type=submit]");
+  bt.disabled = true;
+  try {
+    await F.signInWithEmailAndPassword(auth, f.email.value.trim(), f.senha.value);
+    location.href = "painel.html";
+  } catch (er) { toast(erroAmigavel(er), "erro"); bt.disabled = false; }
+};
+
+// ---- esqueci
+$("#fEsqueci").onsubmit = async e => {
+  e.preventDefault();
+  try { await F.sendPasswordResetEmail(auth, e.target.email.value.trim()); toast("Link enviado! Veja seu e-mail."); ir("entrar"); }
+  catch (er) { toast(erroAmigavel(er), "erro"); }
+};
+
+// ---- cadastro
+const fc = $("#fCadastro");
+mascaraTel(fc.whats);
+fc.cpf.addEventListener("input", () => {
+  let n = soNum(fc.cpf.value).slice(0, 11);
+  fc.cpf.value = n.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+});
+let slugMexido = false;
+fc.nome.addEventListener("input", () => { if (!slugMexido) { fc.slug.value = slugify(fc.nome.value); checaSlug(); } });
+fc.slug.addEventListener("input", () => { slugMexido = true; fc.slug.value = slugify(fc.slug.value); checaSlug(); });
+let tSlug, slugOk = false;
+function checaSlug() {
+  clearTimeout(tSlug);
+  const s = fc.slug.value, st = $("#stSlug");
+  slugOk = false;
+  if (s.length < 3) { st.innerHTML = '<span style="color:var(--cinza)">Mínimo 3 letras</span>'; return; }
+  st.innerHTML = '<span style="color:var(--cinza)">Verificando…</span>';
+  tSlug = setTimeout(async () => {
+    try {
+      const d = await F.getDoc(F.doc(db, "slugs", s));
+      slugOk = !d.exists();
+      st.innerHTML = slugOk ? '<span style="color:var(--verde)">✓ Disponível</span>' : '<span style="color:var(--vermelho)">✕ Esse link já está em uso</span>';
+    } catch { st.textContent = ""; }
+  }, 400);
+}
+
+function falha(msg) { const b = $("#erroCad"); b.textContent = msg; b.classList.remove("oculto"); }
+
+fc.onsubmit = async e => {
+  e.preventDefault();
+  $("#erroCad").classList.add("oculto");
+  const nome = fc.nome.value.trim(), slug = fc.slug.value, whats = zapNum(fc.whats.value),
+        dono = fc.dono.value.trim(), cpf = soNum(fc.cpf.value);
+  if (nome.length < 2) return falha("Digite o nome da loja.");
+  if (slug.length < 3) return falha("O link precisa ter pelo menos 3 letras.");
+  if (whats.length < 12 || whats.length > 13) return falha("Digite o WhatsApp com DDD.");
+  if (dono.length < 2) return falha("Digite seu nome.");
+  if (!cpfValido(cpf)) return falha("CPF inválido.");
+  const bt = $("#btCad"); bt.disabled = true; bt.textContent = "Criando sua loja…";
+  try {
+    const sd = await F.getDoc(F.doc(db, "slugs", slug));
+    if (sd.exists()) throw new Error("Esse link já está em uso. Escolha outro.");
+    let user = auth.currentUser;
+    if (!user) {
+      const email = fc.email.value.trim(), senha = fc.senha.value;
+      if (!email) throw new Error("Digite seu e-mail.");
+      if (senha.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+      user = (await F.createUserWithEmailAndPassword(auth, email, senha)).user;
+      F.sendEmailVerification(user).catch(() => {});
+    }
+    const uid = user.uid;
+    const loja = {
+      nome, slug, whatsapp: whats, descricao: "", logo: "", capa: "", cor: "#FF5A1F",
+      endereco: "", abertoModo: "auto", horarios: horariosPadrao(),
+      entregaAtiva: true, taxaEntrega: 0, retiradaAtiva: true, pedidoMinimo: 0, tempoEntrega: "30–50 min",
+      pagamentos: ["Pix", "Cartão", "Dinheiro"], chavePix: "", categorias: ["Lanches", "Bebidas"],
+      criadoEm: F.serverTimestamp(), pagoAte: F.serverTimestamp()
+    };
+    const privado = { cpf, email: user.email, dono };
+    const montar = comTeste => {
+      const b = F.writeBatch(db);
+      b.set(F.doc(db, "slugs", slug), { uid });
+      if (comTeste) {
+        b.set(F.doc(db, "whatsapps", whats), { uid });
+        b.set(F.doc(db, "cpfs", cpf), { uid });
+      }
+      b.set(F.doc(db, "lojas", uid, "privado", "dados"), privado);
+      b.set(F.doc(db, "lojas", uid), { ...loja, testeDias: comTeste ? 7 : 0 });
+      b.set(F.doc(db, "contadores", uid), { n: 0 });
+      return b.commit();
+    };
+    let ganhouTeste = true;
+    try { await montar(true); }
+    catch (er1) { ganhouTeste = false; await montar(false); }
+    try { sessionStorage.setItem("pdk_boasvindas", ganhouTeste ? "teste" : "semteste"); } catch {}
+    location.href = "painel.html";
+  } catch (er) {
+    falha(erroAmigavel(er));
+    bt.disabled = false; bt.textContent = "Criar minha loja grátis";
+  }
+};
+</script>
+</body>
+</html>

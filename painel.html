@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel — Pedeki</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.lado{background:#fff;border-right:1px solid var(--linha);padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.lado .marca{margin:0 8px 18px}
+.nav-b{display:flex;align-items:center;gap:11px;width:100%;border:0;background:none;padding:11px 12px;border-radius:12px;font-weight:600;color:var(--cinza);cursor:pointer;text-align:left;font-size:.93rem;position:relative}
+.nav-b:hover{background:#F6F2EE;color:var(--escuro)}
+.nav-b.on{background:var(--cor-claro);color:var(--cor)}
+.nav-b .qt{margin-left:auto;background:var(--cor);color:#fff;border-radius:999px;font-size:.7rem;padding:2px 8px;font-weight:800}
+.lado .rodape{margin-top:auto;padding-top:14px;border-top:1px solid var(--linha)}
+.conteudo{min-width:0}
+.topo{display:flex;align-items:center;gap:14px;padding:16px 28px;background:rgba(250,247,244,.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:20;border-bottom:1px solid var(--linha);flex-wrap:wrap}
+.topo .lj{display:flex;align-items:center;gap:12px;min-width:0}
+.topo .lj img,.topo .lj .sem-logo{width:42px;height:42px;border-radius:12px;object-fit:cover;flex-shrink:0}
+.sem-logo{background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800}
+.topo h1{font-size:1.1rem;color:var(--escuro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topo .acoes{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pagina{padding:24px 28px 80px;max-width:1100px}
+.sec{display:none}.sec.on{display:block;animation:sobe .2s}
+.sec-tit{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.sec-tit h2{font-size:1.45rem;letter-spacing:-.03em;color:var(--escuro)}
+.sec-tit p{color:var(--cinza);font-size:.92rem}
+#banners>div{margin-bottom:12px;line-height:1.7}
+#banners .btn{margin-left:8px;vertical-align:middle}
+.menu-mob{display:none}
+@media(max-width:900px){
+  body{grid-template-columns:1fr}
+  .lado{display:none}
+  .menu-mob{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:#fff;border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:25;scrollbar-width:none}
+  .menu-mob::-webkit-scrollbar{display:none}
+  .menu-mob .nav-b{width:auto;white-space:nowrap;padding:9px 13px;font-size:.85rem}
+  .topo{position:static;padding:14px 16px}
+  .pagina{padding:18px 16px 80px}
+}
+/* resumo */
+.numeros{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.numeros .card{padding:16px}
+.numeros small{color:var(--cinza);font-weight:600;font-size:.78rem}
+.numeros strong{display:block;font-size:1.4rem;color:var(--escuro);letter-spacing:-.03em}
+@media(max-width:700px){.numeros{grid-template-columns:1fr 1fr}}
+/* pedidos */
+.filtros{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.filtros button{border:1.5px solid var(--linha);background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:.84rem;cursor:pointer;color:var(--cinza);white-space:nowrap}
+.filtros button.on{background:var(--escuro);border-color:var(--escuro);color:#fff}
+.filtros button span{opacity:.7;margin-left:4px}
+.peds{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.ped{background:#fff;border:1px solid var(--linha);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.ped.novo{border-color:var(--cor);box-shadow:0 0 0 3px color-mix(in srgb,var(--cor) 14%,transparent);animation:pulsa 1.8s infinite}
+@keyframes pulsa{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--cor) 8%,transparent)}}
+.ped-top{display:flex;align-items:center;gap:8px}
+.ped-top b{font-size:1.15rem;color:var(--escuro)}
+.ped-top small{color:var(--cinza)}
+.ped-top .badge{margin-left:auto}
+.ped-cli{font-size:.88rem;background:#FAF7F4;border-radius:12px;padding:10px 12px}
+.ped-cli div{display:flex;gap:6px}
+.ped-it{font-size:.88rem}
+.ped-it .i{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.ped-it .ad{color:var(--cinza);font-size:.8rem;padding-left:14px}
+.ped-tot{display:flex;justify-content:space-between;font-weight:800;color:var(--escuro);border-top:1px dashed var(--linha);padding-top:8px}
+.ped-acoes{display:flex;gap:6px;flex-wrap:wrap}
+.ped-acoes .btn{flex:1}
+/* produtos */
+.cat-bloco{margin-bottom:22px}
+.cat-bloco h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.prod-l{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linha);border-radius:16px;padding:10px 12px;margin-bottom:8px}
+.prod-l .ft{width:56px;height:56px;border-radius:12px;object-fit:cover;background:#F3EFEA;display:grid;place-items:center;font-size:1.5rem;flex-shrink:0}
+.prod-l .inf{flex:1;min-width:0}
+.prod-l .inf b{display:block;color:var(--escuro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod-l .inf small{color:var(--cinza)}
+.prod-l .bts{display:flex;gap:4px;align-items:center}
+.prod-l.off{opacity:.55}
+@media(max-width:560px){.prod-l .bts .mv{display:none}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#F6F2EE;border-radius:999px;padding:6px 6px 6px 14px;font-weight:600;font-size:.88rem}
+.chip button{border:0;background:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:.75rem}
+.foto-up{display:flex;gap:14px;align-items:center}
+.foto-up .pv{width:90px;height:90px;border-radius:16px;background:#F3EFEA center/cover;display:grid;place-items:center;color:var(--cinza);font-size:1.8rem;flex-shrink:0;border:1.5px dashed var(--linha)}
+.capa-pv{height:130px;border-radius:16px;background:#F3EFEA center/cover;display:grid;place-items:center;color:var(--cinza);border:1.5px dashed var(--linha);margin-bottom:10px}
+.grupo-ad{border:1.5px solid var(--linha);border-radius:16px;padding:14px;margin-bottom:10px}
+.op-l{display:grid;grid-template-columns:1fr 110px 36px;gap:6px;margin-bottom:6px}
+.horas{display:grid;gap:8px}
+.hora-l{display:grid;grid-template-columns:100px 54px 1fr 1fr;gap:8px;align-items:center}
+.hora-l input[type=time]{padding:8px}
+.cores{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cores button{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--linha);cursor:pointer}
+.cores input[type=color]{width:44px;height:36px;padding:2px;border-radius:10px}
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.grade2{grid-template-columns:1fr}}
+/* plano */
+.plano-st{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.plano-st .ic{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:1.6rem}
+.plano-preco{font-size:2.4rem;font-weight:800;letter-spacing:-.04em;color:var(--escuro)}
+.pix-qr{width:230px;height:230px;margin:6px auto 14px;border-radius:16px;border:1px solid var(--linha);padding:8px;background:#fff}
+.pix-cc{font-family:ui-monospace,monospace;font-size:.75rem;word-break:break-all;background:#FAF7F4;border-radius:12px;padding:10px;max-height:84px;overflow:auto;margin-bottom:10px}
+.espera{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--cinza);font-weight:600;margin-top:12px}
+.espera .giro{width:20px;height:20px;border-width:3px}
+.sucesso{text-align:center;padding:10px 0}
+.sucesso .ic{font-size:3.4rem;animation:sobe .4s}
+#qrLoja{display:grid;place-items:center;background:#fff;border-radius:16px;padding:14px;width:fit-content;margin:0 auto 12px;border:1px solid var(--linha)}
+.passos-ini{display:grid;gap:8px}
+.passos-ini button{display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--linha);background:#fff;border-radius:14px;padding:12px 14px;cursor:pointer;font-weight:600}
+.passos-ini button .n{width:28px;height:28px;border-radius:50%;background:var(--cor-claro);color:var(--cor);display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.passos-ini button.feito .n{background:var(--verde);color:#fff}
+.passos-ini button.feito{color:var(--cinza);text-decoration:line-through}
+</style>
+</head>
+<body>
+<div class="carregando" id="carregando"><div class="giro"></div></div>
+
+<aside class="lado" id="lado">
+  <a href="index.html" id="marca"></a>
+  <div id="navBotoes"></div>
+  <div class="rodape">
+    <a href="admin.html" class="nav-b oculto" id="lnkAdmin">🛡️ Administração</a>
+    <button class="nav-b" id="btSair">↩ Sair</button>
+  </div>
+</aside>
+
+<div class="conteudo">
+  <nav class="menu-mob" id="menuMob"></nav>
+  <header class="topo">
+    <div class="lj"><div id="topoLogo"></div><div style="min-width:0"><h1 id="topoNome">Sua loja</h1><div id="topoStatus"></div></div></div>
+    <div class="acoes">
+      <button class="btn btn-sec btn-mini" id="btSom">🔕 Ativar som</button>
+      <a class="btn btn-pri btn-mini" id="btVerLoja" target="_blank">Ver minha loja ↗</a>
+    </div>
+  </header>
+
+  <div class="pagina">
+    <div id="banners"></div>
+
+    <!-- PEDIDOS -->
+    <section class="sec" data-sec="pedidos">
+      <div class="sec-tit"><div><h2>Pedidos</h2><p>Os pedidos aparecem aqui na hora, com aviso sonoro.</p></div></div>
+      <div class="numeros">
+        <div class="card"><small>Vendido hoje</small><strong id="nHoje">R$ 0</strong></div>
+        <div class="card"><small>Pedidos hoje</small><strong id="nQtd">0</strong></div>
+        <div class="card"><small>Ticket médio</small><strong id="nTicket">R$ 0</strong></div>
+        <div class="card"><small>Vendido no mês</small><strong id="nMes">R$ 0</strong></div>
+      </div>
+      <div class="card oculto" id="primeirosPassos" style="margin-bottom:18px">
+        <h3>👋 Primeiros passos</h3>
+        <div class="passos-ini" id="passosIni"></div>
+      </div>
+      <div class="filtros" id="filtros"></div>
+      <div class="peds" id="listaPedidos"></div>
+    </section>
+
+    <!-- CARDÁPIO -->
+    <section class="sec" data-sec="cardapio">
+      <div class="sec-tit"><div><h2>Cardápio</h2><p>Seus produtos, preços, fotos e adicionais.</p></div>
+        <button class="btn btn-pri" id="btNovoProd">+ Novo produto</button></div>
+      <div class="card" style="margin-bottom:18px">
+        <h3>Categorias</h3>
+        <div class="chips" id="chipsCat"></div>
+        <form id="fCat" style="display:flex;gap:8px;margin-top:12px"><input name="n" placeholder="Nova categoria (ex.: Pizzas)" maxlength="30"><button class="btn btn-escuro">Adicionar</button></form>
+      </div>
+      <div id="listaProd"></div>
+    </section>
+
+    <!-- CUPONS -->
+    <section class="sec" data-sec="cupons">
+      <div class="sec-tit"><div><h2>Cupons de desconto</h2><p>Crie códigos para seus clientes usarem no carrinho.</p></div>
+        <button class="btn btn-pri" id="btNovoCupom">+ Novo cupom</button></div>
+      <div id="listaCupons"></div>
+    </section>
+
+    <!-- ENTREGA -->
+    <section class="sec" data-sec="entrega">
+      <div class="sec-tit"><div><h2>Entrega e pagamento</h2><p>Como seus clientes recebem e pagam.</p></div></div>
+      <form id="fEntrega">
+        <div class="grade2">
+          <div class="card">
+            <h3>🛵 Entrega</h3>
+            <div class="chave"><div><b>Fazer entregas</b><small>Cliente informa o endereço</small></div><label class="sw"><input type="checkbox" name="entregaAtiva"><span></span></label></div>
+            <div class="linha2" style="margin-top:12px">
+              <div class="campo"><label>Taxa de entrega (R$)</label><input name="taxaEntrega" inputmode="decimal" placeholder="0,00"><small>Deixe 0 para entrega grátis</small></div>
+              <div class="campo"><label>Tempo estimado</label><input name="tempoEntrega" placeholder="30–50 min"></div>
+            </div>
+            <div class="chave"><div><b>Retirada no local</b><small>Cliente busca na loja</small></div><label class="sw"><input type="checkbox" name="retiradaAtiva"><span></span></label></div>
+            <div class="campo" style="margin-top:12px"><label>Pedido mínimo (R$)</label><input name="pedidoMinimo" inputmode="decimal" placeholder="0,00"></div>
+          </div>
+          <div class="card">
+            <h3>💳 Formas de pagamento</h3>
+            <p style="color:var(--cinza);font-size:.88rem;margin-bottom:12px">O cliente paga direto para você, na entrega ou por Pix.</p>
+            <div class="pilulas" id="pilPag"></div>
+            <div class="campo" style="margin-top:16px"><label>Sua chave Pix (opcional)</label><input name="chavePix" maxlength="100" placeholder="CPF, celular, e-mail ou chave aleatória"><small>Aparece para o cliente que escolher Pix</small></div>
+          </div>
+        </div>
+        <button class="btn btn-pri" style="margin-top:16px">Salvar</button>
+      </form>
+    </section>
+
+    <!-- MINHA LOJA -->
+    <section class="sec" data-sec="loja">
+      <div class="sec-tit"><div><h2>Minha loja</h2><p>A cara da sua loja: logo, capa, cores e horários.</p></div></div>
+      <form id="fLoja">
+        <div class="grade2">
+          <div class="card">
+            <h3>Visual</h3>
+            <div class="campo"><label>Capa</label><div class="capa-pv" id="pvCapa">🖼️ Clique para enviar a capa</div><input type="file" accept="image/*" id="upCapa" class="oculto"></div>
+            <div class="campo"><label>Logo</label>
+              <div class="foto-up"><div class="pv" id="pvLogo">🏪</div><div><button type="button" class="btn btn-sec btn-mini" id="btLogo">Enviar logo</button> <button type="button" class="btn btn-perigo btn-mini" id="btTiraLogo">Remover</button><small style="display:block;color:var(--cinza);margin-top:6px">Quadrada, de preferência</small></div></div>
+              <input type="file" accept="image/*" id="upLogo" class="oculto">
+            </div>
+            <div class="campo"><label>Cor da loja</label><div class="cores" id="cores"></div></div>
+          </div>
+          <div class="card">
+            <h3>Informações</h3>
+            <div class="campo"><label>Nome da loja</label><input name="nome" required maxlength="60"></div>
+            <div class="campo"><label>Descrição curta</label><input name="descricao" maxlength="120" placeholder="Ex.: Os melhores lanches artesanais do bairro"></div>
+            <div class="campo"><label>WhatsApp da loja</label><input name="whatsapp" required inputmode="tel"><small>É para esse número que os pedidos vão</small></div>
+            <div class="campo"><label>Endereço da loja</label><input name="endereco" maxlength="150" placeholder="Rua, número, bairro, cidade"></div>
+            <div class="campo"><label>Link da loja</label><input id="slugRO" disabled></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <h3>🕒 Horário de funcionamento</h3>
+          <div class="pilulas" style="margin-bottom:16px">
+            <label><input type="radio" name="abertoModo" value="auto"><span>Automático pelos horários</span></label>
+            <label><input type="radio" name="abertoModo" value="aberto"><span>🟢 Sempre aberta</span></label>
+            <label><input type="radio" name="abertoModo" value="fechado"><span>🔴 Fechada agora</span></label>
+          </div>
+          <div class="horas" id="horas"></div>
+        </div>
+        <button class="btn btn-pri" style="margin-top:16px">Salvar alterações</button>
+      </form>
+    </section>
+
+    <!-- DIVULGAR -->
+    <section class="sec" data-sec="divulgar">
+      <div class="sec-tit"><div><h2>Divulgar</h2><p>Mande seu link para os clientes e coloque o QR Code nas mesas.</p></div></div>
+      <div class="grade2">
+        <div class="card">
+          <h3>🔗 Link da sua loja</h3>
+          <input id="linkLoja" readonly style="margin-bottom:10px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-pri" id="btCopiaLink">Copiar link</button>
+            <a class="btn btn-zap" id="btZapLink" target="_blank">Mandar no WhatsApp</a>
+          </div>
+          <h3 style="margin-top:22px">✍️ Mensagem pronta</h3>
+          <textarea id="msgPronta" rows="5"></textarea>
+          <button class="btn btn-sec btn-mini" id="btCopiaMsg" style="margin-top:8px">Copiar mensagem</button>
+        </div>
+        <div class="card" style="text-align:center">
+          <h3>📱 QR Code</h3>
+          <div id="qrLoja"></div>
+          <a class="btn btn-escuro" id="btBaixaQR" download="qrcode-loja.png">Baixar QR Code</a>
+          <p style="color:var(--cinza);font-size:.85rem;margin-top:10px">Imprima e coloque no balcão, nas mesas e nas embalagens.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANO -->
+    <section class="sec" data-sec="plano">
+      <div class="sec-tit"><div><h2>Meu plano</h2><p>Sua mensalidade e pagamentos.</p></div></div>
+      <div class="card"><div class="plano-st" id="planoSt"></div></div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <div><h3 style="margin:0">Plano Completo</h3><div class="plano-preco" id="planoPreco"></div><small style="color:var(--cinza)" id="planoDias"></small></div>
+          <button class="btn btn-zap" id="btPagar" style="font-size:1.02rem;padding:15px 24px">⚡ Pagar com Pix</button>
+        </div>
+        <p style="color:var(--cinza);font-size:.86rem;margin-top:12px">Pagou, liberou na hora. Se pagar antes de vencer, os dias são somados.</p>
+      </div>
+      <div class="card"><h3>Pagamentos</h3><div id="histPag"><p style="color:var(--cinza)">Nenhum pagamento ainda.</p></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div class="modal" id="mProd"><div class="modal-box">
+  <button class="fechar" data-fecha>✕</button>
+  <h2 id="tProd">Novo produto</h2>
+  <form id="fProd">
+    <div class="campo foto-up"><div class="pv" id="pvProd">📷</div>
+      <div><button type="button" class="btn btn-sec btn-mini" id="btFotoProd">Escolher foto</button> <button type="button" class="btn btn-perigo btn-mini" id="btTiraFoto">Remover</button></div>
+      <input type="file" accept="image/*" id="upProd" class="oculto"></div>
+    <div class="campo"><label>Nome</label><input name="nome" required maxlength="70" placeholder="Ex.: X-Bacon"></div>
+    <div class="campo"><label>Descrição</label><textarea name="descricao" maxlength="250" rows="2" placeholder="Ingredientes, tamanho..."></textarea></div>
+    <div class="campo"><label>Categoria</label><select name="categoria" id="selCat"></select></div>
+    <div class="linha3">
+      <div class="campo"><label>Preço (R$)</label><input name="preco" required inputmode="decimal" placeholder="0,00"></div>
+      <div class="campo"><label>Preço antigo</label><input name="precoDe" inputmode="decimal" placeholder="Opcional"></div>
+      <div class="campo"><label>Estoque</label><input name="estoque" inputmode="numeric" placeholder="Ilimitado"></div>
+    </div>
+    <small style="color:var(--cinza);display:block;margin:-6px 0 14px">Preço antigo maior que o preço = aparece como <b>promoção</b>. Estoque vazio = sem controle. Estoque 0 = esgotado.</small>
+    <div class="chave" style="border:0;padding-top:0"><div><b>Disponível</b><small>Desligue para esconder do cardápio</small></div><label class="sw"><input type="checkbox" name="ativo" checked><span></span></label></div>
+    <h3 style="margin:14px 0 10px;font-size:1rem">Adicionais e opções</h3>
+    <div id="gruposAd"></div>
+    <button type="button" class="btn btn-sec btn-mini" id="btGrupo">+ Grupo de adicionais</button>
+    <div style="display:flex;gap:8px;margin-top:20px"><button class="btn btn-pri" style="flex:1">Salvar produto</button></div>
+  </form>
+</div></div>
+
+<!-- MODAL CUPOM -->
+<div class="modal" id="mCupom"><div class="modal-box">
+  <button class="fechar" data-fecha>✕</button>
+  <h2 id="tCupom">Novo cupom</h2>
+  <form id="fCupom">
+    <div class="campo"><label>Código</label><input name="codigo" required maxlength="20" placeholder="EX.: BEMVINDO" style="text-transform:uppercase"></div>
+    <div class="campo"><label>Tipo de desconto</label>
+      <div class="pilulas"><label><input type="radio" name="tipo" value="pct" checked><span>% Porcentagem</span></label><label><input type="radio" name="tipo" value="fixo"><span>R$ Valor fixo</span></label></div></div>
+    <div class="linha2">
+      <div class="campo"><label>Desconto</label><input name="valor" required inputmode="decimal" placeholder="10"></div>
+      <div class="campo"><label>Pedido mínimo (R$)</label><input name="minimo" inputmode="decimal" placeholder="0,00"></div>
+    </div>
+    <div class="chave" style="border:0"><div><b>Cupom ativo</b></div><label class="sw"><input type="checkbox" name="ativo" checked><span></span></label></div>
+    <button class="btn btn-pri btn-bloco" style="margin-top:12px">Salvar cupom</button>
+  </form>
+</div></div>
+
+<!-- MODAL PIX -->
+<div class="modal" id="mPix"><div class="modal-box" style="max-width:420px;text-align:center">
+  <button class="fechar" data-fecha>✕</button>
+  <div id="pixCorpo"></div>
+</div></div>
+
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, num, dinheiroInput, zapLink, comprimir,
+  ms, fimTeste, validoAte, lojaAtiva, emTeste, dataBR, horaBR, diasRestantes, DIAS, DIAS_NOME, horariosPadrao, abertaAgora,
+  erroAmigavel, marcaHTML, linkLoja, linkPedido } from "./js/base.js";
+
+let user, uid, loja = null, produtos = [], cupons = [], pedidos = [], secAtual = "pedidos";
+const lojaRef = () => F.doc(db, "lojas", uid);
+
+// ================= navegação
+const SECOES = [["pedidos", "📋", "Pedidos"], ["cardapio", "🍔", "Cardápio"], ["cupons", "🏷️", "Cupons"], ["entrega", "🛵", "Entrega e pagamento"], ["loja", "🎨", "Minha loja"], ["divulgar", "📣", "Divulgar"], ["plano", "💳", "Meu plano"]];
+$("#marca").outerHTML = marcaHTML;
+const navHTML = SECOES.map(([s, i, n]) => `<button class="nav-b" data-ir="${s}">${i} ${n}${s === "pedidos" ? '<span class="qt oculto" data-qt></span>' : ""}</button>`).join("");
+$("#navBotoes").innerHTML = navHTML; $("#menuMob").innerHTML = navHTML;
+document.addEventListener("click", e => { const b = e.target.closest("[data-ir]"); if (b) mostrar(b.dataset.ir); });
+function mostrar(s) {
+  if (loja && !lojaAtiva(loja) && s !== "plano") { toast("Seu plano venceu. Renove para usar o painel.", "erro"); s = "plano"; }
+  secAtual = s;
+  $$(".sec").forEach(x => x.classList.toggle("on", x.dataset.sec === s));
+  $$("[data-ir]").forEach(x => x.classList.toggle("on", x.dataset.ir === s));
+  try { history.replaceState(null, "", "#" + s); } catch {}
+  window.scrollTo(0, 0);
+}
+// modais
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-fecha]") || e.target.classList.contains("modal")) {
+    const m = e.target.closest(".modal"); if (m) { m.classList.remove("on"); if (m.id === "mPix") pararPix(); }
+  }
+});
+const abrir = id => $("#" + id).classList.add("on");
+const fechar = id => $("#" + id).classList.remove("on");
+$("#btSair").onclick = () => F.signOut(auth).then(() => location.href = "conta.html#entrar");
+
+// ================= início
+F.onAuthStateChanged(auth, async u => {
+  if (!u) { location.href = "conta.html#entrar"; return; }
+  user = u; uid = u.uid;
+  if (C.adminEmail && u.email === C.adminEmail) $("#lnkAdmin").classList.remove("oculto");
+  const s = await F.getDoc(lojaRef());
+  if (!s.exists()) { location.href = "conta.html#cadastro"; return; }
+  F.onSnapshot(lojaRef(), snap => {
+    const primeira = !loja;
+    loja = snap.data({ serverTimestamps: "estimate" });
+    desenhaTopo(); desenhaBanners(); desenhaPlano(); desenhaCategorias(); desenhaPassos();
+    if (primeira) {
+      preencheEntrega(); preencheLoja(); desenhaDivulgar();
+      $("#carregando").remove();
+      const h = location.hash.slice(1);
+      mostrar(!lojaAtiva(loja) ? "plano" : SECOES.some(x => x[0] === h) ? h : "pedidos");
+    } else if (!lojaAtiva(loja) && secAtual !== "plano") mostrar("plano");
+  });
+  F.onSnapshot(F.query(F.collection(db, "lojas", uid, "produtos"), F.orderBy("ordem")), snap => {
+    produtos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    desenhaProdutos(); desenhaPassos();
+  });
+  F.onSnapshot(F.collection(db, "lojas", uid, "cupons"), snap => {
+    cupons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    desenhaCupons();
+  });
+  let primeiraLeva = true;
+  F.onSnapshot(F.query(F.collection(db, "lojas", uid, "pedidos"), F.orderBy("criadoEm", "desc"), F.limit(200)), snap => {
+    const antes = new Set(pedidos.map(p => p.id));
+    pedidos = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
+    if (!primeiraLeva) {
+      const novos = pedidos.filter(p => !antes.has(p.id) && p.status === "novo");
+      if (novos.length) { tocar(); toast(`🔔 Novo pedido #${novos[0].numero}!`); piscarTitulo(); }
+    }
+    primeiraLeva = false;
+    desenhaPedidos();
+  });
+  carregaPagamentos();
+});
+
+// ================= topo e avisos
+function desenhaTopo() {
+  $("#topoNome").textContent = loja.nome;
+  $("#topoLogo").innerHTML = loja.logo ? `<img src="${loja.logo}" alt="" style="width:42px;height:42px;border-radius:12px;object-fit:cover">` : `<div class="sem-logo" style="width:42px;height:42px;border-radius:12px">${esc(loja.nome.slice(0, 2).toUpperCase())}</div>`;
+  const ab = abertaAgora(loja);
+  $("#topoStatus").innerHTML = !lojaAtiva(loja) ? '<span class="badge b-erro">Plano vencido</span>'
+    : `<span class="badge ${ab ? "b-ok" : "b-cinza"}">${ab ? "● Aberta" : "● Fechada"}</span>`;
+  $("#btVerLoja").href = linkLoja(loja.slug);
+  document.documentElement.style.setProperty("--cor", loja.cor || "#FF5A1F");
+}
+function desenhaBanners() {
+  const b = [];
+  let bv = null; try { bv = sessionStorage.getItem("pdk_boasvindas"); } catch {}
+  if (bv === "teste") b.push(`<div class="aviso verde">🎉 Sua loja foi criada! Você tem <b>${C.diasTeste} dias grátis</b> para testar tudo.</div>`);
+  if (bv === "semteste") b.push(`<div class="aviso amarelo">Esse WhatsApp ou CPF já usou o teste grátis antes. Para ativar sua loja, é só pagar o plano. <button class="btn btn-pri btn-mini" data-ir="plano">Ativar agora</button></div>`);
+  const fim = validoAte(loja), dias = diasRestantes(fim);
+  if (!lojaAtiva(loja)) {
+    if (bv !== "semteste") b.push(`<div class="aviso vermelho">⛔ Seu plano venceu em ${dataBR(fim)}. Sua loja está fora do ar para os clientes. <button class="btn btn-pri btn-mini" data-ir="plano">Renovar agora</button></div>`);
+  } else if (dias <= 3) {
+    b.push(`<div class="aviso laranja">⏳ ${emTeste(loja) ? "Seu teste grátis" : "Seu plano"} termina em <b>${dias} dia${dias > 1 ? "s" : ""}</b> (${dataBR(fim)}). <button class="btn btn-pri btn-mini" data-ir="plano">Pagar agora</button></div>`);
+  }
+  if (user && !user.emailVerified) b.push(`<div class="aviso amarelo" style="font-size:.85rem">📧 Confirme seu e-mail pelo link que enviamos. <button class="btn btn-sec btn-mini" id="btReenvia">Reenviar</button></div>`);
+  $("#banners").innerHTML = b.join("");
+  const r = $("#btReenvia"); if (r) r.onclick = () => F.sendEmailVerification(user).then(() => toast("E-mail reenviado!")).catch(e => toast(erroAmigavel(e), "erro"));
+}
+function desenhaPassos() {
+  if (!loja) return;
+  const passos = [
+    ["loja", "Coloque a logo e a capa da loja", !!loja.logo],
+    ["cardapio", "Cadastre seus produtos", produtos.length > 0],
+    ["entrega", "Configure a entrega e o pagamento", !!loja.entregaConfigurada],
+    ["divulgar", "Divulgue seu link", !!loja.divulgou]
+  ];
+  const tudo = passos.every(p => p[2]);
+  $("#primeirosPassos").classList.toggle("oculto", tudo);
+  $("#passosIni").innerHTML = passos.map(([s, t, ok], i) => `<button class="${ok ? "feito" : ""}" data-ir="${s}"><span class="n">${ok ? "✓" : i + 1}</span>${t}</button>`).join("");
+}
+
+// ================= som e título
+let audio = null, somLigado = false;
+$("#btSom").onclick = () => {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume(); somLigado = true;
+    $("#btSom").textContent = "🔔 Som ligado"; tocar();
+  } catch { toast("Seu navegador não liberou o som.", "erro"); }
+};
+function tocar() {
+  if (!somLigado || !audio) return;
+  [0, .18, .36].forEach((t, i) => {
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = "sine"; o.frequency.value = [880, 1100, 1320][i];
+    g.gain.setValueAtTime(.0001, audio.currentTime + t);
+    g.gain.exponentialRampToValueAtTime(.4, audio.currentTime + t + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .16);
+    o.connect(g).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .18);
+  });
+}
+let tituloT;
+function piscarTitulo() {
+  clearInterval(tituloT); let n = 0;
+  tituloT = setInterval(() => { document.title = n++ % 2 ? "🔔 NOVO PEDIDO!" : "Painel — Pedeki"; if (n > 12) { clearInterval(tituloT); document.title = "Painel — Pedeki"; } }, 900);
+}
+
+// ================= pedidos
+const ST = { novo: ["Novo", "b-novo"], preparo: ["Em preparo", "b-prep"], entrega: ["Saiu p/ entrega", "b-ok"], pronto: ["Pronto p/ retirar", "b-ok"], concluido: ["Concluído", "b-cinza"], cancelado: ["Cancelado", "b-erro"] };
+const FILTROS = [["ativos", "Em andamento", p => ["novo", "preparo", "entrega", "pronto"].includes(p.status)], ["novo", "Novos", p => p.status === "novo"], ["concluido", "Concluídos", p => p.status === "concluido"], ["cancelado", "Cancelados", p => p.status === "cancelado"], ["todos", "Todos", () => true]];
+let filtro = "ativos";
+function desenhaPedidos() {
+  // números
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const mes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  const validos = pedidos.filter(p => p.status !== "cancelado");
+  const ph = validos.filter(p => ms(p.criadoEm) >= hoje.getTime());
+  const th = ph.reduce((s, p) => s + p.total, 0);
+  $("#nHoje").textContent = R(th); $("#nQtd").textContent = ph.length;
+  $("#nTicket").textContent = R(ph.length ? th / ph.length : 0);
+  $("#nMes").textContent = R(validos.filter(p => ms(p.criadoEm) >= mes.getTime()).reduce((s, p) => s + p.total, 0));
+  const qn = pedidos.filter(p => p.status === "novo").length;
+  $$("[data-qt]").forEach(q => { q.textContent = qn; q.classList.toggle("oculto", !qn); });
+  $("#filtros").innerHTML = FILTROS.map(([k, n, f]) => `<button class="${filtro === k ? "on" : ""}" data-f="${k}">${n}<span>${pedidos.filter(f).length}</span></button>`).join("");
+  $$("#filtros button").forEach(b => b.onclick = () => { filtro = b.dataset.f; desenhaPedidos(); });
+  const lista = pedidos.filter(FILTROS.find(f => f[0] === filtro)[2]);
+  if (!lista.length) {
+    $("#listaPedidos").innerHTML = `<div class="card vazio" style="grid-column:1/-1"><div class="ic">🛎️</div><b>Nenhum pedido aqui</b><p>Quando um cliente fizer um pedido, ele aparece aqui na hora.${somLigado ? "" : "<br>Toque em <b>Ativar som</b> lá em cima para ouvir o aviso."}</p></div>`;
+    return;
+  }
+  $("#listaPedidos").innerHTML = lista.map(p => {
+    const [stN, stC] = ST[p.status] || ["?", "b-cinza"];
+    const it = p.itens.map(i => `<div class="i"><span><b>${i.qtd}x</b> ${esc(i.nome)}</span><span>${R(i.unit * i.qtd)}</span></div>` +
+      (i.adicionais || []).map(a => `<div class="ad">+ ${esc(a.nome)}</div>`).join("") + (i.obs ? `<div class="ad">📝 ${esc(i.obs)}</div>` : "")).join("");
+    let ac = "";
+    if (p.status === "novo") ac = `<button class="btn btn-zap btn-mini" data-ac="aceitar" data-id="${p.id}">✓ Aceitar e avisar</button><button class="btn btn-perigo btn-mini" data-ac="recusar" data-id="${p.id}">Recusar</button>`;
+    else if (p.status === "preparo") ac = p.tipo === "entrega" ? `<button class="btn btn-pri btn-mini" data-ac="entrega" data-id="${p.id}">🛵 Saiu para entrega</button>` : `<button class="btn btn-pri btn-mini" data-ac="pronto" data-id="${p.id}">✅ Pronto para retirar</button>`;
+    else if (p.status === "entrega" || p.status === "pronto") ac = `<button class="btn btn-escuro btn-mini" data-ac="concluir" data-id="${p.id}">✓ Concluir</button>`;
+    const extra = `<button class="ico-btn" title="Conversar no WhatsApp" data-ac="zap" data-id="${p.id}">💬</button><button class="ico-btn" title="Imprimir" data-ac="imprimir" data-id="${p.id}">🖨️</button>` +
+      (["preparo", "entrega", "pronto"].includes(p.status) ? `<button class="ico-btn" title="Cancelar" data-ac="cancelar" data-id="${p.id}">✕</button>` : "");
+    return `<div class="ped ${p.status === "novo" ? "novo" : ""}">
+      <div class="ped-top"><b>#${p.numero}</b><small>${horaBR(ms(p.criadoEm))} · ${dataBR(ms(p.criadoEm))}</small><span class="badge ${stC}">${stN}</span></div>
+      <div class="ped-cli"><div><b>${esc(p.cliente.nome)}</b> · ${esc(fmtTel(p.cliente.tel))}</div>
+        <div>${p.tipo === "entrega" ? "🛵 " + esc(p.cliente.endereco) : "🏪 Retirada no local"}</div>
+        <div>💳 ${esc(p.pagamento)}${p.troco ? " · troco p/ " + R(p.troco) : ""}</div>${p.obs ? `<div>📝 ${esc(p.obs)}</div>` : ""}</div>
+      <div class="ped-it">${it}</div>
+      <div style="font-size:.84rem;color:var(--cinza)">Subtotal ${R(p.subtotal)}${p.tipo === "entrega" ? " · Entrega " + (p.taxa ? R(p.taxa) : "grátis") : ""}${p.desconto ? ` · Cupom ${esc(p.cupom)} -${R(p.desconto)}` : ""}</div>
+      <div class="ped-tot"><span>Total</span><span>${R(p.total)}</span></div>
+      <div class="ped-acoes">${ac}${extra}</div></div>`;
+  }).join("");
+}
+function msgCliente(p, tipo) {
+  const link = linkPedido(uid, p.id), n = p.cliente.nome.split(" ")[0];
+  const m = {
+    aceitar: `Olá, ${n}! 😄\nSeu pedido *#${p.numero}* na *${loja.nome}* foi recebido e já está em preparo! 👨‍🍳\n${p.tipo === "entrega" ? "Tempo estimado: " + (loja.tempoEntrega || "em breve") + "." : "Avisaremos quando estiver pronto para retirar."}\n\nAcompanhe aqui: ${link}`,
+    entrega: `${n}, seu pedido *#${p.numero}* saiu para entrega! 🛵\nJá já chega aí.`,
+    pronto: `${n}, seu pedido *#${p.numero}* está pronto para retirar! ✅\n${loja.endereco ? "📍 " + loja.endereco : ""}`,
+    recusar: `Olá, ${n}. Infelizmente não conseguimos aceitar seu pedido *#${p.numero}* agora. 😔\nDesculpe pelo transtorno!`,
+    cancelar: `Olá, ${n}. Seu pedido *#${p.numero}* foi cancelado. Qualquer dúvida, é só chamar aqui.`
+  };
+  return m[tipo] || "";
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-ac]"); if (!b) return;
+  const p = pedidos.find(x => x.id === b.dataset.id); if (!p) return;
+  const ac = b.dataset.ac;
+  const ref = F.doc(db, "lojas", uid, "pedidos", p.id);
+  if (ac === "zap") return void window.open(zapLink(p.cliente.tel, `Olá, ${p.cliente.nome.split(" ")[0]}! Sobre seu pedido #${p.numero} na ${loja.nome}:`), "_blank");
+  if (ac === "imprimir") return imprimir(p);
+  if ((ac === "recusar" || ac === "cancelar") && !confirmaSimples(b)) return;
+  const novoSt = { aceitar: "preparo", entrega: "entrega", pronto: "pronto", concluir: "concluido", recusar: "cancelado", cancelar: "cancelado" }[ac];
+  const texto = msgCliente(p, ac);
+  if (texto) window.open(zapLink(p.cliente.tel, texto), "_blank");
+  try {
+    await F.updateDoc(ref, { status: novoSt });
+    if (ac === "aceitar") baixaEstoque(p);
+    toast("Pedido #" + p.numero + ": " + ST[novoSt][0]);
+  } catch (er) { toast(erroAmigavel(er), "erro"); }
+});
+function confirmaSimples(b) {
+  if (b.dataset.conf === "1") return true;
+  b.dataset.conf = "1"; const t = b.innerHTML; b.innerHTML = "Toque de novo p/ confirmar";
+  setTimeout(() => { b.dataset.conf = ""; b.innerHTML = t; }, 3000);
+  return false;
+}
+function baixaEstoque(p) {
+  p.itens.forEach(i => {
+    const pr = produtos.find(x => x.id === i.pid);
+    if (pr && typeof pr.estoque === "number") F.updateDoc(F.doc(db, "lojas", uid, "produtos", pr.id), { estoque: Math.max(0, pr.estoque - i.qtd) }).catch(() => {});
+  });
+}
+function imprimir(p) {
+  const w = window.open("", "_blank", "width=380,height=600");
+  if (!w) return toast("Libere as janelas (pop-up) para imprimir.", "erro");
+  const it = p.itens.map(i => `<div>${i.qtd}x ${esc(i.nome)} <span style="float:right">${R(i.unit * i.qtd)}</span></div>` + (i.adicionais || []).map(a => `<div style="padding-left:12px">+ ${esc(a.nome)}</div>`).join("") + (i.obs ? `<div style="padding-left:12px">Obs: ${esc(i.obs)}</div>` : "")).join("");
+  w.document.write(`<html><head><title>Pedido #${p.numero}</title></head><body style="font-family:monospace;font-size:13px;width:280px">
+  <h3 style="text-align:center;margin:0">${esc(loja.nome)}</h3><p style="text-align:center;margin:4px 0">Pedido #${p.numero} · ${horaBR(ms(p.criadoEm))} ${dataBR(ms(p.criadoEm))}</p><hr>
+  <div><b>${esc(p.cliente.nome)}</b> ${esc(fmtTel(p.cliente.tel))}</div><div>${p.tipo === "entrega" ? "ENTREGA: " + esc(p.cliente.endereco) : "RETIRADA NO LOCAL"}</div><hr>${it}<hr>
+  <div>Subtotal <span style="float:right">${R(p.subtotal)}</span></div>${p.tipo === "entrega" ? `<div>Entrega <span style="float:right">${R(p.taxa)}</span></div>` : ""}${p.desconto ? `<div>Desconto <span style="float:right">-${R(p.desconto)}</span></div>` : ""}
+  <div style="font-size:15px"><b>TOTAL <span style="float:right">${R(p.total)}</span></b></div><hr><div>Pagamento: ${esc(p.pagamento)}${p.troco ? " (troco p/ " + R(p.troco) + ")" : ""}</div>${p.obs ? `<div>Obs: ${esc(p.obs)}</div>` : ""}
+  <script>window.onload=()=>{window.print()}<\/script></body></html>`);
+  w.document.close();
+}
+
+// ================= categorias
+function desenhaCategorias() {
+  const cats = loja.categorias || [];
+  $("#chipsCat").innerHTML = cats.length ? cats.map((c, i) => `<span class="chip">${esc(c)}
+    <button type="button" title="Mover para a esquerda" data-cat="esq" data-i="${i}">◀</button>
+    <button type="button" title="Renomear" data-cat="ren" data-i="${i}">✎</button>
+    <button type="button" title="Apagar" data-cat="del" data-i="${i}">✕</button></span>`).join("") : '<span style="color:var(--cinza)">Nenhuma categoria ainda.</span>';
+  $("#selCat").innerHTML = cats.map(c => `<option>${esc(c)}</option>`).join("");
+}
+$("#fCat").onsubmit = async e => {
+  e.preventDefault();
+  const n = e.target.n.value.trim(); if (!n) return;
+  const cats = loja.categorias || [];
+  if (cats.some(c => c.toLowerCase() === n.toLowerCase())) return toast("Essa categoria já existe.", "erro");
+  await F.updateDoc(lojaRef(), { categorias: [...cats, n] });
+  e.target.n.value = ""; toast("Categoria criada!");
+};
+$("#chipsCat").onclick = async e => {
+  const b = e.target.closest("[data-cat]"); if (!b) return;
+  const cats = [...(loja.categorias || [])], i = +b.dataset.i, velho = cats[i];
+  if (b.dataset.cat === "esq") { if (i === 0) return; [cats[i - 1], cats[i]] = [cats[i], cats[i - 1]]; return F.updateDoc(lojaRef(), { categorias: cats }); }
+  if (b.dataset.cat === "ren") {
+    const chip = b.parentElement;
+    chip.innerHTML = `<input value="${esc(velho)}" style="width:140px;padding:4px 8px;border-radius:8px" maxlength="30"><button type="button">✓</button>`;
+    const inp = chip.querySelector("input"); inp.focus();
+    const salvar = async () => {
+      const nv = inp.value.trim(); if (!nv || nv === velho) return desenhaCategorias();
+      cats[i] = nv; await F.updateDoc(lojaRef(), { categorias: cats });
+      for (const p of produtos.filter(p => p.categoria === velho)) await F.updateDoc(F.doc(db, "lojas", uid, "produtos", p.id), { categoria: nv });
+      toast("Categoria renomeada!");
+    };
+    chip.querySelector("button").onclick = salvar; inp.onkeydown = ev => { if (ev.key === "Enter") { ev.preventDefault(); salvar(); } };
+    return;
+  }
+  if (b.dataset.cat === "del") {
+    const qt = produtos.filter(p => p.categoria === velho).length;
+    if (qt) return toast(`Essa categoria tem ${qt} produto(s). Mude eles de categoria antes.`, "erro");
+    if (!confirmaSimples(b)) return;
+    cats.splice(i, 1); await F.updateDoc(lojaRef(), { categorias: cats }); toast("Categoria apagada.");
+  }
+};
+
+// ================= produtos
+function desenhaProdutos() {
+  const cats = [...(loja?.categorias || [])];
+  produtos.forEach(p => { if (!cats.includes(p.categoria)) cats.push(p.categoria || "Outros"); });
+  if (!produtos.length) { $("#listaProd").innerHTML = `<div class="card vazio"><div class="ic">🍔</div><b>Seu cardápio está vazio</b><p>Clique em <b>+ Novo produto</b> para começar.</p></div>`; return; }
+  $("#listaProd").innerHTML = cats.map(c => {
+    const ps = produtos.filter(p => (p.categoria || "Outros") === c);
+    if (!ps.length) return "";
+    return `<div class="cat-bloco"><h4>${esc(c)} <span class="badge b-cinza">${ps.length}</span></h4>` + ps.map(p => {
+      const promo = p.precoDe && p.precoDe > p.preco, esg = p.estoque === 0;
+      return `<div class="prod-l ${p.ativo === false ? "off" : ""}">
+        ${p.foto ? `<img class="ft" src="${p.foto}" alt="">` : '<div class="ft">🍽️</div>'}
+        <div class="inf"><b>${esc(p.nome)}</b><small>${R(p.preco)}${promo ? ` <s>${R(p.precoDe)}</s> <span class="badge b-novo">Promo</span>` : ""}${esg ? ' <span class="badge b-erro">Esgotado</span>' : typeof p.estoque === "number" ? ` · estoque ${p.estoque}` : ""}${(p.adicionais || []).length ? " · " + p.adicionais.length + " grupo(s) de adicionais" : ""}</small></div>
+        <div class="bts"><label class="sw" title="Disponível"><input type="checkbox" data-pativo="${p.id}" ${p.ativo !== false ? "checked" : ""}><span></span></label>
+        <button class="ico-btn mv" data-pmv="-1" data-id="${p.id}" title="Subir">↑</button><button class="ico-btn mv" data-pmv="1" data-id="${p.id}" title="Descer">↓</button>
+        <button class="ico-btn" data-ped="${p.id}" title="Editar">✎</button><button class="ico-btn" data-pdel="${p.id}" title="Apagar">🗑</button></div></div>`;
+    }).join("") + "</div>";
+  }).join("");
+}
+$("#listaProd").addEventListener("change", e => {
+  const id = e.target.dataset.pativo; if (!id) return;
+  F.updateDoc(F.doc(db, "lojas", uid, "produtos", id), { ativo: e.target.checked }).then(() => toast(e.target.checked ? "Produto visível" : "Produto escondido"));
+});
+$("#listaProd").addEventListener("click", async e => {
+  const ed = e.target.closest("[data-ped]"), del = e.target.closest("[data-pdel]"), mv = e.target.closest("[data-pmv]");
+  if (ed) abreProduto(produtos.find(p => p.id === ed.dataset.ped));
+  if (del) { if (!confirmaSimples(del)) return; await F.deleteDoc(F.doc(db, "lojas", uid, "produtos", del.dataset.pdel)); toast("Produto apagado."); }
+  if (mv) {
+    const p = produtos.find(x => x.id === mv.dataset.id), irmaos = produtos.filter(x => x.categoria === p.categoria);
+    const j = irmaos.indexOf(p) + +mv.dataset.pmv, o = irmaos[j]; if (!o) return;
+    const b = F.writeBatch(db);
+    b.update(F.doc(db, "lojas", uid, "produtos", p.id), { ordem: o.ordem });
+    b.update(F.doc(db, "lojas", uid, "produtos", o.id), { ordem: p.ordem });
+    await b.commit();
+  }
+});
+let prodEdit = null, fotoProd = "";
+const fp = $("#fProd");
+$("#btNovoProd").onclick = () => abreProduto(null);
+function abreProduto(p) {
+  if (!(loja.categorias || []).length) { toast("Crie uma categoria primeiro (ex.: Lanches).", "erro"); return; }
+  prodEdit = p; fotoProd = p?.foto || "";
+  $("#tProd").textContent = p ? "Editar produto" : "Novo produto";
+  fp.reset();
+  fp.nome.value = p?.nome || ""; fp.descricao.value = p?.descricao || "";
+  desenhaCategorias(); if (p) fp.categoria.value = p.categoria;
+  fp.preco.value = dinheiroInput(p?.preco); fp.precoDe.value = dinheiroInput(p?.precoDe);
+  fp.estoque.value = typeof p?.estoque === "number" ? p.estoque : "";
+  fp.ativo.checked = p ? p.ativo !== false : true;
+  pvFoto(); desenhaGrupos(JSON.parse(JSON.stringify(p?.adicionais || [])));
+  abrir("mProd");
+}
+function pvFoto() { const v = $("#pvProd"); v.style.backgroundImage = fotoProd ? `url(${fotoProd})` : ""; v.textContent = fotoProd ? "" : "📷"; }
+$("#btFotoProd").onclick = () => $("#upProd").click();
+$("#pvProd").onclick = () => $("#upProd").click();
+$("#btTiraFoto").onclick = () => { fotoProd = ""; pvFoto(); };
+$("#upProd").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { fotoProd = await comprimir(f, 640, 640, .75); pvFoto(); } catch { toast("Não consegui abrir essa imagem.", "erro"); } e.target.value = ""; };
+let grupos = [];
+function desenhaGrupos(g) {
+  if (g) grupos = g;
+  $("#gruposAd").innerHTML = grupos.map((gr, gi) => `<div class="grupo-ad">
+    <div style="display:flex;gap:8px;margin-bottom:8px"><input placeholder="Nome do grupo (ex.: Adicionais)" value="${esc(gr.nome)}" data-g="${gi}" data-k="nome"><button type="button" class="ico-btn" data-gdel="${gi}">🗑</button></div>
+    <div class="linha2" style="margin-bottom:8px"><div><small style="color:var(--cinza)">Mínimo (0 = opcional)</small><input type="number" min="0" value="${gr.min || 0}" data-g="${gi}" data-k="min"></div><div><small style="color:var(--cinza)">Máximo de escolhas</small><input type="number" min="1" value="${gr.max || 1}" data-g="${gi}" data-k="max"></div></div>
+    ${(gr.opcoes || []).map((o, oi) => `<div class="op-l"><input placeholder="Opção (ex.: Bacon)" value="${esc(o.nome)}" data-g="${gi}" data-o="${oi}" data-k="nome"><input placeholder="+ R$ 0,00" inputmode="decimal" value="${o.preco ? dinheiroInput(o.preco) : ""}" data-g="${gi}" data-o="${oi}" data-k="preco"><button type="button" class="ico-btn" data-odel="${gi}-${oi}">✕</button></div>`).join("")}
+    <button type="button" class="btn btn-sec btn-mini" data-oadd="${gi}">+ Opção</button></div>`).join("");
+}
+$("#gruposAd").addEventListener("input", e => {
+  const t = e.target, g = t.dataset.g; if (g === undefined) return;
+  if (t.dataset.o !== undefined) grupos[g].opcoes[t.dataset.o][t.dataset.k] = t.dataset.k === "preco" ? num(t.value) : t.value;
+  else grupos[g][t.dataset.k] = t.dataset.k === "nome" ? t.value : Math.max(0, parseInt(t.value) || 0);
+});
+$("#gruposAd").addEventListener("click", e => {
+  const a = e.target.closest("[data-oadd]"), d = e.target.closest("[data-odel]"), gd = e.target.closest("[data-gdel]");
+  if (a) { grupos[a.dataset.oadd].opcoes.push({ nome: "", preco: 0 }); desenhaGrupos(); }
+  if (d) { const [g, o] = d.dataset.odel.split("-"); grupos[g].opcoes.splice(o, 1); desenhaGrupos(); }
+  if (gd) { grupos.splice(gd.dataset.gdel, 1); desenhaGrupos(); }
+});
+$("#btGrupo").onclick = () => { grupos.push({ nome: "Adicionais", min: 0, max: 3, opcoes: [{ nome: "", preco: 0 }] }); desenhaGrupos(); };
+fp.onsubmit = async e => {
+  e.preventDefault();
+  const preco = num(fp.preco.value); if (preco <= 0) return toast("Digite o preço.", "erro");
+  const precoDe = num(fp.precoDe.value);
+  const est = fp.estoque.value.trim();
+  const ads = grupos.map(g => ({ nome: g.nome.trim() || "Adicionais", min: Math.min(g.min || 0, g.max || 1), max: Math.max(1, g.max || 1), opcoes: (g.opcoes || []).filter(o => o.nome.trim()).map(o => ({ nome: o.nome.trim(), preco: num(o.preco) })) })).filter(g => g.opcoes.length);
+  const dados = {
+    nome: fp.nome.value.trim(), descricao: fp.descricao.value.trim(), categoria: fp.categoria.value,
+    preco, precoDe: precoDe > preco ? precoDe : null, estoque: est === "" ? null : Math.max(0, parseInt(est) || 0),
+    ativo: fp.ativo.checked, foto: fotoProd, adicionais: ads
+  };
+  const bt = fp.querySelector("button:not([type=button])"); bt.disabled = true;
+  try {
+    if (prodEdit) await F.updateDoc(F.doc(db, "lojas", uid, "produtos", prodEdit.id), dados);
+    else await F.addDoc(F.collection(db, "lojas", uid, "produtos"), { ...dados, ordem: Date.now() });
+    fechar("mProd"); toast("Produto salvo!");
+  } catch (er) { toast(erroAmigavel(er), "erro"); }
+  bt.disabled = false;
+};
+
+// ================= cupons
+function desenhaCupons() {
+  if (!cupons.length) { $("#listaCupons").innerHTML = `<div class="card vazio"><div class="ic">🏷️</div><b>Nenhum cupom</b><p>Crie um cupom como <b>BEMVINDO</b> com 10% de desconto para atrair clientes novos.</p></div>`; return; }
+  $("#listaCupons").innerHTML = `<div class="peds">` + cupons.map(c => `<div class="card" style="margin:0">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:1.15rem;letter-spacing:.04em;color:var(--escuro)">${esc(c.id)}</b><span class="badge ${c.ativo ? "b-ok" : "b-cinza"}">${c.ativo ? "Ativo" : "Pausado"}</span></div>
+    <p style="color:var(--cinza);margin:6px 0 12px">${c.tipo === "pct" ? c.valor + "% de desconto" : R(c.valor) + " de desconto"}${c.minimo ? " · mínimo " + R(c.minimo) : ""}</p>
+    <div style="display:flex;gap:6px"><button class="btn btn-sec btn-mini" data-ced="${esc(c.id)}">Editar</button><button class="btn btn-perigo btn-mini" data-cdel="${esc(c.id)}">Apagar</button></div></div>`).join("") + "</div>";
+}
+let cupomEdit = null;
+const fcu = $("#fCupom");
+$("#btNovoCupom").onclick = () => abreCupom(null);
+function abreCupom(c) {
+  cupomEdit = c; fcu.reset();
+  $("#tCupom").textContent = c ? "Editar cupom" : "Novo cupom";
+  fcu.codigo.value = c?.id || ""; fcu.codigo.disabled = !!c;
+  if (c) { fcu.tipo.value = c.tipo; fcu.valor.value = c.tipo === "pct" ? c.valor : dinheiroInput(c.valor); fcu.minimo.value = c.minimo ? dinheiroInput(c.minimo) : ""; fcu.ativo.checked = c.ativo; }
+  abrir("mCupom");
+}
+$("#listaCupons").onclick = async e => {
+  const ed = e.target.closest("[data-ced]"), del = e.target.closest("[data-cdel]");
+  if (ed) abreCupom(cupons.find(c => c.id === ed.dataset.ced));
+  if (del) { if (!confirmaSimples(del)) return; await F.deleteDoc(F.doc(db, "lojas", uid, "cupons", del.dataset.cdel)); toast("Cupom apagado."); }
+};
+fcu.onsubmit = async e => {
+  e.preventDefault();
+  const cod = (cupomEdit?.id || fcu.codigo.value).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (cod.length < 3) return toast("O código precisa ter pelo menos 3 letras/números.", "erro");
+  const tipo = fcu.tipo.value, valor = num(fcu.valor.value);
+  if (valor <= 0 || (tipo === "pct" && valor > 100)) return toast("Valor do desconto inválido.", "erro");
+  if (!cupomEdit && cupons.some(c => c.id === cod)) return toast("Já existe um cupom com esse código.", "erro");
+  await F.setDoc(F.doc(db, "lojas", uid, "cupons", cod), { tipo, valor, minimo: num(fcu.minimo.value), ativo: fcu.ativo.checked });
+  fechar("mCupom"); toast("Cupom salvo!");
+};
+
+// ================= entrega
+const PAGS = ["Pix", "Cartão", "Cartão de crédito", "Cartão de débito", "Dinheiro", "Vale-refeição"];
+function preencheEntrega() {
+  const f = $("#fEntrega");
+  f.entregaAtiva.checked = loja.entregaAtiva !== false; f.retiradaAtiva.checked = loja.retiradaAtiva !== false;
+  f.taxaEntrega.value = dinheiroInput(loja.taxaEntrega || 0); f.tempoEntrega.value = loja.tempoEntrega || "";
+  f.pedidoMinimo.value = dinheiroInput(loja.pedidoMinimo || 0); f.chavePix.value = loja.chavePix || "";
+  $("#pilPag").innerHTML = PAGS.map(p => `<label><input type="checkbox" value="${p}" ${(loja.pagamentos || []).includes(p) ? "checked" : ""}><span>${p}</span></label>`).join("");
+}
+$("#fEntrega").onsubmit = async e => {
+  e.preventDefault(); const f = e.target;
+  const pags = $$("#pilPag input:checked").map(i => i.value);
+  if (!pags.length) return toast("Escolha pelo menos uma forma de pagamento.", "erro");
+  if (!f.entregaAtiva.checked && !f.retiradaAtiva.checked) return toast("Ative entrega ou retirada (ou os dois).", "erro");
+  await F.updateDoc(lojaRef(), { entregaAtiva: f.entregaAtiva.checked, retiradaAtiva: f.retiradaAtiva.checked, taxaEntrega: num(f.taxaEntrega.value), tempoEntrega: f.tempoEntrega.value.trim(), pedidoMinimo: num(f.pedidoMinimo.value), pagamentos: pags, chavePix: f.chavePix.value.trim(), entregaConfigurada: true });
+  toast("Salvo!");
+};
+
+// ================= minha loja
+let logoNovo, capaNova, corNova;
+const CORES = ["#FF5A1F", "#E5484D", "#D6336C", "#7C3AED", "#2563EB", "#0EA5E9", "#16A34A", "#CA8A04", "#17151F"];
+function preencheLoja() {
+  const f = $("#fLoja");
+  logoNovo = loja.logo || ""; capaNova = loja.capa || ""; corNova = loja.cor || "#FF5A1F";
+  f.nome.value = loja.nome; f.descricao.value = loja.descricao || ""; f.whatsapp.value = fmtTel(loja.whatsapp); f.endereco.value = loja.endereco || "";
+  $("#slugRO").value = linkLoja(loja.slug);
+  f.querySelector(`[name=abertoModo][value=${loja.abertoModo || "auto"}]`).checked = true;
+  const h = loja.horarios || horariosPadrao();
+  $("#horas").innerHTML = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"].map(d => `<div class="hora-l"><b>${DIAS_NOME[d]}</b><label class="sw"><input type="checkbox" data-hd="${d}" ${h[d]?.on ? "checked" : ""}><span></span></label><input type="time" data-ha="${d}" value="${h[d]?.ab || "18:00"}"><input type="time" data-hf="${d}" value="${h[d]?.fe || "23:30"}"></div>`).join("") + '<small style="color:var(--cinza)">Se fecha depois da meia-noite, é só colocar o horário (ex.: abre 18:00, fecha 02:00).</small>';
+  pvLoja(); desenhaCores();
+}
+mascaraTel($("#fLoja").whatsapp);
+function pvLoja() {
+  const l = $("#pvLogo"), c = $("#pvCapa");
+  l.style.backgroundImage = logoNovo ? `url(${logoNovo})` : ""; l.textContent = logoNovo ? "" : "🏪";
+  c.style.backgroundImage = capaNova ? `url(${capaNova})` : ""; c.textContent = capaNova ? "" : "🖼️ Clique para enviar a capa";
+}
+function desenhaCores() {
+  $("#cores").innerHTML = CORES.map(c => `<button type="button" data-cor="${c}" style="background:${c};${c === corNova ? "box-shadow:0 0 0 3px " + c : ""}"></button>`).join("") + `<input type="color" id="corLivre" value="${corNova}" title="Outra cor">`;
+  $("#corLivre").oninput = e => { corNova = e.target.value; document.documentElement.style.setProperty("--cor", corNova); };
+}
+$("#cores").onclick = e => { const b = e.target.closest("[data-cor]"); if (!b) return; corNova = b.dataset.cor; document.documentElement.style.setProperty("--cor", corNova); desenhaCores(); };
+$("#btLogo").onclick = () => $("#upLogo").click(); $("#pvLogo").onclick = () => $("#upLogo").click();
+$("#btTiraLogo").onclick = () => { logoNovo = ""; pvLoja(); };
+$("#pvCapa").onclick = () => $("#upCapa").click();
+$("#upLogo").onchange = async e => { const f = e.target.files[0]; if (f) { try { logoNovo = await comprimir(f, 300, 300, .85); pvLoja(); } catch { toast("Imagem inválida", "erro"); } } e.target.value = ""; };
+$("#upCapa").onchange = async e => { const f = e.target.files[0]; if (f) { try { capaNova = await comprimir(f, 1200, 500, .75); pvLoja(); } catch { toast("Imagem inválida", "erro"); } } e.target.value = ""; };
+$("#fLoja").onsubmit = async e => {
+  e.preventDefault(); const f = e.target;
+  const whats = zapNum(f.whatsapp.value);
+  if (whats.length < 12 || whats.length > 13) return toast("WhatsApp inválido. Coloque com DDD.", "erro");
+  const horarios = {};
+  DIAS.forEach(d => horarios[d] = { on: $(`[data-hd=${d}]`).checked, ab: $(`[data-ha=${d}]`).value || "18:00", fe: $(`[data-hf=${d}]`).value || "23:30" });
+  const dados = { nome: f.nome.value.trim(), descricao: f.descricao.value.trim(), endereco: f.endereco.value.trim(), logo: logoNovo, capa: capaNova, cor: corNova, horarios, abertoModo: f.abertoModo.value, whatsapp: whats };
+  const bt = f.querySelector("button:not([type=button])"); bt.disabled = true;
+  try {
+    if (whats !== loja.whatsapp) {
+      // trocar o WhatsApp: o número novo precisa estar livre (regra do teste grátis)
+      try { const b = F.writeBatch(db); b.set(F.doc(db, "whatsapps", whats), { uid }); b.update(lojaRef(), dados); await b.commit(); }
+      catch { await F.updateDoc(lojaRef(), dados); }
+    } else await F.updateDoc(lojaRef(), dados);
+    toast("Loja atualizada!"); desenhaDivulgar();
+  } catch (er) {
+    toast(er.code === "permission-denied" && whats !== loja.whatsapp ? "Esse WhatsApp já foi usado em outra loja no teste grátis. Ative o plano para poder usar ele." : erroAmigavel(er), "erro");
+  }
+  bt.disabled = false;
+};
+
+// ================= divulgar
+function desenhaDivulgar() {
+  const link = linkLoja(loja.slug);
+  $("#linkLoja").value = link;
+  $("#msgPronta").value = `🍔 Agora você pode pedir na *${loja.nome}* pelo nosso cardápio online!\n\nÉ só escolher, montar o pedido e enviar pelo WhatsApp 👇\n${link}`;
+  $("#btZapLink").href = "https://wa.me/?text=" + encodeURIComponent($("#msgPronta").value);
+  const box = $("#qrLoja"); box.innerHTML = "";
+  if (window.QRCode) {
+    new QRCode(box, { text: link, width: 220, height: 220, colorDark: "#17151F", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+    setTimeout(() => { const c = box.querySelector("canvas"); if (c) $("#btBaixaQR").href = c.toDataURL("image/png"); }, 200);
+  }
+}
+async function copiar(t) { try { await navigator.clipboard.writeText(t); toast("Copiado!"); } catch { toast("Não consegui copiar. Selecione e copie manualmente.", "erro"); } }
+const marcaDivulgou = () => { if (!loja.divulgou) F.updateDoc(lojaRef(), { divulgou: true }).catch(() => {}); };
+$("#btCopiaLink").onclick = () => { copiar($("#linkLoja").value); marcaDivulgou(); };
+$("#btCopiaMsg").onclick = () => { copiar($("#msgPronta").value); marcaDivulgou(); };
+$("#btZapLink").addEventListener("click", marcaDivulgou);
+$("#btBaixaQR").addEventListener("click", marcaDivulgou);
+
+// ================= plano e pagamento (BetterSell via Worker)
+function desenhaPlano() {
+  const fim = validoAte(loja), ativa = lojaAtiva(loja), teste = emTeste(loja);
+  $("#planoPreco").innerHTML = R(C.preco) + '<small style="font-size:1rem;color:var(--cinza);font-weight:600">/mês</small>';
+  $("#planoDias").textContent = `Libera ${C.diasPlano} dias por pagamento`;
+  $("#planoSt").innerHTML = ativa
+    ? `<div class="ic" style="background:${teste ? "var(--cor-claro)" : "var(--verde-claro)"}">${teste ? "🎁" : "✅"}</div><div><b style="font-size:1.1rem;color:var(--escuro)">${teste ? "Teste grátis" : "Plano ativo"}</b><div style="color:var(--cinza)">${teste ? "Termina" : "Válido até"} em <b>${dataBR(fim)}</b> · faltam ${diasRestantes(fim)} dia(s)</div></div>`
+    : `<div class="ic" style="background:#FDECEC">⛔</div><div><b style="font-size:1.1rem;color:var(--vermelho)">Plano vencido</b><div style="color:var(--cinza)">Sua loja está fora do ar para os clientes. Pague para liberar na hora.</div></div>`;
+}
+async function carregaPagamentos() {
+  try {
+    const s = await F.getDocs(F.query(F.collection(db, "pagamentos"), F.where("loja", "==", uid)));
+    const l = s.docs.map(d => d.data()).sort((a, b) => ms(b.pagoEm) - ms(a.pagoEm));
+    if (l.length) $("#histPag").innerHTML = l.map(p => `<div class="chave"><div><b>${R(p.valor)}</b><small>${dataBR(ms(p.pagoEm))} · +${p.dias} dias</small></div><span class="badge b-ok">Pago</span></div>`).join("");
+  } catch {}
+}
+let pixTimer = null, pixCont = null;
+function pararPix() { clearInterval(pixTimer); clearInterval(pixCont); pixTimer = pixCont = null; }
+$("#btPagar").onclick = gerarPix;
+async function gerarPix() {
+  const corpo = $("#pixCorpo");
+  corpo.innerHTML = `<h2 style="padding:0">Gerando seu Pix…</h2><div class="espera"><div class="giro"></div>Aguarde um instante</div>`;
+  abrir("mPix");
+  try {
+    if (!C.worker || C.worker.includes("SEU-USUARIO")) throw new Error("O pagamento ainda não foi configurado (worker no config.js).");
+    const r = await fetch(C.worker.replace(/\/$/, "") + "/cobrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ loja: uid }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.id) throw new Error(d.erro || "Não foi possível gerar o Pix agora.");
+    const exp = Date.parse(d.expires_at) || Date.now() + 30 * 60e3;
+    const img = d.qr_code_base64 ? `data:image/png;base64,${d.qr_code_base64}` : "";
+    corpo.innerHTML = `<h2 style="padding:0 30px">Pague com Pix</h2>
+      <div style="font-size:2rem;font-weight:800;color:var(--escuro);letter-spacing:-.03em">${R(d.amount)}</div>
+      <p style="color:var(--cinza);font-size:.9rem">Abra o app do seu banco e escaneie o QR Code</p>
+      ${img ? `<img class="pix-qr" id="pixImg" src="${img}" alt="QR Code Pix">` : ""}
+      <p style="font-weight:700;margin-bottom:6px;font-size:.9rem">Ou use o Pix copia e cola:</p>
+      <div class="pix-cc" id="pixCC">${esc(d.copy_paste)}</div>
+      <button class="btn btn-pri btn-bloco" id="btCopiaPix">📋 Copiar código Pix</button>
+      <div class="espera"><div class="giro"></div><span>Aguardando pagamento… <span id="pixTempo"></span></span></div>`;
+    $("#btCopiaPix").onclick = () => copiar(d.copy_paste);
+    pararPix();
+    pixCont = setInterval(() => {
+      const s = Math.max(0, Math.floor((exp - Date.now()) / 1000));
+      const t = $("#pixTempo"); if (t) t.textContent = `(expira em ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")})`;
+      if (!s) { pararPix(); corpo.innerHTML = `<h2 style="padding:0">Pix expirado</h2><p style="color:var(--cinza);margin-bottom:16px">Esse código venceu. Gere um novo.</p><button class="btn btn-pri btn-bloco" id="btNovoPix">Gerar novo Pix</button>`; $("#btNovoPix").onclick = gerarPix; }
+    }, 1000);
+    pixTimer = setInterval(async () => {
+      try {
+        const s = await (await fetch(C.worker.replace(/\/$/, "") + "/status?id=" + encodeURIComponent(d.id))).json();
+        if (s.paid) pago(s);
+      } catch {}
+    }, 5000);
+  } catch (er) {
+    corpo.innerHTML = `<h2 style="padding:0">Ops!</h2><p style="color:var(--cinza);margin-bottom:16px">${esc(er.message)}</p><button class="btn btn-pri btn-bloco" id="btDeNovo">Tentar de novo</button>`;
+    $("#btDeNovo").onclick = gerarPix;
+  }
+}
+function pago(s) {
+  pararPix();
+  $("#pixCorpo").innerHTML = `<div class="sucesso"><div class="ic">🎉</div><h2 style="padding:0;margin:8px 0">Pagamento confirmado!</h2>
+    <p style="color:var(--cinza);margin-bottom:18px">Sua loja está liberada${s.validoAte ? " até <b>" + dataBR(Date.parse(s.validoAte)) + "</b>" : ""}. Obrigado!</p>
+    <button class="btn btn-pri btn-bloco" data-fecha>Continuar</button></div>`;
+  try { sessionStorage.removeItem("pdk_boasvindas"); } catch {}
+  carregaPagamentos();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+rules_version = '2';
+// =====================================================
+//  REGRAS DE SEGURANÇA DO PEDEKI
+//  Troque SEU_EMAIL_AQUI pelo seu e-mail de administrador.
+// =====================================================
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function logado() { return request.auth != null; }
+    function eu(uid) { return logado() && request.auth.uid == uid; }
+    function admin() {
+      return logado() && request.auth.token.email == "SEU_EMAIL_AQUI"
+        && request.auth.token.email_verified == true;
+    }
+    // loja dentro do teste grátis ou do plano pago
+    function ativa(l) {
+      let d = get(/databases/$(db)/documents/lojas/$(l)).data;
+      return d.criadoEm + duration.value(d.testeDias, 'd') > request.time
+        || d.pagoAte > request.time;
+    }
+
+    // o WhatsApp é dessa loja (já era dela) ou está sendo registrado agora
+    function zapDaLoja(uid, w) {
+      let p = /databases/$(db)/documents/whatsapps/$(w);
+      return (exists(p) && get(p).data.uid == uid)
+        || (!exists(p) && getAfter(p).data.uid == uid);
+    }
+
+    function criacaoOk(uid) {
+      let d = request.resource.data;
+      let priv = getAfter(/databases/$(db)/documents/lojas/$(uid)/privado/dados).data;
+      let wp = /databases/$(db)/documents/whatsapps/$(d.whatsapp);
+      let cp = /databases/$(db)/documents/cpfs/$(priv.cpf);
+      return d.keys().hasAll(['nome', 'slug', 'whatsapp', 'criadoEm', 'testeDias', 'pagoAte'])
+        && d.nome is string && d.nome.size() > 0 && d.nome.size() <= 60
+        && d.criadoEm == request.time
+        && d.pagoAte == request.time
+        && d.whatsapp is string && d.whatsapp.matches('^[0-9]{12,13}$')
+        && getAfter(/databases/$(db)/documents/slugs/$(d.slug)).data.uid == uid
+        && (d.testeDias == 0
+            || (d.testeDias == 7
+                && !exists(wp) && getAfter(wp).data.uid == uid
+                && !exists(cp) && getAfter(cp).data.uid == uid));
+    }
+
+    function pedidoOk(uid) {
+      let d = request.resource.data;
+      let cont = /databases/$(db)/documents/contadores/$(uid);
+      return d.keys().hasOnly(['numero', 'status', 'criadoEm', 'tipo', 'itens', 'subtotal', 'taxa',
+                               'desconto', 'total', 'cupom', 'cliente', 'pagamento', 'troco', 'obs'])
+        && d.status == 'novo'
+        && d.criadoEm == request.time
+        && d.tipo in ['entrega', 'retirada']
+        && d.itens is list && d.itens.size() > 0 && d.itens.size() <= 60
+        && d.total is number && d.total >= 0
+        && d.cliente.nome is string && d.cliente.tel is string
+        && d.numero == get(cont).data.n + 1
+        && d.numero == getAfter(cont).data.n;
+    }
+
+    // ---------- registros únicos (ninguém pode ler) ----------
+    match /slugs/{s} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if logado() && s.matches('^[a-z0-9-]{3,30}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /whatsapps/{w} {
+      allow read: if false;
+      allow create: if logado() && w.matches('^[0-9]{12,13}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /cpfs/{c} {
+      allow read: if false;
+      allow create: if logado() && c.matches('^[0-9]{11}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ---------- lojas ----------
+    match /lojas/{uid} {
+      allow read: if true;
+      allow create: if eu(uid) && criacaoOk(uid);
+      allow update: if
+        (eu(uid)
+          && !request.resource.data.diff(resource.data).affectedKeys()
+               .hasAny(['criadoEm', 'testeDias', 'pagoAte', 'slug'])
+          && request.resource.data.whatsapp.matches('^[0-9]{12,13}$')
+          && (request.resource.data.whatsapp == resource.data.whatsapp
+              || resource.data.pagoAte > request.time
+              || zapDaLoja(uid, request.resource.data.whatsapp)))
+        || (admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pagoAte']));
+      allow delete: if false;
+
+      match /privado/{d} {
+        allow read: if eu(uid) || admin();
+        allow create: if eu(uid) && d == 'dados'
+          && request.resource.data.cpf is string && request.resource.data.cpf.matches('^[0-9]{11}$');
+        allow update: if eu(uid) && request.resource.data.cpf == resource.data.cpf;
+        allow delete: if false;
+      }
+      match /produtos/{p} {
+        allow read: if true;
+        allow write: if eu(uid);
+      }
+      match /cupons/{c} {
+        allow get: if true;
+        allow list, write: if eu(uid);
+      }
+      match /pedidos/{p} {
+        allow get: if true;
+        allow list: if eu(uid) || admin();
+        allow create: if ativa(uid) && pedidoOk(uid);
+        allow update, delete: if eu(uid);
+      }
+    }
+
+    // ---------- contador de pedidos (#1, #2, #3...) ----------
+    match /contadores/{uid} {
+      allow read: if true;
+      allow create: if eu(uid) && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 0;
+      allow update: if request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == resource.data.n + 1;
+      allow delete: if false;
+    }
+
+    // ---------- pagamentos (só o Worker grava) ----------
+    match /pagamentos/{id} {
+      allow read: if admin() || (logado() && resource.data.loja == request.auth.uid);
+      allow write: if false;
+    }
+  }
+}

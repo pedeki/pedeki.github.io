@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedeki — Cardápio digital com pedidos no WhatsApp</title>
+<meta name="description" content="Cardápio digital para lanchonetes, pizzarias, açaí e restaurantes. Carrinho, cupons, taxa de entrega e pedidos direto no WhatsApp. Teste 7 dias grátis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --laranja:#FF5A1F; --laranja2:#FF8A3D; --laranja-claro:#FFF1E8;
+  --escuro:#17151F; --texto:#2B2836; --cinza:#6E6A7C; --linha:#EDE8E3;
+  --fundo:#FFFAF5; --branco:#fff; --verde:#1FAF5A; --zap:#25D366;
+  --raio:18px; --sombra:0 20px 50px -20px rgba(40,20,10,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fundo);color:var(--texto);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:inherit;font-weight:700;border-radius:999px;padding:14px 24px;transition:transform .15s,box-shadow .15s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--laranja),var(--laranja2));color:#fff;box-shadow:0 10px 24px -8px rgba(255,90,31,.6)}
+.btn-pri:hover{box-shadow:0 14px 30px -8px rgba(255,90,31,.75);transform:translateY(-1px)}
+.btn-sec{background:#fff;color:var(--escuro);border:1.5px solid var(--linha)}
+.btn-sec:hover{border-color:var(--laranja)}
+.btn-ghost{background:transparent;color:var(--escuro);padding:10px 16px}
+.btn-ghost:hover{color:var(--laranja)}
+
+/* topo */
+header{position:sticky;top:0;z-index:50;background:rgba(255,250,245,.85);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border .2s}
+header.rolou{border-bottom-color:var(--linha)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.marca{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.45rem;letter-spacing:-.03em;color:var(--escuro)}
+.marca svg{width:38px;height:38px}
+.marca b{color:var(--laranja)}
+.menu{display:flex;gap:28px;font-weight:600;color:var(--cinza);font-size:.95rem}
+.menu a:hover{color:var(--laranja)}
+.acoes{display:flex;gap:8px;align-items:center}
+.acoes .btn-pri{padding:11px 20px}
+@media(max-width:880px){.menu{display:none}}
+@media(max-width:480px){.acoes .btn-ghost{display:none}.marca{font-size:1.25rem}}
+
+/* hero */
+.hero{padding:56px 0 80px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;width:700px;height:700px;right:-200px;top:-160px;background:radial-gradient(circle,rgba(255,138,61,.22),transparent 65%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;position:relative}
+.selo{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--linha);padding:7px 14px 7px 8px;border-radius:999px;font-size:.85rem;font-weight:600;color:var(--cinza)}
+.selo span{background:var(--laranja-claro);color:var(--laranja);padding:3px 10px;border-radius:999px;font-weight:700}
+h1{font-size:clamp(2.3rem,5.2vw,3.9rem);line-height:1.05;letter-spacing:-.045em;color:var(--escuro);margin:22px 0 18px;font-weight:800}
+h1 em{font-style:normal;background:linear-gradient(135deg,var(--laranja),var(--laranja2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:1.15rem;color:var(--cinza);max-width:520px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 26px}
+.garantias{display:flex;gap:22px;flex-wrap:wrap;font-size:.9rem;color:var(--cinza);font-weight:600}
+.garantias div{display:flex;align-items:center;gap:7px}
+.garantias svg{width:18px;height:18px;color:var(--verde)}
+@media(max-width:920px){.hero-grid{grid-template-columns:1fr}.hero{padding-top:30px}}
+
+/* celular */
+.cel-area{display:flex;justify-content:center;position:relative}
+.cel{width:320px;height:640px;background:var(--escuro);border-radius:46px;padding:11px;box-shadow:0 40px 80px -30px rgba(23,21,31,.55),0 0 0 1px rgba(255,255,255,.06) inset;position:relative}
+.cel::before{content:"";position:absolute;top:20px;left:50%;transform:translateX(-50%);width:96px;height:24px;background:var(--escuro);border-radius:20px;z-index:5}
+.tela{width:100%;height:100%;background:#F7F5F2;border-radius:36px;overflow:hidden;position:relative;font-size:13px}
+.flutua{position:absolute;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:var(--sombra);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:10px;z-index:6;animation:boia 4s ease-in-out infinite}
+.flutua .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:1.1rem}
+.flutua small{display:block;color:var(--cinza);font-weight:500;font-size:.75rem}
+.f1{left:-10px;top:110px}.f2{right:-14px;bottom:120px;animation-delay:1.5s}
+@keyframes boia{50%{transform:translateY(-8px)}}
+@media(max-width:420px){.f1,.f2{display:none}.cel{width:300px;height:610px}}
+
+/* telas do app demo */
+.view{position:absolute;inset:0;display:flex;flex-direction:column;transition:transform .35s ease,opacity .35s}
+.view.escondida{transform:translateX(100%);opacity:0;pointer-events:none}
+.capa{height:118px;background:linear-gradient(135deg,#2B1A12,#5A2E18 60%,#FF7A2F);position:relative;flex-shrink:0}
+.capa::after{content:"🍔";position:absolute;right:18px;top:36px;font-size:46px;opacity:.9}
+.loja-topo{background:#fff;margin:-30px 12px 0;border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;position:relative;box-shadow:0 6px 18px -8px rgba(0,0,0,.2)}
+.loja-logo{width:44px;height:44px;border-radius:12px;background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0}
+.loja-topo h4{font-size:14px;color:var(--escuro)}
+.loja-topo p{font-size:11px;color:var(--cinza)}
+.aberto{color:var(--verde);font-weight:700}
+.cats{display:flex;gap:6px;padding:12px 12px 6px;overflow-x:auto;scrollbar-width:none}
+.cats span{white-space:nowrap;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--linha);font-weight:600;font-size:11.5px;color:var(--cinza)}
+.cats span.on{background:var(--escuro);color:#fff;border-color:var(--escuro)}
+.lista{flex:1;overflow-y:auto;padding:4px 12px 90px;scrollbar-width:none}
+.lista::-webkit-scrollbar,.cats::-webkit-scrollbar{display:none}
+.prod{background:#fff;border-radius:14px;padding:10px;display:flex;gap:10px;margin-bottom:8px;align-items:center}
+.prod .foto{width:62px;height:62px;border-radius:12px;display:grid;place-items:center;font-size:30px;flex-shrink:0}
+.prod h5{font-size:13px;color:var(--escuro)}
+.prod p{font-size:11px;color:var(--cinza);line-height:1.35;margin:2px 0 4px}
+.preco{font-weight:800;color:var(--escuro);font-size:13px}
+.preco s{color:var(--cinza);font-weight:500;font-size:11px;margin-left:4px}
+.tag{display:inline-block;background:var(--laranja-claro);color:var(--laranja);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:6px;margin-left:4px;vertical-align:middle}
+.add{margin-left:auto;width:30px;height:30px;border-radius:10px;border:0;background:var(--laranja);color:#fff;font-size:18px;font-weight:700;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.add:active{transform:scale(.85)}
+.barra-car{position:absolute;left:12px;right:12px;bottom:14px;background:var(--laranja);color:#fff;border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700;cursor:pointer;transform:translateY(120%);transition:transform .3s;box-shadow:0 10px 24px -8px rgba(255,90,31,.7)}
+.barra-car.mostra{transform:none}
+.barra-car .qtd{background:rgba(255,255,255,.25);border-radius:8px;padding:2px 8px;margin-right:8px}
+.topo-v{display:flex;align-items:center;gap:10px;padding:46px 14px 12px;background:#fff;border-bottom:1px solid var(--linha);flex-shrink:0}
+.topo-v button{border:0;background:#F3F0EC;width:30px;height:30px;border-radius:10px;cursor:pointer;font-size:15px}
+.topo-v h4{font-size:15px;color:var(--escuro)}
+.corpo-v{flex:1;overflow-y:auto;padding:12px;scrollbar-width:none}
+.bloco{background:#fff;border-radius:14px;padding:12px;margin-bottom:10px}
+.bloco h6{font-size:12px;color:var(--cinza);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.linha-it{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0}
+.linha-it.tot{font-weight:800;font-size:14px;color:var(--escuro);border-top:1px dashed var(--linha);margin-top:6px;padding-top:8px}
+.desc{color:var(--verde)}
+.opc{display:flex;gap:6px;flex-wrap:wrap}
+.opc label{flex:1;min-width:70px;text-align:center;padding:8px 4px;border:1.5px solid var(--linha);border-radius:10px;font-size:11.5px;font-weight:600;cursor:pointer}
+.opc input{display:none}
+.opc input:checked+label{border-color:var(--laranja);background:var(--laranja-claro);color:var(--laranja)}
+.cupom{display:flex;gap:6px}
+.cupom input{flex:1;border:1.5px solid var(--linha);border-radius:10px;padding:8px;font:inherit;font-size:12px;text-transform:uppercase}
+.cupom button{border:0;background:var(--escuro);color:#fff;border-radius:10px;padding:0 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.cupom-msg{font-size:11px;margin-top:5px;min-height:14px}
+.rodape-v{padding:12px;background:#fff;border-top:1px solid var(--linha);flex-shrink:0}
+.btn-zap{width:100%;border:0;background:var(--zap);color:#fff;font:inherit;font-weight:800;padding:13px;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px}
+/* tela zap */
+.zap-topo{background:#075E54;color:#fff;padding:46px 12px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.zap-topo .av{width:34px;height:34px;border-radius:50%;background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800;font-size:12px}
+.zap-topo small{display:block;font-size:10.5px;opacity:.8}
+.zap-chat{flex:1;overflow-y:auto;padding:12px 10px;background:#ECE5DD;scrollbar-width:none;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:86%;padding:8px 10px;border-radius:10px;font-size:11.5px;line-height:1.45;white-space:pre-line;box-shadow:0 1px 1px rgba(0,0,0,.08);animation:entra .3s ease}
+.msg.eu{align-self:flex-end;background:#DCF8C6;border-top-right-radius:2px}
+.msg.loja{align-self:flex-start;background:#fff;border-top-left-radius:2px}
+.msg.sis{align-self:center;background:#FFF3C4;font-size:10.5px;color:#6b5a1e;text-align:center}
+@keyframes entra{from{opacity:0;transform:translateY(8px)}}
+.zap-base{display:flex;gap:8px;padding:8px;background:#F0F0F0;flex-shrink:0}
+.zap-base div{flex:1;background:#fff;border-radius:20px;padding:9px 12px;font-size:11.5px;color:var(--cinza)}
+.zap-base button{width:38px;height:38px;border-radius:50%;border:0;background:#00A884;color:#fff;cursor:pointer;font-size:15px}
+.zap-base button:disabled{opacity:.4;cursor:default}
+.reiniciar{font-size:11px;color:#075E54;font-weight:700;align-self:center;background:#fff;border:0;padding:6px 12px;border-radius:999px;cursor:pointer;margin-top:6px}
+
+/* seções */
+section{padding:90px 0}
+.titulo-sec{text-align:center;max-width:680px;margin:0 auto 54px}
+.etq{color:var(--laranja);font-weight:800;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}
+h2{font-size:clamp(1.9rem,3.8vw,2.7rem);letter-spacing:-.035em;line-height:1.12;color:var(--escuro);margin:10px 0 14px;font-weight:800}
+.titulo-sec p{color:var(--cinza);font-size:1.08rem}
+
+.passos{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;counter-reset:p}
+.passo{background:#fff;border:1px solid var(--linha);border-radius:24px;padding:30px;position:relative}
+.passo::before{counter-increment:p;content:counter(p);position:absolute;top:26px;right:28px;font-size:3.4rem;font-weight:800;color:var(--laranja-claro);line-height:1}
+.passo .ic{width:52px;height:52px;border-radius:16px;background:var(--laranja-claro);display:grid;place-items:center;font-size:1.6rem;margin-bottom:18px}
+.passo h3{font-size:1.2rem;color:var(--escuro);margin-bottom:8px;letter-spacing:-.02em}
+.passo p{color:var(--cinza);font-size:.97rem}
+@media(max-width:820px){.passos{grid-template-columns:1fr}}
+
+.escuro{background:var(--escuro);color:#fff;border-radius:40px;margin:0 14px}
+.escuro h2{color:#fff}
+.escuro .titulo-sec p{color:#B9B5C6}
+.recursos{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.rec{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;transition:background .2s,transform .2s}
+.rec:hover{background:rgba(255,255,255,.09);transform:translateY(-3px)}
+.rec .ic{font-size:1.6rem;margin-bottom:14px}
+.rec h3{font-size:1.02rem;margin-bottom:6px}
+.rec p{color:#B9B5C6;font-size:.9rem}
+@media(max-width:980px){.recursos{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.recursos{grid-template-columns:1fr}}
+
+.painel-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:50px;align-items:center}
+.painel-grid ul{list-style:none;display:grid;gap:14px;margin-top:22px}
+.painel-grid li{display:flex;gap:12px;align-items:flex-start;font-weight:500}
+.painel-grid li b{color:var(--escuro)}
+.painel-grid li span.ck{flex-shrink:0;width:24px;height:24px;border-radius:8px;background:var(--laranja-claro);color:var(--laranja);display:grid;place-items:center;font-weight:800;font-size:.8rem;margin-top:1px}
+.painel-mock{background:#fff;border:1px solid var(--linha);border-radius:24px;box-shadow:var(--sombra);overflow:hidden}
+.pm-topo{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--linha);background:#FBF9F7}
+.pm-topo i{width:10px;height:10px;border-radius:50%;background:#E9E4DE}
+.pm-corpo{display:grid;grid-template-columns:150px 1fr;min-height:330px}
+.pm-lado{border-right:1px solid var(--linha);padding:14px 10px;display:flex;flex-direction:column;gap:4px;font-size:.82rem;font-weight:600;color:var(--cinza)}
+.pm-lado div{padding:8px 10px;border-radius:10px}
+.pm-lado div.on{background:var(--laranja-claro);color:var(--laranja)}
+.pm-main{padding:18px}
+.pm-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pm-card{background:#FBF9F7;border-radius:14px;padding:12px}
+.pm-card small{color:var(--cinza);font-size:.72rem;font-weight:600}
+.pm-card strong{display:block;font-size:1.15rem;color:var(--escuro);letter-spacing:-.02em}
+.pedido{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--linha);border-radius:14px;margin-bottom:8px;font-size:.82rem}
+.pedido .num{font-weight:800;color:var(--escuro)}
+.pedido .st{margin-left:auto;font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px}
+.st.novo{background:#FFF1E8;color:var(--laranja)}
+.st.prep{background:#FFF7D6;color:#A07800}
+.st.saiu{background:#E5F7EC;color:var(--verde)}
+.novo-ped{animation:pisca 1.6s infinite}
+@keyframes pisca{50%{box-shadow:0 0 0 4px rgba(255,90,31,.15)}}
+@media(max-width:920px){.painel-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.pm-corpo{grid-template-columns:1fr}.pm-lado{display:none}.pm-cards{grid-template-columns:1fr 1fr}}
+
+/* preço */
+.preco-box{max-width:460px;margin:0 auto;background:#fff;border-radius:32px;padding:38px;border:2px solid var(--laranja);box-shadow:0 30px 60px -30px rgba(255,90,31,.45);position:relative;text-align:center}
+.preco-box .fita{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--escuro);color:#fff;font-size:.8rem;font-weight:700;padding:6px 16px;border-radius:999px;white-space:nowrap}
+.preco-box h3{font-size:1.15rem;color:var(--cinza);font-weight:700}
+.valor{font-size:3.8rem;font-weight:800;letter-spacing:-.05em;color:var(--escuro);margin:8px 0 2px;line-height:1}
+.valor sup{font-size:1.3rem;vertical-align:top;margin-right:4px;position:relative;top:10px}
+.valor small{font-size:1rem;color:var(--cinza);font-weight:600;letter-spacing:0}
+.preco-box .obs{color:var(--verde);font-weight:700;font-size:.92rem;margin-bottom:24px}
+.preco-box ul{list-style:none;text-align:left;display:grid;gap:11px;margin-bottom:28px}
+.preco-box li{display:flex;gap:10px;font-weight:500}
+.preco-box li::before{content:"✓";color:var(--verde);font-weight:800}
+.preco-box .btn{width:100%}
+.sem-taxa{text-align:center;color:var(--cinza);margin-top:22px;font-size:.95rem}
+
+/* faq */
+.faq{max-width:760px;margin:0 auto}
+details{background:#fff;border:1px solid var(--linha);border-radius:18px;padding:20px 24px;margin-bottom:12px}
+summary{font-weight:700;color:var(--escuro);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.4rem;color:var(--laranja);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--cinza);margin-top:12px}
+
+/* cta final */
+.cta{background:linear-gradient(135deg,var(--laranja),#FF8A3D);border-radius:36px;padding:60px 30px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.1);left:-120px;bottom:-200px}
+.cta h2{color:#fff;position:relative}
+.cta p{opacity:.92;font-size:1.1rem;margin-bottom:28px;position:relative}
+.cta .btn{background:#fff;color:var(--laranja);position:relative}
+footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
+.rod{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+
+.revela{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.revela.vis{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gLogo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF5A1F"/><stop offset="1" stop-color="#FF8A3D"/>
+    </linearGradient>
+    <symbol id="logo" viewBox="0 0 48 48">
+      <rect width="48" height="48" rx="14" fill="url(#gLogo)"/>
+      <path d="M12.5 17.5a4.5 4.5 0 0 1 4.5-4.5h14a4.5 4.5 0 0 1 4.5 4.5v11a4.5 4.5 0 0 1-4.5 4.5h-8.2l-6.3 5.2V33A4.5 4.5 0 0 1 12.5 28.5z" fill="#fff"/>
+      <path d="M19.5 21v-1.5a4.5 4.5 0 0 1 9 0V21" fill="none" stroke="#FF5A1F" stroke-width="2.4" stroke-linecap="round"/>
+      <rect x="17" y="20.5" width="14" height="8.5" rx="2.2" fill="#FF5A1F"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header id="topo">
+  <div class="wrap nav">
+    <a href="#" class="marca"><svg><use href="#logo"/></svg><span>Pede<b>ki</b></span></a>
+    <nav class="menu">
+      <a href="#como">Como funciona</a>
+      <a href="#demo">Prévia</a>
+      <a href="#recursos">Recursos</a>
+      <a href="#preco">Preço</a>
+      <a href="#faq">Dúvidas</a>
+    </nav>
+    <div class="acoes">
+      <button class="btn btn-ghost" data-abre="entrar">Entrar</button>
+      <button class="btn btn-pri" data-abre="cadastro">Testar grátis</button>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="selo"><span>Novo</span> 7 dias grátis, sem cartão</div>
+      <h1>Seu cardápio digital com pedidos <em>direto no WhatsApp</em></h1>
+      <p class="sub">Monte a loja da sua lanchonete, pizzaria ou açaí em minutos. O cliente escolhe, monta o carrinho e o pedido chega pronto no seu WhatsApp. Sem taxa por pedido.</p>
+      <div class="hero-btns">
+        <button class="btn btn-pri" data-abre="cadastro">Criar minha loja grátis →</button>
+        <a href="#demo" class="btn btn-sec">▶ Testar a prévia</a>
+        <a href="loja.html?l=exemplo" data-exemplo class="btn btn-sec">🍔 Ver loja de exemplo</a>
+      </div>
+      <div class="garantias">
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Sem taxa por pedido</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Pronto em 10 minutos</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Cancele quando quiser</div>
+      </div>
+    </div>
+
+    <div class="cel-area" id="demo">
+      <div class="flutua f1"><div class="ic" style="background:#E5F7EC">💬</div><div>Pedido no WhatsApp<small>chega prontinho</small></div></div>
+      <div class="flutua f2"><div class="ic" style="background:#FFF1E8">🔔</div><div>Novo pedido #128<small>R$ 54,80 · entrega</small></div></div>
+      <div class="cel">
+        <div class="tela">
+
+          <!-- CARDÁPIO -->
+          <div class="view" id="vCardapio">
+            <div class="capa"></div>
+            <div class="loja-topo">
+              <div class="loja-logo">BV</div>
+              <div><h4>Burger da Vila</h4><p><span class="aberto">● Aberto</span> · 30–45 min · Entrega R$ 5,00</p></div>
+            </div>
+            <div class="cats"><span class="on">🔥 Promoções</span><span>Lanches</span><span>Porções</span><span>Bebidas</span></div>
+            <div class="lista" id="listaProd"></div>
+            <div class="barra-car" id="barraCar"><div><span class="qtd" id="qtdCar">0</span>Ver carrinho</div><div id="totCar">R$ 0,00</div></div>
+          </div>
+
+          <!-- CARRINHO -->
+          <div class="view escondida" id="vCarrinho">
+            <div class="topo-v"><button data-volta="vCardapio">←</button><h4>Seu pedido</h4></div>
+            <div class="corpo-v">
+              <div class="bloco"><h6>Itens</h6><div id="itensCar"></div></div>
+              <div class="bloco"><h6>Como quer receber?</h6>
+                <div class="opc">
+                  <input type="radio" name="ent" id="e1" value="entrega" checked><label for="e1">🛵 Entrega</label>
+                  <input type="radio" name="ent" id="e2" value="retirada"><label for="e2">🏪 Retirar</label>
+                </div>
+              </div>
+              <div class="bloco"><h6>Pagamento</h6>
+                <div class="opc">
+                  <input type="radio" name="pag" id="p1" value="Pix" checked><label for="p1">Pix</label>
+                  <input type="radio" name="pag" id="p2" value="Cartão"><label for="p2">Cartão</label>
+                  <input type="radio" name="pag" id="p3" value="Dinheiro"><label for="p3">Dinheiro</label>
+                </div>
+              </div>
+              <div class="bloco"><h6>Cupom</h6>
+                <div class="cupom"><input id="cupomIn" placeholder="Ex.: BEMVINDO"><button id="cupomBt">Aplicar</button></div>
+                <div class="cupom-msg" id="cupomMsg"></div>
+              </div>
+              <div class="bloco" id="resumo"></div>
+            </div>
+            <div class="rodape-v"><button class="btn-zap" id="btConfirma">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.4-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.6-.1 1.1z"/></svg>
+              Confirmar pedido no WhatsApp</button></div>
+          </div>
+
+          <!-- WHATSAPP -->
+          <div class="view escondida" id="vZap">
+            <div class="zap-topo"><div class="av">BV</div><div><b>Burger da Vila</b><small>conta comercial</small></div></div>
+            <div class="zap-chat" id="zapChat"></div>
+            <div class="zap-base"><div id="zapTxt">Pedido pronto para enviar…</div><button id="zapEnvia">➤</button></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como">
+  <div class="wrap">
+    <div class="titulo-sec revela">
+      <div class="etq">Como funciona</div>
+      <h2>Sua loja online em 3 passos</h2>
+      <p>Sem precisar entender de tecnologia. Se você sabe usar o WhatsApp, sabe usar o Pedeki.</p>
+    </div>
+    <div class="passos">
+      <div class="passo revela"><div class="ic">📝</div><h3>Cadastre sua loja</h3><p>Coloque o nome, a logo, as cores e o WhatsApp da sua loja. Leva 2 minutos.</p></div>
+      <div class="passo revela"><div class="ic">🍟</div><h3>Monte o cardápio</h3><p>Adicione produtos com foto, preço, adicionais e promoções. Configure a taxa de entrega.</p></div>
+      <div class="passo revela"><div class="ic">📲</div><h3>Receba pedidos</h3><p>Divulgue seu link no Instagram e no WhatsApp. Os pedidos chegam organizados, com total e endereço.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- RECURSOS -->
+<section class="escuro" id="recursos">
+  <div class="wrap">
+    <div class="titulo-sec revela">
+      <div class="etq">Tudo incluso</div>
+      <h2>Uma loja completa, igual aos grandes apps</h2>
+      <p>Todos os recursos no mesmo plano. Sem pegadinha.</p>
+    </div>
+    <div class="recursos">
+      <div class="rec revela"><div class="ic">🛒</div><h3>Carrinho de compras</h3><p>O cliente escolhe vários itens e vê o total na hora.</p></div>
+      <div class="rec revela"><div class="ic">🧀</div><h3>Adicionais e observações</h3><p>"Sem cebola", "+ bacon", tamanho e sabores.</p></div>
+      <div class="rec revela"><div class="ic">🏷️</div><h3>Cupons e promoções</h3><p>Crie cupons de desconto e destaque produtos em oferta.</p></div>
+      <div class="rec revela"><div class="ic">🛵</div><h3>Taxa de entrega</h3><p>Cobre a entrega ou deixe grátis. Também tem retirada no local.</p></div>
+      <div class="rec revela"><div class="ic">📦</div><h3>Controle de estoque</h3><p>Acabou o produto? Ele some do cardápio sozinho.</p></div>
+      <div class="rec revela"><div class="ic">🔔</div><h3>Pedidos com som</h3><p>Painel apita quando chega pedido novo. Nada passa batido.</p></div>
+      <div class="rec revela"><div class="ic">📍</div><h3>Acompanhamento</h3><p>O cliente vê: recebido, em preparo, saiu para entrega.</p></div>
+      <div class="rec revela"><div class="ic">🎨</div><h3>A cara da sua loja</h3><p>Sua logo, suas cores, seu link e QR Code para as mesas.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAINEL -->
+<section>
+  <div class="wrap painel-grid">
+    <div class="revela">
+      <div class="etq">Painel do lojista</div>
+      <h2>Você no controle de tudo, pelo celular ou PC</h2>
+      <p style="color:var(--cinza)">Mude preços, pause produtos e acompanhe os pedidos em tempo real.</p>
+      <ul>
+        <li><span class="ck">✓</span><div><b>Aceite o pedido com 1 toque</b> e o cliente recebe no WhatsApp: "Pedido recebido, já está em preparo!"</div></li>
+        <li><span class="ck">✓</span><div><b>Altere preços na hora</b>, sem reimprimir cardápio.</div></li>
+        <li><span class="ck">✓</span><div><b>Veja quanto vendeu</b> no dia e no mês.</div></li>
+        <li><span class="ck">✓</span><div><b>Horário de funcionamento</b>: a loja abre e fecha sozinha.</div></li>
+      </ul>
+    </div>
+    <div class="painel-mock revela">
+      <div class="pm-topo"><i></i><i></i><i></i></div>
+      <div class="pm-corpo">
+        <div class="pm-lado"><div class="on">📋 Pedidos</div><div>🍔 Produtos</div><div>🏷️ Cupons</div><div>🛵 Entrega</div><div>🎨 Minha loja</div><div>💳 Plano</div></div>
+        <div class="pm-main">
+          <div class="pm-cards">
+            <div class="pm-card"><small>Hoje</small><strong>R$ 842</strong></div>
+            <div class="pm-card"><small>Pedidos</small><strong>23</strong></div>
+            <div class="pm-card"><small>Ticket médio</small><strong>R$ 36</strong></div>
+          </div>
+          <div class="pedido novo-ped"><span class="num">#128</span>Maria · 2 itens<span class="st novo">Novo</span></div>
+          <div class="pedido"><span class="num">#127</span>João · 3 itens<span class="st prep">Em preparo</span></div>
+          <div class="pedido"><span class="num">#126</span>Ana · 1 item<span class="st saiu">Saiu p/ entrega</span></div>
+          <div class="pedido"><span class="num">#125</span>Carlos · 4 itens<span class="st saiu">Saiu p/ entrega</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section id="preco" style="padding-top:30px">
+  <div class="wrap">
+    <div class="titulo-sec revela">
+      <div class="etq">Preço</div>
+      <h2>Um plano só, com tudo dentro</h2>
+      <p>Comece grátis. Só paga se gostar.</p>
+    </div>
+    <div class="preco-box revela">
+      <div class="fita">🎁 7 dias grátis</div>
+      <h3>Plano Completo</h3>
+      <div class="valor"><sup>R$</sup>39,90<small>/mês</small></div>
+      <div class="obs">Sem taxa por pedido. Sem fidelidade.</div>
+      <ul>
+        <li>Cardápio digital com sua logo e cores</li>
+        <li>Pedidos ilimitados no WhatsApp</li>
+        <li>Carrinho, adicionais, cupons e promoções</li>
+        <li>Taxa de entrega e retirada</li>
+        <li>Estoque e painel de pedidos</li>
+        <li>Link próprio e QR Code</li>
+        <li>Pagamento da mensalidade por Pix</li>
+      </ul>
+      <button class="btn btn-pri" data-abre="cadastro">Começar meus 7 dias grátis</button>
+    </div>
+    <p class="sem-taxa">Não pede cartão para testar. No fim do teste, você decide se continua.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding-top:20px">
+  <div class="wrap">
+    <div class="titulo-sec revela"><div class="etq">Dúvidas</div><h2>Perguntas frequentes</h2></div>
+    <div class="faq">
+      <details><summary>Preciso pagar alguma coisa para testar?</summary><p>Não. Você tem 7 dias grátis com tudo liberado e não precisa cadastrar cartão.</p></details>
+      <details><summary>Vocês cobram taxa em cima dos meus pedidos?</summary><p>Não. Você paga só a mensalidade. Todo o dinheiro das vendas é seu.</p></details>
+      <details><summary>Como o pedido chega pra mim?</summary><p>Quando o cliente confirma, abre o WhatsApp com o pedido completo: itens, adicionais, forma de pagamento, endereço e total. Ele também aparece no seu painel com aviso sonoro.</p></details>
+      <details><summary>Preciso saber mexer com computador?</summary><p>Não. Tudo é feito pelo painel, que funciona no celular. Se você sabe mandar mensagem no WhatsApp, consegue usar.</p></details>
+      <details><summary>Como pago a mensalidade?</summary><p>Por Pix, direto no painel. Assim que o pagamento cai, sua loja é liberada por mais 30 dias, na hora.</p></details>
+      <details><summary>Posso cancelar quando quiser?</summary><p>Pode. Não tem fidelidade nem multa. É só não renovar.</p></details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="cta revela">
+      <h2>Bora vender mais pelo WhatsApp?</h2>
+      <p>Crie sua loja agora e comece a receber pedidos hoje mesmo.</p>
+      <button class="btn" data-abre="cadastro">Criar minha loja grátis →</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap rod">
+    <a href="#" class="marca" style="font-size:1.2rem"><svg style="width:30px;height:30px"><use href="#logo"/></svg><span>Pede<b>ki</b></span></a>
+    <div>© <span id="ano"></span> Pedeki · Cardápio digital com pedidos no WhatsApp</div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script>
+// ===== dados da loja de exemplo =====
+const produtos=[
+  {id:1,n:"X-Bacon Duplo",d:"2 carnes 150g, bacon crocante, cheddar e molho da casa",p:29.9,a:34.9,e:"🍔",c:"#FFE9D6",promo:true},
+  {id:2,n:"Combo Vila",d:"X-Salada + batata média + refri lata",p:39.9,a:46.9,e:"🍟",c:"#FFF3C4",promo:true},
+  {id:3,n:"X-Salada",d:"Carne 150g, queijo, alface, tomate e maionese",p:22.9,e:"🥪",c:"#E5F7EC"},
+  {id:4,n:"Batata com cheddar e bacon",d:"Porção média para 2 pessoas",p:24.9,e:"🧀",c:"#FFF1E8"},
+  {id:5,n:"Refrigerante lata",d:"Coca-Cola, Guaraná ou Fanta · 350ml",p:6.0,e:"🥤",c:"#E8EEFF"},
+  {id:6,n:"Milkshake de Ovomaltine",d:"500ml, cremoso",p:16.9,e:"🥛",c:"#F3E8FF"}
+];
+const TAXA=5, CUPONS={BEMVINDO:10,PEDEKI:10};
+let car={}, cupom=null;
+const R=v=>"R$ "+v.toFixed(2).replace(".",",");
+const $=id=>document.getElementById(id);
+
+function montaLista(){
+  $("listaProd").innerHTML=produtos.map(p=>`
+   <div class="prod">
+     <div class="foto" style="background:${p.c}">${p.e}</div>
+     <div style="min-width:0"><h5>${p.n}${p.promo?'<span class="tag">OFERTA</span>':''}</h5><p>${p.d}</p>
+     <div class="preco">${R(p.p)}${p.a?`<s>${R(p.a)}</s>`:''}</div></div>
+     <button class="add" data-add="${p.id}" aria-label="Adicionar">+</button>
+   </div>`).join("");
+}
+function totais(){
+  let sub=0,q=0;
+  for(const id in car){const p=produtos.find(x=>x.id==id);sub+=p.p*car[id];q+=car[id];}
+  const ent=document.querySelector('input[name=ent]:checked').value==="entrega"?TAXA:0;
+  const desc=cupom?sub*CUPONS[cupom]/100:0;
+  return{sub,q,ent,desc,tot:sub+ent-desc};
+}
+function atualiza(){
+  const t=totais();
+  $("qtdCar").textContent=t.q;$("totCar").textContent=R(t.sub);
+  $("barraCar").classList.toggle("mostra",t.q>0);
+  $("itensCar").innerHTML=Object.keys(car).map(id=>{const p=produtos.find(x=>x.id==id);
+    return `<div class="linha-it"><span>${car[id]}x ${p.n}</span><span>${R(p.p*car[id])}</span></div>`}).join("")||'<div class="linha-it">Carrinho vazio</div>';
+  $("resumo").innerHTML=`<h6>Resumo</h6>
+   <div class="linha-it"><span>Subtotal</span><span>${R(t.sub)}</span></div>
+   <div class="linha-it"><span>Taxa de entrega</span><span>${t.ent?R(t.ent):"Grátis"}</span></div>
+   ${t.desc?`<div class="linha-it desc"><span>Cupom ${cupom}</span><span>- ${R(t.desc)}</span></div>`:""}
+   <div class="linha-it tot"><span>Total</span><span>${R(t.tot)}</span></div>`;
+}
+function vai(id){
+  ["vCardapio","vCarrinho","vZap"].forEach(v=>$(v).classList.toggle("escondida",v!==id));
+}
+document.addEventListener("click",e=>{
+  const a=e.target.closest("[data-add]");
+  if(a){const id=a.dataset.add;car[id]=(car[id]||0)+1;atualiza();}
+  const v=e.target.closest("[data-volta]");if(v)vai(v.dataset.volta);
+});
+$("barraCar").onclick=()=>{atualiza();vai("vCarrinho")};
+document.querySelectorAll('input[name=ent],input[name=pag]').forEach(i=>i.onchange=atualiza);
+$("cupomBt").onclick=()=>{
+  const c=$("cupomIn").value.trim().toUpperCase();
+  if(CUPONS[c]){cupom=c;$("cupomMsg").innerHTML='<span style="color:var(--verde)">✓ Cupom aplicado: '+CUPONS[c]+'% de desconto</span>';}
+  else{cupom=null;$("cupomMsg").innerHTML='<span style="color:#d33">Cupom inválido. Tente BEMVINDO</span>';}
+  atualiza();
+};
+$("btConfirma").onclick=()=>{
+  const t=totais();if(!t.q)return;
+  const ent=document.querySelector('input[name=ent]:checked').value;
+  const pag=document.querySelector('input[name=pag]:checked').value;
+  const itens=Object.keys(car).map(id=>{const p=produtos.find(x=>x.id==id);return `• ${car[id]}x ${p.n} — ${R(p.p*car[id])}`}).join("\n");
+  const txt=`🧾 *NOVO PEDIDO #128*\n\n${itens}\n\nSubtotal: ${R(t.sub)}\n${ent==="entrega"?"Entrega: "+R(t.ent):"Retirada no local"}${t.desc?"\nCupom "+cupom+": -"+R(t.desc):""}\n*Total: ${R(t.tot)}*\n\nPagamento: ${pag}${ent==="entrega"?"\n📍 Rua das Flores, 120 — Centro":""}\n\nAcompanhe: pedeki.app/p/128`;
+  $("zapChat").innerHTML=`<div class="msg sis">Seu pedido foi montado. Toque em ➤ para enviar à loja.</div>`;
+  $("zapTxt").textContent="🧾 NOVO PEDIDO #128…";
+  $("zapEnvia").disabled=false;
+  $("zapEnvia").dataset.txt=txt;
+  vai("vZap");
+};
+$("zapEnvia").onclick=function(){
+  if(this.disabled)return;this.disabled=true;
+  const chat=$("zapChat");
+  chat.insertAdjacentHTML("beforeend",`<div class="msg eu">${this.dataset.txt.replace(/\*(.+?)\*/g,"<b>$1</b>")}</div>`);
+  $("zapTxt").textContent="Mensagem";
+  chat.scrollTop=chat.scrollHeight;
+  setTimeout(()=>{chat.insertAdjacentHTML("beforeend",`<div class="msg loja">Oi! 😄 Seu pedido <b>#128</b> foi recebido e já está em preparo! 👨‍🍳\nTempo estimado: 30–45 min.</div>`);chat.scrollTop=chat.scrollHeight;},1400);
+  setTimeout(()=>{chat.insertAdjacentHTML("beforeend",`<div class="msg loja">🛵 Seu pedido saiu para entrega!</div><button class="reiniciar" id="reini">↺ Fazer outro pedido</button>`);chat.scrollTop=chat.scrollHeight;
+    $("reini").onclick=()=>{car={};cupom=null;$("cupomIn").value="";$("cupomMsg").textContent="";atualiza();vai("vCardapio")};},3600);
+};
+
+// ===== botões de entrar/cadastrar
+document.addEventListener("click",e=>{const b=e.target.closest("[data-abre]");if(b){e.preventDefault();location.href="conta.html#"+b.dataset.abre;}});
+try{const ex=(window.PEDEKI&&window.PEDEKI.lojaExemplo)||"exemplo";document.querySelectorAll("[data-exemplo]").forEach(a=>a.href="loja.html?l="+encodeURIComponent(ex));}catch(e){}
+
+// ===== efeitos =====
+window.addEventListener("scroll",()=>$("topo").classList.toggle("rolou",scrollY>10));
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("vis");io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll(".revela").forEach(el=>io.observe(el));
+$("ano").textContent=new Date().getFullYear();
+montaLista();atualiza();
+</script>
+</body>
+</html>

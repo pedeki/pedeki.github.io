@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acompanhe seu pedido</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{background:#F7F5F2}
+.wrap{max-width:520px;margin:0 auto;padding:20px 16px 50px}
+.loja{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.loja .lg{width:52px;height:52px;border-radius:14px;object-fit:cover;background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800}
+.loja h1{font-size:1.15rem;color:var(--escuro)}
+.loja small{color:var(--cinza)}
+.status{background:#fff;border-radius:24px;padding:22px;text-align:center;margin-bottom:14px;border:1px solid var(--linha)}
+.status .ic{font-size:3rem;margin-bottom:4px}
+.status h2{font-size:1.35rem;color:var(--escuro);letter-spacing:-.02em}
+.status p{color:var(--cinza)}
+.linha-t{display:flex;justify-content:space-between;margin:22px 4px 4px;position:relative}
+.linha-t::before{content:"";position:absolute;left:18px;right:18px;top:15px;height:4px;background:var(--linha);border-radius:4px}
+.linha-t .barra{position:absolute;left:18px;top:15px;height:4px;background:var(--verde);border-radius:4px;transition:width .6s}
+.passo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;width:25%}
+.passo .b{width:34px;height:34px;border-radius:50%;background:#fff;border:3px solid var(--linha);display:grid;place-items:center;font-size:.9rem;transition:.3s}
+.passo.ok .b{background:var(--verde);border-color:var(--verde);color:#fff}
+.passo.at .b{border-color:var(--verde);animation:pul 1.5s infinite}
+@keyframes pul{50%{box-shadow:0 0 0 6px rgba(31,175,90,.18)}}
+.passo small{font-size:.72rem;font-weight:700;color:var(--cinza);text-align:center}
+.passo.ok small,.passo.at small{color:var(--escuro)}
+.i{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.92rem}
+.ad{color:var(--cinza);font-size:.82rem;padding-left:14px}
+.tot{font-weight:800;color:var(--escuro);border-top:1px dashed var(--linha);margin-top:8px;padding-top:10px}
+</style>
+</head>
+<body>
+<div class="carregando" id="carregando"><div class="giro"></div></div>
+<div class="wrap" id="app"></div>
+<script src="config.js"></script>
+<script type="module">
+import { db, F, $, R, esc, fmtTel, ms, horaBR, dataBR, zapLink, textoPedido, linkLoja } from "./js/base.js";
+const q = new URLSearchParams(location.search), l = q.get("l"), p = q.get("p");
+let loja, ped, enviou = false;
+const PASSOS = { novo: 0, preparo: 1, entrega: 2, pronto: 2, concluido: 3 };
+function falha(t) { $("#carregando")?.remove(); $("#app").innerHTML = `<div class="vazio"><div class="ic">🔎</div><b>${t}</b></div>`; }
+(async () => {
+  if (!l || !p) return falha("Pedido não encontrado");
+  try {
+    loja = (await F.getDoc(F.doc(db, "lojas", l))).data();
+    if (!loja) return falha("Pedido não encontrado");
+    document.documentElement.style.setProperty("--cor", loja.cor || "#FF5A1F");
+    F.onSnapshot(F.doc(db, "lojas", l, "pedidos", p), s => {
+      if (!s.exists()) return falha("Pedido não encontrado");
+      ped = s.data({ serverTimestamps: "estimate" });
+      desenha();
+      if (q.get("z") === "1" && !enviou) {
+        enviou = true;
+        try { history.replaceState(null, "", location.pathname + `?l=${encodeURIComponent(l)}&p=${encodeURIComponent(p)}`); } catch {}
+        setTimeout(() => { location.href = linkZap(); }, 900);
+      }
+    }, () => falha("Não foi possível carregar o pedido"));
+  } catch { falha("Não foi possível carregar o pedido"); }
+})();
+const linkZap = () => zapLink(loja.whatsapp, textoPedido(ped, loja, location.href.split("&z=")[0]));
+function desenha() {
+  $("#carregando")?.remove();
+  const ret = ped.tipo !== "entrega";
+  const info = {
+    novo: ["📨", "Pedido enviado!", "Aguardando a loja confirmar. Se ainda não mandou, toque no botão verde abaixo."],
+    preparo: ["👨‍🍳", "Em preparo", "A loja confirmou e já está preparando seu pedido."],
+    entrega: ["🛵", "Saiu para entrega", "Seu pedido está a caminho!"],
+    pronto: ["✅", "Pronto para retirar", "Pode buscar seu pedido na loja."],
+    concluido: ["🎉", "Pedido concluído", "Obrigado pela preferência! Bom apetite."],
+    cancelado: ["😔", "Pedido cancelado", "Fale com a loja pelo WhatsApp se tiver dúvidas."]
+  }[ped.status] || ["📦", "Pedido", ""];
+  const at = PASSOS[ped.status] ?? -1;
+  const nomes = ["Recebido", "Em preparo", ret ? "Pronto" : "A caminho", "Entregue"];
+  const ic = ["📨", "👨‍🍳", ret ? "✅" : "🛵", "🎉"];
+  $("#app").innerHTML = `
+    <div class="loja">${loja.logo ? `<img class="lg" src="${loja.logo}" alt="">` : `<div class="lg">${esc(loja.nome.slice(0, 2).toUpperCase())}</div>`}<div><h1>${esc(loja.nome)}</h1><small>Pedido #${ped.numero} · ${horaBR(ms(ped.criadoEm))} ${dataBR(ms(ped.criadoEm))}</small></div></div>
+    <div class="status"><div class="ic">${info[0]}</div><h2>${info[1]}</h2><p>${info[2]}</p>
+      ${ped.status === "cancelado" ? "" : `<div class="linha-t"><div class="barra" style="width:calc(${Math.max(0, at) / 3 * 100}% - ${Math.max(0, at) / 3 * 36}px)"></div>${nomes.map((n, i) => `<div class="passo ${i < at || ped.status === "concluido" ? "ok" : i === at ? "at" : ""}"><div class="b">${i < at || ped.status === "concluido" ? "✓" : ic[i]}</div><small>${n}</small></div>`).join("")}</div>`}
+    </div>
+    <a class="btn btn-zap btn-bloco" style="padding:15px;margin-bottom:14px" href="${linkZap()}">💬 ${ped.status === "novo" ? "Enviar pedido no WhatsApp" : "Falar com a loja"}</a>
+    <div class="card">
+      <h3>Resumo</h3>
+      ${ped.itens.map(i => `<div class="i"><span><b>${i.qtd}x</b> ${esc(i.nome)}</span><span>${R(i.unit * i.qtd)}</span></div>${(i.adicionais || []).map(a => `<div class="ad">+ ${esc(a.nome)}</div>`).join("")}${i.obs ? `<div class="ad">📝 ${esc(i.obs)}</div>` : ""}`).join("")}
+      <div class="i" style="color:var(--cinza);margin-top:6px"><span>Subtotal</span><span>${R(ped.subtotal)}</span></div>
+      ${!ret ? `<div class="i" style="color:var(--cinza)"><span>Entrega</span><span>${ped.taxa ? R(ped.taxa) : "Grátis"}</span></div>` : ""}
+      ${ped.desconto ? `<div class="i" style="color:var(--verde)"><span>Cupom ${esc(ped.cupom)}</span><span>-${R(ped.desconto)}</span></div>` : ""}
+      <div class="i tot"><span>Total</span><span>${R(ped.total)}</span></div>
+      <p style="color:var(--cinza);font-size:.88rem;margin-top:10px">💳 ${esc(ped.pagamento)}${ped.troco ? " · troco para " + R(ped.troco) : ""}<br>${ret ? "🏪 Retirada no local" + (loja.endereco ? ": " + esc(loja.endereco) : "") : "🛵 " + esc(ped.cliente.endereco)}</p>
+    </div>
+    <p style="text-align:center;margin-top:18px"><a href="${linkLoja(loja.slug)}" style="color:var(--cor);font-weight:700;text-decoration:none">← Voltar ao cardápio</a></p>
+    <p style="text-align:center;color:var(--cinza);font-size:.78rem;margin-top:14px">Esta página atualiza sozinha.</p>`;
+}
+</script>
+</body>
+</html>
