@@ -324,6 +324,7 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
 
 <script src="config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script type="module">
 import { auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, num, dinheiroInput, zapLink, comprimir,
   ms, fimTeste, validoAte, lojaAtiva, emTeste, dataBR, horaBR, diasRestantes, DIAS, DIAS_NOME, horariosPadrao, abertaAgora,
@@ -847,16 +848,30 @@ async function gerarPix() {
     const d = await r.json().catch(() => ({}));
     if (!r.ok || !d.id) throw new Error(d.erro || "Não foi possível gerar o Pix agora.");
     const exp = Date.parse(d.expires_at) || Date.now() + 30 * 60e3;
-    const img = d.qr_code_base64 ? `data:image/png;base64,${d.qr_code_base64}` : "";
+    let img = d.qr_code_base64 || "";
+    if (img && !img.startsWith("data:")) img = "data:image/png;base64," + img;
     corpo.innerHTML = `<h2 style="padding:0 30px">Pague com Pix</h2>
       <div style="font-size:2rem;font-weight:800;color:var(--escuro);letter-spacing:-.03em">${R(d.amount)}</div>
       <p style="color:var(--cinza);font-size:.9rem">Abra o app do seu banco e escaneie o QR Code</p>
-      ${img ? `<img class="pix-qr" id="pixImg" src="${img}" alt="QR Code Pix">` : ""}
+      <div class="pix-qr" id="pixQR" style="display:grid;place-items:center"></div>
       <p style="font-weight:700;margin-bottom:6px;font-size:.9rem">Ou use o Pix copia e cola:</p>
       <div class="pix-cc" id="pixCC">${esc(d.copy_paste)}</div>
       <button class="btn btn-pri btn-bloco" id="btCopiaPix">📋 Copiar código Pix</button>
       <div class="espera"><div class="giro"></div><span>Aguardando pagamento… <span id="pixTempo"></span></span></div>`;
     $("#btCopiaPix").onclick = () => copiar(d.copy_paste);
+    // desenha o QR Code a partir do copia e cola (sempre funciona); se não der, usa a imagem da BetterSell
+    const qrBox = $("#pixQR");
+    try {
+      if (typeof window.qrcode !== "function") throw 0;
+      const q = window.qrcode(0, "M"); q.addData(d.copy_paste); q.make();
+      const n = q.getModuleCount(), m = 3; let p = "";
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) p += `M${c + m} ${r + m}h1v1h-1z`;
+      qrBox.innerHTML = `<svg id="pixImg" viewBox="0 0 ${n + 2 * m} ${n + 2 * m}" width="210" height="210" shape-rendering="crispEdges" role="img" aria-label="QR Code Pix"><rect width="100%" height="100%" fill="#fff"/><path d="${p}" fill="#000"/></svg>`;
+      qrBox.dataset.texto = d.copy_paste;
+    } catch {
+      if (img) qrBox.innerHTML = `<img id="pixImg" src="${img}" alt="QR Code Pix" style="width:210px;height:210px">`;
+      else if (d.qr_code_url) qrBox.innerHTML = `<a href="${esc(d.qr_code_url)}" target="_blank" class="btn btn-sec">Abrir QR Code</a>`;
+    }
     pararPix();
     pixCont = setInterval(() => {
       const s = Math.max(0, Math.floor((exp - Date.now()) / 1000));
