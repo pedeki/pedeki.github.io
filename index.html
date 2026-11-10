@@ -470,6 +470,18 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
 </footer>
 
 <script src="config.js"></script>
+<script type="module">
+// Contador de visitas: conta 1 vez por aparelho (o aparelho do admin não conta)
+try {
+  if (!localStorage.getItem("pdk_vis") && window.PEDEKI && window.PEDEKI.firebase) {
+    const id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)).replace(/[^a-z0-9]/g, "").slice(0, 32);
+    const F = await import("./js/fb.js");
+    const db = F.getFirestore(F.initializeApp(window.PEDEKI.firebase));
+    await F.setDoc(F.doc(db, "visitas", id), { em: F.serverTimestamp() });
+    localStorage.setItem("pdk_vis", id);
+  }
+} catch (e) {}
+</script>
 <script>
 // ===== dados da loja de exemplo =====
 const produtos=[

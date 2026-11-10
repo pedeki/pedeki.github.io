@@ -10,8 +10,10 @@
 <style>
 .wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
-.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
-.nums .card{padding:16px}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px}
+.nums.vis{grid-template-columns:repeat(3,1fr);margin-bottom:18px}
+.nums.vis .card{background:linear-gradient(135deg,#fff,var(--cor-claro))}
+.nums .card{padding:16px;margin-top:0}
 .nums small{color:var(--cinza);font-weight:600;font-size:.78rem}
 .nums strong{display:block;font-size:1.5rem;color:var(--escuro)}
 @media(max-width:800px){.nums{grid-template-columns:1fr 1fr}}
@@ -77,7 +79,21 @@ F.onAuthStateChanged(auth, u => {
     desenha(); desenhaConversas();
   }, e => toast(erroAmigavel(e), "erro"));
   ligaSuporte();
+  try { localStorage.setItem("pdk_vis", "admin"); } catch {}
+  contaVisitas(); setInterval(contaVisitas, 60000);
 });
+// ================= visitas (1 por aparelho)
+let vis = {};
+async function contaVisitas() {
+  const col = F.collection(db, "visitas"), n = async q => (await F.getCountFromServer(q)).data().count;
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  try {
+    const [total, h, d7] = await Promise.all([n(col), n(F.query(col, F.where("em", ">=", F.Timestamp.fromMillis(hoje.getTime())))),
+      n(F.query(col, F.where("em", ">=", F.Timestamp.fromMillis(hoje.getTime() - 6 * DIA))))]);
+    vis = { total, hoje: h, d7 };
+  } catch (e) { vis = { total: "—", hoje: "—", d7: "—" }; }
+  [["#visTotal", vis.total], ["#visHoje", vis.hoje], ["#vis7", vis.d7]].forEach(([s, v]) => { const el = $(s); if (el) el.textContent = typeof v === "number" ? v.toLocaleString("pt-BR") : v; });
+}
 function situacao(l) {
   if (!lojaAtiva(l)) return ["Vencida", "b-erro", "vencidas"];
   if (emTeste(l)) return ["Em teste", "b-novo", "teste"];
@@ -94,6 +110,11 @@ function desenha() {
     <div class="card"><small>Pagantes</small><strong>${cont.pagantes}</strong></div>
     <div class="card"><small>Vencidas</small><strong>${cont.vencidas}</strong></div>
     <div class="card"><small>Receita/mês (estimada)</small><strong>${R(cont.pagantes * C.preco)}</strong></div>
+  </div>
+  <div class="nums vis" title="Cada celular/computador conta 1 vez só. O seu aparelho não conta.">
+    <div class="card"><small>👀 Visitas no site (total)</small><strong id="visTotal">${vis.total ?? "…"}</strong></div>
+    <div class="card"><small>Visitas hoje</small><strong id="visHoje">${vis.hoje ?? "…"}</strong></div>
+    <div class="card"><small>Últimos 7 dias</small><strong id="vis7">${vis.d7 ?? "…"}</strong></div>
   </div>
   <div class="card">
     <div class="ff"><input id="busca" placeholder="Buscar loja, link ou WhatsApp" value="${esc(busca)}">
