@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de Privacidade — Pedeki</title>
+<meta name="description" content="Como a Pedeki coleta, usa e protege dados pessoais, conforme a LGPD.">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{background:#FAF7F4}
+.topo-l{background:#fff;border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:10}
+.topo-l .in{max-width:860px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hero-l{background:linear-gradient(150deg,#17151F,#3a1d10 70%,#FF5A1F);color:#fff;padding:46px 20px 40px}
+.hero-l .in{max-width:860px;margin:0 auto}
+.hero-l h1{font-size:2.1rem;letter-spacing:-.04em;line-height:1.1}
+.hero-l p{color:#e8dcd4;margin-top:10px;max-width:620px}
+.hero-l small{display:inline-block;margin-top:16px;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:999px;font-weight:600}
+.doc{max-width:860px;margin:0 auto;padding:26px 20px 60px;display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:start}
+.indice{position:sticky;top:78px;background:#fff;border:1px solid var(--linha);border-radius:18px;padding:14px;font-size:.86rem}
+.indice b{display:block;margin-bottom:8px;color:var(--escuro)}
+.indice a{display:block;padding:5px 6px;border-radius:8px;text-decoration:none;color:var(--cinza);font-weight:600}
+.indice a:hover{background:var(--cor-claro);color:var(--cor)}
+.texto{background:#fff;border:1px solid var(--linha);border-radius:22px;padding:28px}
+.texto h2{font-size:1.15rem;color:var(--escuro);margin:26px 0 8px;letter-spacing:-.02em;scroll-margin-top:84px}
+.texto h2:first-child{margin-top:0}
+.texto p,.texto li{color:var(--texto);font-size:.95rem;line-height:1.7}
+.texto ul{padding-left:20px;margin:6px 0}
+.texto li{margin:3px 0}
+.resumo-l{background:var(--cor-claro);border-radius:16px;padding:16px 18px;margin-bottom:8px}
+.resumo-l b{color:var(--cor)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem}
+th,td{border:1px solid var(--linha);padding:9px 10px;text-align:left;vertical-align:top}
+th{background:#FAF7F4;color:var(--escuro)}
+.contato{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.rod-l{text-align:center;color:var(--cinza);font-size:.85rem;padding:0 20px 40px}
+.rod-l a{color:var(--escuro);font-weight:700;text-decoration:none;margin:0 6px}
+@media(max-width:760px){.doc{grid-template-columns:1fr}.indice{position:static}.texto{padding:20px}.hero-l h1{font-size:1.7rem}table{font-size:.8rem}}
+@media print{.topo-l,.indice,.contato,.rod-l{display:none}.doc{display:block}.hero-l{background:none;color:#000}.hero-l p{color:#000}}
+</style>
+</head>
+<body>
+<header class="topo-l"><div class="in">
+  <a href="index.html" class="marca"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lgP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF5A1F"/><stop offset="1" stop-color="#FF8A3D"/></linearGradient></defs><rect width="48" height="48" rx="14" fill="url(#lgP)"/><path d="M12.5 17.5a4.5 4.5 0 0 1 4.5-4.5h14a4.5 4.5 0 0 1 4.5 4.5v11a4.5 4.5 0 0 1-4.5 4.5h-8.2l-6.3 5.2V33A4.5 4.5 0 0 1 12.5 28.5z" fill="#fff"/><path d="M21 20.6v-1.4a3 3 0 0 1 6 0v1.4" fill="none" stroke="#FF5A1F" stroke-width="1.7" stroke-linecap="round"/><path d="M17.6 20.2h12.8a.9.9 0 0 1 .9.95l-.55 7.9a1.6 1.6 0 0 1-1.6 1.45H18.85a1.6 1.6 0 0 1-1.6-1.45l-.55-7.9a.9.9 0 0 1 .9-.95z" fill="#FF5A1F"/><path d="M21.2 24.2q2.8 2.4 5.6 0" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg><span>Pede<b>ki</b></span></a>
+  <a href="termos.html" class="btn btn-sec btn-mini">Termos de Uso</a>
+</div></header>
+
+<section class="hero-l"><div class="in">
+  <h1>Política de Privacidade</h1>
+  <p>Explicamos aqui, de forma simples, quais dados usamos, para quê e quais são os seus direitos, de acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 — LGPD).</p>
+  <small>Última atualização: 10 de novembro de 2026</small>
+</div></section>
+
+<div class="doc">
+  <nav class="indice">
+    <b>Nesta página</b>
+    <a href="#resumo">Resumo rápido</a>
+    <a href="#quem">1. Quem somos</a>
+    <a href="#papeis">2. Quem é responsável</a>
+    <a href="#dados">3. Dados que usamos</a>
+    <a href="#finalidade">4. Para que usamos</a>
+    <a href="#compartilha">5. Com quem compartilhamos</a>
+    <a href="#onde">6. Onde ficam os dados</a>
+    <a href="#tempo">7. Por quanto tempo</a>
+    <a href="#seguranca">8. Segurança</a>
+    <a href="#aparelho">9. Dados no seu aparelho</a>
+    <a href="#direitos">10. Seus direitos</a>
+    <a href="#menores">11. Menores de idade</a>
+    <a href="#mudancas">12. Mudanças</a>
+    <a href="#contato">13. Contato</a>
+  </nav>
+
+  <article class="texto">
+    <div class="resumo-l" id="resumo">
+      <p><b>Resumo rápido:</b> usamos só os dados necessários para o cardápio funcionar, o pedido chegar na loja e a mensalidade ser cobrada. <b>Não vendemos dados</b>, não usamos para propaganda de terceiros e você pode pedir para ver, corrigir ou apagar seus dados quando quiser.</p>
+    </div>
+
+    <h2 id="quem">1. Quem somos</h2>
+    <p>A <b>Pedeki</b> é uma plataforma on-line que permite a lojas (restaurantes, lanchonetes, pizzarias, mercadinhos e outros negócios) criar um cardápio digital, receber pedidos dos seus clientes pelo WhatsApp e organizar suas entregas. O site funciona no endereço <b>pedeki.github.io</b>.</p>
+    <p id="identificacao"></p>
+
+    <h2 id="papeis">2. Quem é responsável por cada dado</h2>
+    <ul>
+      <li><b>Dados das lojas e dos entregadores</b> (cadastro, plano e pagamentos): a Pedeki é a <b>controladora</b>, ou seja, decide como esses dados são usados.</li>
+      <li><b>Dados dos clientes que fazem pedidos</b> em uma loja: a <b>loja</b> é a controladora, porque é ela quem vende, prepara e entrega o pedido. A Pedeki atua como <b>operadora</b>: guarda e mostra esses dados para a loja, só para o pedido funcionar.</li>
+    </ul>
+    <p>Se você é cliente e quer saber o que uma loja faz com seus dados, fale primeiro com a própria loja pelo WhatsApp dela. A Pedeki também ajuda, pelo contato do item 13.</p>
+
+    <h2 id="dados">3. Dados que usamos</h2>
+    <table>
+      <tr><th>Quem</th><th>Quais dados</th></tr>
+      <tr><td><b>Dono da loja</b></td><td>Nome, CPF, e-mail, senha (guardada de forma criptografada pelo Google Firebase, a Pedeki não vê sua senha), WhatsApp da loja, nome, endereço, logo, fotos e cardápio da loja, chave Pix (se informada), histórico de pagamentos da mensalidade e as mensagens trocadas com o suporte pelo chat do painel.</td></tr>
+      <tr><td><b>Cliente que faz pedido</b></td><td>Nome, WhatsApp, endereço de entrega (rua, número, bairro, complemento), itens do pedido, forma de pagamento, troco e observações.</td></tr>
+      <tr><td><b>Entregador</b></td><td>Nome, WhatsApp, senha (criptografada), lojas em que entrega e histórico de entregas.</td></tr>
+    </table>
+    <p>Não pedimos dados sensíveis (como saúde, religião ou biometria) e não coletamos localização GPS. Não guardamos número de cartão: o pagamento do pedido é feito direto entre cliente e loja.</p>
+
+    <h2 id="finalidade">4. Para que usamos (e com qual base da LGPD)</h2>
+    <ul>
+      <li><b>Criar e manter a conta da loja e do entregador</b>: execução do contrato (art. 7º, V).</li>
+      <li><b>Enviar o pedido para a loja, mostrar o acompanhamento e permitir a entrega</b>: execução do contrato e procedimentos pedidos pelo próprio cliente (art. 7º, V).</li>
+      <li><b>Cobrar a mensalidade e confirmar pagamentos</b>: execução do contrato (art. 7º, V) e cumprimento de obrigações legais (art. 7º, II).</li>
+      <li><b>Usar o CPF e o WhatsApp para impedir que a mesma pessoa use o teste grátis várias vezes e para evitar fraudes</b>: legítimo interesse (art. 7º, IX) e prevenção à fraude.</li>
+      <li><b>Responder dúvidas, dar suporte e avisar sobre mudanças importantes</b>: execução do contrato e legítimo interesse.</li>
+      <li><b>Cumprir a lei e se defender em processos</b>: art. 7º, II e VI.</li>
+    </ul>
+    <p>Não usamos seus dados para tomar decisões automáticas que afetem seus direitos, e não enviamos propaganda de outras empresas.</p>
+
+    <h2 id="compartilha">5. Com quem compartilhamos</h2>
+    <ul>
+      <li><b>Com a loja do pedido</b>: os dados do cliente vão só para a loja onde ele fez o pedido, e para o entregador escolhido pela loja (nome, WhatsApp e endereço, só para fazer a entrega).</li>
+      <li><b>Google Firebase</b> (Google Cloud): guarda as contas e os dados do sistema.</li>
+      <li><b>Cloudflare</b>: processa com segurança a comunicação com o meio de pagamento.</li>
+      <li><b>BetterSell</b>: gera o Pix da mensalidade e confirma o pagamento.</li>
+      <li><b>GitHub</b>: hospeda as páginas do site (não recebe dados dos formulários).</li>
+      <li><b>WhatsApp</b>: quando você toca em um botão de WhatsApp, a mensagem é aberta no seu aplicativo e passa a seguir as regras do WhatsApp/Meta.</li>
+      <li><b>Autoridades</b>: somente quando a lei ou uma ordem judicial exigir.</li>
+    </ul>
+    <p><b>Nunca vendemos nem alugamos dados pessoais.</b></p>
+
+    <h2 id="onde">6. Onde ficam os dados</h2>
+    <p>O banco de dados fica em servidores do Google no Brasil (região São Paulo). Alguns fornecedores acima podem processar dados em outros países, sempre com padrões de segurança adequados, como permite o art. 33 da LGPD.</p>
+
+    <h2 id="tempo">7. Por quanto tempo guardamos</h2>
+    <ul>
+      <li><b>Conta da loja e do entregador</b>: enquanto a conta existir. Depois de pedida a exclusão, apagamos em até 30 dias, exceto o que a lei obriga a guardar.</li>
+      <li><b>Pedidos</b>: ficam disponíveis para a loja no painel. A própria loja pode apagar pedidos antigos a qualquer momento.</li>
+      <li><b>Conversas do suporte</b>: enquanto a conta existir, para ajudarmos melhor em novos atendimentos. Você pode pedir para apagar a qualquer momento.</li>
+      <li><b>Pagamentos da mensalidade</b>: pelo prazo exigido pela legislação fiscal e para comprovar pagamentos (em geral, até 5 anos).</li>
+      <li><b>Registro de CPF e WhatsApp do teste grátis</b>: guardado de forma fechada, só para evitar o uso repetido do teste.</li>
+    </ul>
+
+    <h2 id="seguranca">8. Segurança</h2>
+    <p>Usamos conexão segura (HTTPS), senhas criptografadas e regras de acesso no banco de dados: cada loja só enxerga os próprios dados e pedidos; o entregador só vê as entregas que recebeu; dados como CPF não ficam públicos. Nenhum sistema é 100% invulnerável. Se acontecer um incidente de segurança que possa causar risco ou dano relevante, avisaremos as pessoas afetadas e a ANPD, como manda a lei.</p>
+
+    <h2 id="aparelho">9. Dados guardados no seu aparelho</h2>
+    <p>Não usamos cookies de propaganda nem rastreadores. O site guarda no seu próprio navegador apenas o necessário para funcionar: seu login, o carrinho e, se você quiser, seus dados de entrega para não precisar digitar de novo. No cardápio existe o botão <b>“Esquecer meus dados neste aparelho”</b> para apagar isso a qualquer momento.</p>
+
+    <h2 id="direitos">10. Seus direitos</h2>
+    <p>Pela LGPD (art. 18), você pode pedir, a qualquer momento e sem custo:</p>
+    <ul>
+      <li>confirmação de que usamos seus dados e acesso a eles;</li>
+      <li>correção de dados errados ou desatualizados;</li>
+      <li>exclusão, bloqueio ou anonimização de dados desnecessários;</li>
+      <li>portabilidade (uma cópia dos seus dados);</li>
+      <li>informação sobre com quem compartilhamos;</li>
+      <li>revogação do consentimento, quando ele for a base usada;</li>
+      <li>reclamação à Autoridade Nacional de Proteção de Dados (ANPD), no site gov.br/anpd.</li>
+    </ul>
+    <p>Donos de loja também podem corrigir quase tudo direto no painel. Respondemos os pedidos em até 15 dias.</p>
+
+    <h2 id="menores">11. Menores de idade</h2>
+    <p>As contas de loja e de entregador são só para maiores de 18 anos. O cardápio pode ser usado por qualquer pessoa, mas não coletamos dados de crianças de forma intencional.</p>
+
+    <h2 id="mudancas">12. Mudanças nesta política</h2>
+    <p>Podemos atualizar esta política para melhorar o serviço ou seguir mudanças na lei. A data no topo mostra a última versão. Se a mudança for importante, avisaremos no painel.</p>
+
+    <h2 id="contato">13. Contato sobre privacidade</h2>
+    <p>Para tirar dúvidas ou exercer seus direitos, fale com a Pedeki pelo canal de atendimento:</p>
+    <div class="contato">
+      <a class="btn btn-zap" id="btZapPriv" target="_blank" rel="noopener">💬 Falar no WhatsApp</a>
+    </div>
+    <p style="margin-top:10px;font-size:.86rem;color:var(--cinza)">Para sua segurança, podemos pedir uma confirmação de identidade antes de mostrar ou apagar dados.</p>
+  </article>
+</div>
+
+<p class="rod-l">© <span id="ano"></span> Pedeki · <a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a> · <a href="index.html">Início</a></p>
+
+<script src="config.js"></script>
+<script src="js/legal.js"></script>
+</body>
+</html>

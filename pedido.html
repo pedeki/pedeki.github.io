@@ -91,7 +91,7 @@ function desenha() {
       <p style="color:var(--cinza);font-size:.88rem;margin-top:10px">💳 ${esc(ped.pagamento)}${ped.troco ? " · troco para " + R(ped.troco) : ""}<br>${ret ? "🏪 Retirada no local" + (loja.endereco ? ": " + esc(loja.endereco) : "") : "🛵 " + esc(ped.cliente.endereco)}</p>
     </div>
     <p style="text-align:center;margin-top:18px"><a href="${linkLoja(loja.slug)}" style="color:var(--cor);font-weight:700;text-decoration:none">← Voltar ao cardápio</a></p>
-    <p style="text-align:center;color:var(--cinza);font-size:.78rem;margin-top:14px">Esta página atualiza sozinha.</p>`;
+    <p style="text-align:center;color:var(--cinza);font-size:.78rem;margin-top:14px">Esta página atualiza sozinha.<br><a href="termos.html" style="color:var(--cinza)">Termos de Uso</a> · <a href="privacidade.html" style="color:var(--cinza)">Privacidade</a></p>`;
 }
 </script>
 </body>

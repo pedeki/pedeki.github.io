@@ -109,6 +109,29 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
 .passos-ini button .n{width:28px;height:28px;border-radius:50%;background:var(--cor-claro);color:var(--cor);display:grid;place-items:center;font-weight:800;flex-shrink:0}
 .passos-ini button.feito .n{background:var(--verde);color:#fff}
 .passos-ini button.feito{color:var(--cinza);text-decoration:line-through}
+/* relatórios */
+.periodo{display:flex;gap:6px;flex-wrap:wrap}
+.periodo button{border:1.5px solid var(--linha);background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:.84rem;cursor:pointer;color:var(--cinza)}
+.periodo button.on{background:var(--escuro);border-color:var(--escuro);color:#fff}
+.grafico{display:flex;align-items:flex-end;gap:4px;height:180px;padding-top:24px;overflow-x:auto}
+.grafico .col{flex:1;min-width:18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}
+.grafico .bar{width:100%;max-width:38px;background:linear-gradient(180deg,var(--cor),color-mix(in srgb,var(--cor) 65%,#fff));border-radius:8px 8px 3px 3px;min-height:3px;transition:height .4s}
+.grafico .bar.zero{background:#EFEAE5}
+.grafico .col small{font-size:.66rem;color:var(--cinza);margin-top:5px;white-space:nowrap}
+.grafico .col .v{position:absolute;top:-2px;font-size:.62rem;font-weight:800;color:var(--escuro);white-space:nowrap;opacity:0;transition:opacity .15s}
+.grafico .col:hover .v{opacity:1}
+.top-l{display:grid;gap:10px}
+.top-i{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;font-size:.9rem}
+.top-i .n{width:26px;height:26px;border-radius:8px;background:var(--cor-claro);color:var(--cor);display:grid;place-items:center;font-weight:800;font-size:.8rem}
+.top-i .tr{height:6px;border-radius:9px;background:#F1EEEA;margin-top:5px;overflow:hidden}
+.top-i .tr i{display:block;height:100%;background:var(--cor);border-radius:9px}
+.top-i b{color:var(--escuro)}
+.lado .legal{display:flex;gap:10px;flex-wrap:wrap;padding:8px 12px 0;font-size:.74rem}
+.lado .legal a{color:var(--cinza);text-decoration:none;font-weight:600}
+.lado .legal a:hover{color:var(--cor)}
+#btAbreFecha{min-width:0}
+.numeros>.card,.grade2>.card{margin-top:0}
+a.nav-b{text-decoration:none}
 </style>
 </head>
 <body>
@@ -118,8 +141,9 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
   <a href="index.html" id="marca"></a>
   <div id="navBotoes"></div>
   <div class="rodape">
-    <a href="admin.html" class="nav-b oculto" id="lnkAdmin">🛡️ Administração</a>
+    <button class="nav-b" data-ir="suporte">💬 Ajuda e suporte</button>
     <button class="nav-b" id="btSair">↩ Sair</button>
+    <div class="legal"><a href="termos.html" target="_blank">Termos de Uso</a><a href="privacidade.html" target="_blank">Privacidade</a></div>
   </div>
 </aside>
 
@@ -128,6 +152,7 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
   <header class="topo">
     <div class="lj"><div id="topoLogo"></div><div style="min-width:0"><h1 id="topoNome">Sua loja</h1><div id="topoStatus"></div></div></div>
     <div class="acoes">
+      <button class="btn btn-sec btn-mini oculto" id="btAbreFecha"></button>
       <button class="btn btn-sec btn-mini" id="btSom">🔕 Ativar som</button>
       <a class="btn btn-pri btn-mini" id="btVerLoja" target="_blank">Ver minha loja ↗</a>
     </div>
@@ -151,6 +176,30 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
       </div>
       <div class="filtros" id="filtros"></div>
       <div class="peds" id="listaPedidos"></div>
+    </section>
+
+    <!-- RELATÓRIOS -->
+    <section class="sec" data-sec="relatorios">
+      <div class="sec-tit"><div><h2>Relatórios</h2><p>Quanto você vendeu, o que mais sai e como seus clientes pagam.</p></div>
+        <button class="btn btn-sec" id="btCsv">⬇️ Baixar planilha</button></div>
+      <div class="periodo" id="periodo" style="margin-bottom:16px"></div>
+      <div class="numeros">
+        <div class="card"><small>Faturamento</small><strong id="rFat">R$ 0</strong></div>
+        <div class="card"><small>Pedidos</small><strong id="rQtd">0</strong></div>
+        <div class="card"><small>Ticket médio</small><strong id="rTicket">R$ 0</strong></div>
+        <div class="card"><small>Cancelados</small><strong id="rCanc">0</strong></div>
+      </div>
+      <div class="card"><h3>📈 Vendas por dia</h3><div class="grafico" id="grafico"></div></div>
+      <div class="grade2" style="margin-top:14px">
+        <div class="card"><h3>🏆 Mais vendidos</h3><div class="top-l" id="topProd"></div></div>
+        <div class="card"><h3>💳 Como pagaram</h3><div class="top-l" id="topPag"></div>
+          <h3 style="margin-top:20px">🛵 Entrega x retirada</h3><div class="top-l" id="topTipo"></div></div>
+      </div>
+      <div class="grade2" style="margin-top:14px">
+        <div class="card"><h3>👥 Melhores clientes</h3><div class="top-l" id="topCli"></div></div>
+        <div class="card"><h3>🏷️ Cupons usados</h3><div class="top-l" id="topCup"></div></div>
+      </div>
+      <p style="color:var(--cinza);font-size:.8rem;margin-top:12px">Conta só pedidos não cancelados dos últimos 500 pedidos.</p>
     </section>
 
     <!-- CARDÁPIO -->
@@ -270,6 +319,18 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
       <div id="listaConvites"></div>
     </section>
 
+    <!-- SUPORTE -->
+    <section class="sec" data-sec="suporte">
+      <div class="sec-tit"><div><h2>Suporte</h2><p>Fale com a equipe Pedeki por aqui. A resposta chega nesta mesma tela.</p></div>
+        <a class="btn btn-sec btn-mini" id="btSupZap" target="_blank" rel="noopener">Prefiro WhatsApp</a></div>
+      <div class="chat">
+        <div class="chat-topo"><div class="av" id="supAv"></div><div><b>Suporte Pedeki</b><small>● Respondemos o mais rápido possível</small></div></div>
+        <div class="chat-msgs" id="supMsgs"></div>
+        <div class="chat-rap" id="supRap"></div>
+        <div class="chat-env"><textarea id="supTxt" rows="1" maxlength="1000" placeholder="Escreva sua mensagem..."></textarea><button class="btn btn-pri" id="supEnv" title="Enviar">➤</button></div>
+      </div>
+    </section>
+
     <!-- PLANO -->
     <section class="sec" data-sec="plano">
       <div class="sec-tit"><div><h2>Meu plano</h2><p>Sua mensalidade e pagamentos.</p></div></div>
@@ -282,6 +343,12 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
         <p style="color:var(--cinza);font-size:.86rem;margin-top:12px">Pagou, liberou na hora. Se pagar antes de vencer, os dias são somados.</p>
       </div>
       <div class="card"><h3>Pagamentos</h3><div id="histPag"><p style="color:var(--cinza)">Nenhum pagamento ainda.</p></div></div>
+      <div class="card">
+        <h3>🔒 Conta e privacidade</h3>
+        <div class="chave"><div><b>Apagar pedidos antigos</b><small>Remove pedidos com mais de 90 dias. Bom para proteger os dados dos seus clientes (LGPD).</small></div><button class="btn btn-sec btn-mini" id="btLimpaPed">Apagar</button></div>
+        <div class="chave"><div><b>Termos e privacidade</b><small>As regras do serviço e como cuidamos dos dados</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn btn-sec btn-mini" href="termos.html" target="_blank">Termos</a><a class="btn btn-sec btn-mini" href="privacidade.html" target="_blank">Privacidade</a></div></div>
+        <div class="chave"><div><b>Excluir minha conta</b><small>Pedimos a confirmação pelo WhatsApp de suporte e apagamos em até 30 dias</small></div><a class="btn btn-perigo btn-mini" id="btExcluirConta" target="_blank" rel="noopener">Solicitar</a></div>
+      </div>
     </section>
   </div>
 </div>
@@ -361,25 +428,27 @@ body{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
 <script type="module">
 import { auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, num, dinheiroInput, zapLink, comprimir,
   ms, fimTeste, validoAte, lojaAtiva, emTeste, dataBR, horaBR, diasRestantes, DIAS, DIAS_NOME, horariosPadrao, abertaAgora,
-  erroAmigavel, marcaHTML, linkLoja, linkPedido } from "./js/base.js";
+  erroAmigavel, marcaHTML, linkLoja, linkPedido, LOGO } from "./js/base.js";
+import { desenhaChat, ligaEnvio } from "./js/chat.js";
 
 let user, uid, loja = null, produtos = [], cupons = [], pedidos = [], secAtual = "pedidos";
 let entregadoresLoja = [], entregasPorPedido = {}, convitesLoja = [];
 const lojaRef = () => F.doc(db, "lojas", uid);
 
 // ================= navegação
-const SECOES = [["pedidos", "📋", "Pedidos"], ["cardapio", "🍔", "Cardápio"], ["cupons", "🏷️", "Cupons"], ["entrega", "🛵", "Entrega e pagamento"], ["entregadores", "🏍️", "Entregadores"], ["loja", "🎨", "Minha loja"], ["divulgar", "📣", "Divulgar"], ["plano", "💳", "Meu plano"]];
+const SECOES = [["pedidos", "📋", "Pedidos"], ["relatorios", "📊", "Relatórios"], ["cardapio", "🍔", "Cardápio"], ["cupons", "🏷️", "Cupons"], ["entrega", "🛵", "Entrega e pagamento"], ["entregadores", "🏍️", "Entregadores"], ["loja", "🎨", "Minha loja"], ["divulgar", "📣", "Divulgar"], ["suporte", "💬", "Suporte"], ["plano", "💳", "Meu plano"]];
 $("#marca").outerHTML = marcaHTML;
-const navHTML = SECOES.map(([s, i, n]) => `<button class="nav-b" data-ir="${s}">${i} ${n}${s === "pedidos" ? '<span class="qt oculto" data-qt></span>' : ""}</button>`).join("");
+const navHTML = SECOES.map(([s, i, n]) => `<button class="nav-b" data-ir="${s}">${i} ${n}${s === "pedidos" ? '<span class="qt oculto" data-qt></span>' : s === "suporte" ? '<span class="qt oculto" data-qts>nova</span>' : ""}</button>`).join("");
 $("#navBotoes").innerHTML = navHTML; $("#menuMob").innerHTML = navHTML;
 document.addEventListener("click", e => { const b = e.target.closest("[data-ir]"); if (b) mostrar(b.dataset.ir); });
 function mostrar(s) {
-  if (loja && !lojaAtiva(loja) && s !== "plano") { toast("Seu plano venceu. Renove para usar o painel.", "erro"); s = "plano"; }
+  if (loja && !lojaAtiva(loja) && s !== "plano" && s !== "suporte") { toast("Seu plano venceu. Renove para usar o painel.", "erro"); s = "plano"; }
   secAtual = s;
   $$(".sec").forEach(x => x.classList.toggle("on", x.dataset.sec === s));
   $$("[data-ir]").forEach(x => x.classList.toggle("on", x.dataset.ir === s));
   try { history.replaceState(null, "", "#" + s); } catch {}
   window.scrollTo(0, 0);
+  if (s === "suporte") abriuSuporte();
 }
 // modais
 document.addEventListener("click", e => {
@@ -395,19 +464,18 @@ $("#btSair").onclick = () => F.signOut(auth).then(() => location.href = "conta.h
 F.onAuthStateChanged(auth, async u => {
   if (!u) { location.href = "conta.html#entrar"; return; }
   user = u; uid = u.uid;
-  if (C.adminEmail && u.email === C.adminEmail) $("#lnkAdmin").classList.remove("oculto");
   const s = await F.getDoc(lojaRef());
   if (!s.exists()) { location.href = "conta.html#cadastro"; return; }
   F.onSnapshot(lojaRef(), snap => {
     const primeira = !loja;
     loja = snap.data({ serverTimestamps: "estimate" });
-    desenhaTopo(); desenhaBanners(); desenhaPlano(); desenhaCategorias(); desenhaPassos();
+    desenhaTopo(); desenhaAbreFecha(); desenhaBanners(); desenhaPlano(); desenhaCategorias(); desenhaPassos();
     if (primeira) {
       preencheEntrega(); preencheLoja(); desenhaDivulgar();
       $("#carregando").remove();
       const h = location.hash.slice(1);
       mostrar(!lojaAtiva(loja) ? "plano" : SECOES.some(x => x[0] === h) ? h : "pedidos");
-    } else if (!lojaAtiva(loja) && secAtual !== "plano") mostrar("plano");
+    } else if (!lojaAtiva(loja) && secAtual !== "plano" && secAtual !== "suporte") mostrar("plano");
   });
   F.onSnapshot(F.query(F.collection(db, "lojas", uid, "produtos"), F.orderBy("ordem")), snap => {
     produtos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -418,7 +486,7 @@ F.onAuthStateChanged(auth, async u => {
     desenhaCupons();
   });
   let primeiraLeva = true;
-  F.onSnapshot(F.query(F.collection(db, "lojas", uid, "pedidos"), F.orderBy("criadoEm", "desc"), F.limit(200)), snap => {
+  F.onSnapshot(F.query(F.collection(db, "lojas", uid, "pedidos"), F.orderBy("criadoEm", "desc"), F.limit(500)), snap => {
     const antes = new Set(pedidos.map(p => p.id));
     pedidos = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
     if (!primeiraLeva) {
@@ -426,8 +494,9 @@ F.onAuthStateChanged(auth, async u => {
       if (novos.length) { tocar(); toast(`🔔 Novo pedido #${novos[0].numero}!`); piscarTitulo(); }
     }
     primeiraLeva = false;
-    desenhaPedidos();
+    desenhaPedidos(); desenhaRelatorios();
   });
+  ligaSuporte();
   F.onSnapshot(F.collection(db, "lojas", uid, "entregadores"), snap => {
     entregadoresLoja = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
     desenhaEntregadores();
@@ -735,7 +804,7 @@ function desenhaProdutos() {
         <div class="inf"><b>${esc(p.nome)}</b><small>${R(p.preco)}${promo ? ` <s>${R(p.precoDe)}</s> <span class="badge b-novo">Promo</span>` : ""}${esg ? ' <span class="badge b-erro">Esgotado</span>' : typeof p.estoque === "number" ? ` · estoque ${p.estoque}` : ""}${(p.adicionais || []).length ? " · " + p.adicionais.length + " grupo(s) de adicionais" : ""}</small></div>
         <div class="bts"><label class="sw" title="Disponível"><input type="checkbox" data-pativo="${p.id}" ${p.ativo !== false ? "checked" : ""}><span></span></label>
         <button class="ico-btn mv" data-pmv="-1" data-id="${p.id}" title="Subir">↑</button><button class="ico-btn mv" data-pmv="1" data-id="${p.id}" title="Descer">↓</button>
-        <button class="ico-btn" data-ped="${p.id}" title="Editar">✎</button><button class="ico-btn" data-pdel="${p.id}" title="Apagar">🗑</button></div></div>`;
+        <button class="ico-btn" data-ped="${p.id}" title="Editar">✎</button><button class="ico-btn mv" data-pdup="${p.id}" title="Duplicar">⧉</button><button class="ico-btn" data-pdel="${p.id}" title="Apagar">🗑</button></div></div>`;
     }).join("") + "</div>";
   }).join("");
 }
@@ -744,7 +813,13 @@ $("#listaProd").addEventListener("change", e => {
   F.updateDoc(F.doc(db, "lojas", uid, "produtos", id), { ativo: e.target.checked }).then(() => toast(e.target.checked ? "Produto visível" : "Produto escondido"));
 });
 $("#listaProd").addEventListener("click", async e => {
-  const ed = e.target.closest("[data-ped]"), del = e.target.closest("[data-pdel]"), mv = e.target.closest("[data-pmv]");
+  const ed = e.target.closest("[data-ped]"), del = e.target.closest("[data-pdel]"), mv = e.target.closest("[data-pmv]"), dup = e.target.closest("[data-pdup]");
+  if (dup) {
+    const o = produtos.find(p => p.id === dup.dataset.pdup); if (!o) return;
+    const { id, ...dados } = o;
+    await F.addDoc(F.collection(db, "lojas", uid, "produtos"), { ...dados, nome: (o.nome + " (cópia)").slice(0, 70), ativo: false, ordem: Math.max(0, ...produtos.map(p => p.ordem || 0)) + 1 });
+    toast("Cópia criada (escondida). Edite e ative quando quiser.");
+  }
   if (ed) abreProduto(produtos.find(p => p.id === ed.dataset.ped));
   if (del) { if (!confirmaSimples(del)) return; await F.deleteDoc(F.doc(db, "lojas", uid, "produtos", del.dataset.pdel)); toast("Produto apagado."); }
   if (mv) {
@@ -918,6 +993,139 @@ $("#fLoja").onsubmit = async e => {
     toast(er.code === "permission-denied" && whats !== loja.whatsapp ? "Esse WhatsApp já foi usado em outra loja no teste grátis. Ative o plano para poder usar ele." : erroAmigavel(er), "erro");
   }
   bt.disabled = false;
+};
+
+// ================= abrir / fechar rápido
+function desenhaAbreFecha() {
+  const b = $("#btAbreFecha"); if (!lojaAtiva(loja)) { b.classList.add("oculto"); return; }
+  b.classList.remove("oculto");
+  const ab = abertaAgora(loja), modo = loja.abertoModo || "auto";
+  b.dataset.acao = modo === "fechado" ? "auto" : ab ? "fechado" : "aberto";
+  b.textContent = modo === "fechado" ? "🟢 Reabrir loja" : ab ? "⏸️ Pausar pedidos" : "🟢 Abrir agora";
+  b.title = modo === "fechado" ? "Volta a seguir o horário de funcionamento" : ab ? "Fecha a loja na hora (ex.: muito movimento)" : "Abre a loja agora, fora do horário";
+}
+$("#btAbreFecha").onclick = async () => {
+  const b = $("#btAbreFecha"), novo = b.dataset.acao; b.disabled = true;
+  try {
+    await F.updateDoc(lojaRef(), { abertoModo: novo });
+    const r = $("#fLoja").querySelector(`[name=abertoModo][value=${novo}]`); if (r) r.checked = true;
+    const ab = abertaAgora({ ...loja, abertoModo: novo });
+    toast(novo === "fechado" ? "Loja pausada. Os clientes não conseguem pedir." : ab ? "Loja aberta! 🟢" : "Voltou ao horário automático (agora está fora do horário).");
+  } catch (e) { toast(erroAmigavel(e), "erro"); }
+  b.disabled = false;
+};
+setInterval(() => { if (loja) { desenhaAbreFecha(); desenhaTopo(); } }, 60000);
+
+// ================= relatórios
+const PERIODOS = [["hoje", "Hoje"], ["7", "7 dias"], ["30", "30 dias"], ["mes", "Este mês"], ["mesAnt", "Mês passado"]];
+let periodo = "7";
+function intervalo() {
+  const h = new Date(); h.setHours(0, 0, 0, 0);
+  if (periodo === "hoje") return [h.getTime(), Date.now() + 1];
+  if (periodo === "mes") return [new Date(h.getFullYear(), h.getMonth(), 1).getTime(), Date.now() + 1];
+  if (periodo === "mesAnt") return [new Date(h.getFullYear(), h.getMonth() - 1, 1).getTime(), new Date(h.getFullYear(), h.getMonth(), 1).getTime()];
+  return [h.getTime() - (+periodo - 1) * 864e5, Date.now() + 1];
+}
+const pedidosPeriodo = () => { const [a, b] = intervalo(); return pedidos.filter(p => { const t = ms(p.criadoEm); return t >= a && t < b; }); };
+function listaTop(el, itens, fmt) {
+  if (!itens.length) { $(el).innerHTML = '<p style="color:var(--cinza);font-size:.88rem">Sem dados neste período.</p>'; return; }
+  const max = Math.max(...itens.map(i => i[1]));
+  $(el).innerHTML = itens.map(([n, v, ex], i) => `<div class="top-i"><span class="n">${i + 1}</span><div style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</b><div class="tr"><i style="width:${Math.max(4, v / max * 100)}%"></i></div></div><span style="text-align:right;font-weight:700;color:var(--escuro);font-size:.85rem">${fmt(v)}${ex ? `<br><small style="color:var(--cinza);font-weight:600">${ex}</small>` : ""}</span></div>`).join("");
+}
+function agrupa(lista, chave, valor) {
+  const m = {}; lista.forEach(x => { const k = chave(x); if (!k) return; m[k] = m[k] || [0, 0]; m[k][0] += valor(x); m[k][1]++; });
+  return Object.entries(m).sort((a, b) => b[1][0] - a[1][0]);
+}
+function desenhaRelatorios() {
+  if (!$("#periodo")) return;
+  $("#periodo").innerHTML = PERIODOS.map(([k, n]) => `<button class="${periodo === k ? "on" : ""}" data-per="${k}">${n}</button>`).join("");
+  const todos = pedidosPeriodo(), ok = todos.filter(p => p.status !== "cancelado");
+  const fat = ok.reduce((s, p) => s + p.total, 0);
+  $("#rFat").textContent = R(fat); $("#rQtd").textContent = ok.length;
+  $("#rTicket").textContent = R(ok.length ? fat / ok.length : 0); $("#rCanc").textContent = todos.length - ok.length;
+  // gráfico por dia
+  const [a, b] = intervalo(), dias = [];
+  for (let t = a; t < Math.min(b, Date.now() + 1); t += 864e5) dias.push(t);
+  if (periodo === "hoje") {
+    const hs = Array.from({ length: 24 }, (_, h) => [h, ok.filter(p => new Date(ms(p.criadoEm)).getHours() === h).reduce((s, p) => s + p.total, 0)]);
+    const max = Math.max(1, ...hs.map(x => x[1]));
+    $("#grafico").innerHTML = hs.map(([h, v]) => `<div class="col"><span class="v">${R(v)}</span><div class="bar ${v ? "" : "zero"}" style="height:${v / max * 100}%"></div><small>${h}h</small></div>`).join("");
+  } else {
+    const vs = dias.map(t => [t, ok.filter(p => { const x = ms(p.criadoEm); return x >= t && x < t + 864e5; }).reduce((s, p) => s + p.total, 0)]);
+    const max = Math.max(1, ...vs.map(x => x[1]));
+    $("#grafico").innerHTML = vs.map(([t, v]) => { const d = new Date(t); return `<div class="col"><span class="v">${R(v)}</span><div class="bar ${v ? "" : "zero"}" style="height:${v / max * 100}%"></div><small>${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}</small></div>`; }).join("");
+  }
+  $("#grafico").scrollLeft = $("#grafico").scrollWidth;
+  // mais vendidos
+  const prod = {}; ok.forEach(p => p.itens.forEach(i => { prod[i.nome] = prod[i.nome] || [0, 0]; prod[i.nome][0] += i.qtd; prod[i.nome][1] += i.unit * i.qtd; }));
+  listaTop("#topProd", Object.entries(prod).sort((x, y) => y[1][0] - x[1][0]).slice(0, 6).map(([n, [q, v]]) => [n, q, R(v)]), q => q + " un.");
+  listaTop("#topPag", agrupa(ok, p => p.pagamento, p => p.total).map(([n, [v, q]]) => [n, v, q + " pedido(s)"]), R);
+  listaTop("#topTipo", agrupa(ok, p => p.tipo === "entrega" ? "🛵 Entrega" : "🏪 Retirada", () => 1).map(([n, [q]]) => [n, q, ok.length ? Math.round(q / ok.length * 100) + "%" : ""]), q => q + " pedido(s)");
+  listaTop("#topCli", agrupa(ok, p => p.cliente?.tel ? p.cliente.nome + " · " + fmtTel(p.cliente.tel) : "", p => p.total).slice(0, 5).map(([n, [v, q]]) => [n, v, q + " pedido(s)"]), R);
+  listaTop("#topCup", agrupa(ok, p => p.cupom, p => p.desconto || 0).map(([n, [v, q]]) => [n, q, "-" + R(v)]), q => q + " uso(s)");
+}
+$("#periodo").addEventListener("click", e => { const b = e.target.closest("[data-per]"); if (b) { periodo = b.dataset.per; desenhaRelatorios(); } });
+$("#btCsv").onclick = () => {
+  const lista = pedidosPeriodo();
+  if (!lista.length) return toast("Não há pedidos nesse período.", "erro");
+  const c = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const linhas = [["Número", "Data", "Hora", "Status", "Tipo", "Cliente", "WhatsApp", "Endereço", "Itens", "Subtotal", "Entrega", "Desconto", "Cupom", "Total", "Pagamento"].map(c).join(";")];
+  lista.forEach(p => linhas.push([p.numero, dataBR(ms(p.criadoEm)), horaBR(ms(p.criadoEm)), (ST[p.status] || [p.status])[0], p.tipo, p.cliente.nome, fmtTel(p.cliente.tel), p.cliente.endereco, p.itens.map(i => i.qtd + "x " + i.nome).join(", "),
+    p.subtotal.toFixed(2).replace(".", ","), (p.taxa || 0).toFixed(2).replace(".", ","), (p.desconto || 0).toFixed(2).replace(".", ","), p.cupom, p.total.toFixed(2).replace(".", ","), p.pagamento].map(c).join(";")));
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\ufeff" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" }));
+  a.download = `pedidos-${loja.slug}-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+
+// ================= suporte (chat com a Pedeki)
+let supMsgs = [], supDoc = null, supPrimeira = true;
+const supRef = () => F.doc(db, "suporte", uid);
+$("#supAv").innerHTML = LOGO;
+const RAPIDAS = ["Como coloco meus produtos?", "Como funciona o pagamento?", "Meu pedido não chegou no WhatsApp", "Quero uma ajuda para configurar"];
+$("#supRap").innerHTML = RAPIDAS.map(t => `<button>${esc(t)}</button>`).join("");
+$("#supRap").onclick = e => { const b = e.target.closest("button"); if (b) { $("#supTxt").value = b.textContent; $("#supTxt").focus(); } };
+function ligaSuporte() {
+  F.onSnapshot(supRef(), s => { supDoc = s.exists() ? s.data() : null; avisoSuporte(); }, () => {});
+  F.onSnapshot(F.query(F.collection(db, "suporte", uid, "msgs"), F.orderBy("em")), s => {
+    const antes = supMsgs.length;
+    supMsgs = s.docs.map(d => d.data({ serverTimestamps: "estimate" }));
+    const nova = supMsgs.slice(antes).some(m => m.de === "admin");
+    if (!supPrimeira && nova) { tocar(); if (secAtual !== "suporte") toast("💬 O suporte Pedeki respondeu! Toque em Suporte."); else abriuSuporte(); }
+    supPrimeira = false;
+    desenhaChat($("#supMsgs"), supMsgs, false);
+    $("#supRap").classList.toggle("oculto", supMsgs.length > 0);
+  }, () => desenhaChat($("#supMsgs"), [], false));
+}
+function avisoSuporte() { const n = !!(supDoc && supDoc.naoLidaLoja && secAtual !== "suporte"); $$("[data-qts]").forEach(x => x.classList.toggle("oculto", !n)); }
+function abriuSuporte() {
+  avisoSuporte(); setTimeout(() => { const c = $("#supMsgs"); c.scrollTop = c.scrollHeight; }, 50);
+  if (supDoc && supDoc.naoLidaLoja) F.updateDoc(supRef(), { naoLidaLoja: false }).catch(() => {});
+}
+ligaEnvio($("#supTxt"), $("#supEnv"), async texto => {
+  const b = F.writeBatch(db);
+  b.set(F.doc(F.collection(db, "suporte", uid, "msgs")), { de: "loja", texto, em: F.serverTimestamp() });
+  b.set(supRef(), { nome: loja.nome, slug: loja.slug, ultima: texto.slice(0, 120), ultimaEm: F.serverTimestamp(), naoLidaAdmin: true, naoLidaLoja: false, status: "aberto" });
+  try { await b.commit(); } catch (e) { toast(erroAmigavel(e), "erro"); throw e; }
+});
+
+// ================= privacidade
+const SUP = C.suporteZap || "5582994012972";
+$("#btSupZap").href = `https://wa.me/${SUP}?text=${encodeURIComponent("Olá! Preciso de ajuda com minha loja na Pedeki.")}`;
+$("#btExcluirConta").onclick = e => {
+  e.preventDefault();
+  if (!confirm("Vamos abrir o WhatsApp de suporte para você confirmar a exclusão da conta. Continuar?")) return;
+  window.open(`https://wa.me/${SUP}?text=${encodeURIComponent(`Olá! Quero excluir minha conta da Pedeki e apagar meus dados.\nLoja: ${loja.nome}\nLink: ${loja.slug}\nE-mail: ${user.email}`)}`, "_blank");
+};
+$("#btLimpaPed").onclick = async () => {
+  const lim = Date.now() - 90 * 864e5;
+  const velhos = pedidos.filter(p => ms(p.criadoEm) < lim && ["concluido", "cancelado"].includes(p.status));
+  if (!velhos.length) return toast("Não há pedidos finalizados com mais de 90 dias.");
+  if (!confirm(`Apagar ${velhos.length} pedido(s) com mais de 90 dias? Isso não tem volta.`)) return;
+  try {
+    for (let i = 0; i < velhos.length; i += 400) { const b = F.writeBatch(db); velhos.slice(i, i + 400).forEach(p => b.delete(F.doc(db, "lojas", uid, "pedidos", p.id))); await b.commit(); }
+    toast(`${velhos.length} pedido(s) apagado(s).`);
+  } catch (e) { toast(erroAmigavel(e), "erro"); }
 };
 
 // ================= divulgar

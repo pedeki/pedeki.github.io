@@ -25,6 +25,14 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
 .link{color:var(--cor);font-weight:700;cursor:pointer;background:none;border:0}
 .status-slug{font-size:.78rem;margin-top:5px;min-height:16px}
 .topo-mob{display:none}
+.aceite{display:flex;gap:10px;align-items:flex-start;background:#FAF7F4;border:1.5px solid var(--linha);border-radius:12px;padding:12px;margin-bottom:14px;cursor:pointer;font-size:.86rem;line-height:1.5}
+.aceite input{width:20px;height:20px;flex-shrink:0;margin-top:1px;accent-color:var(--cor)}
+.aceite a{color:var(--cor);font-weight:700}
+.aceite.erro{border-color:var(--vermelho);background:#FDECEC}
+.legal-l{font-size:.78rem;color:var(--cinza);text-align:center;margin-top:22px}
+.legal-l a{color:var(--cinza);font-weight:700;margin:0 6px}
+.olho{position:relative}.olho input{padding-right:46px}
+.olho button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:1.05rem;padding:6px}
 @media(max-width:860px){body{grid-template-columns:1fr}.lado{display:none}.topo-mob{display:block;margin-bottom:22px}}
 </style>
 </head>
@@ -36,7 +44,7 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
     <p>Crie seu cardápio digital, receba pedidos organizados e controle tudo pelo celular.</p>
     <ul><li>7 dias grátis, sem cartão</li><li>Sem taxa por pedido</li><li>Pronto em 10 minutos</li></ul>
   </div>
-  <small style="opacity:.6">© Pedeki</small>
+  <small style="opacity:.7">© Pedeki · <a href="termos.html" style="color:#fff">Termos</a> · <a href="privacidade.html" style="color:#fff">Privacidade</a></small>
 </aside>
 
 <main class="form-area">
@@ -55,7 +63,7 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
       <h2>Bem-vindo de volta 👋</h2>
       <p class="sub">Entre para ver os pedidos da sua loja.</p>
       <div class="campo"><label>E-mail</label><input name="email" type="email" required autocomplete="email"></div>
-      <div class="campo"><label>Senha</label><input name="senha" type="password" required autocomplete="current-password"></div>
+      <div class="campo"><label>Senha</label><div class="olho"><input name="senha" type="password" required autocomplete="current-password"><button type="button" data-olho title="Mostrar senha">👁️</button></div></div>
       <button class="btn btn-pri btn-bloco" type="submit">Entrar</button>
       <p style="text-align:center;margin-top:16px"><button type="button" class="link" data-ir="esqueci">Esqueci minha senha</button></p>
     </form>
@@ -85,12 +93,15 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
       </div>
       <div id="blocoLogin">
         <div class="campo"><label>E-mail</label><input name="email" type="email" required autocomplete="email"></div>
-        <div class="campo"><label>Senha</label><input name="senha" type="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></div>
+        <div class="campo"><label>Senha</label><div class="olho"><input name="senha" type="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres"><button type="button" data-olho title="Mostrar senha">👁️</button></div></div>
       </div>
+      <label class="aceite" id="boxAceite"><input type="checkbox" name="aceite" id="aceite"><span>Tenho 18 anos ou mais e li e aceito os <a href="termos.html" target="_blank">Termos de Uso</a> e a <a href="privacidade.html" target="_blank">Política de Privacidade</a> da Pedeki.</span></label>
       <div id="erroCad" class="aviso vermelho oculto" style="margin-bottom:12px"></div>
       <button class="btn btn-pri btn-bloco" type="submit" id="btCad">Criar minha loja grátis</button>
       <p style="font-size:.78rem;color:var(--cinza);text-align:center;margin-top:12px">O teste grátis é 1 por WhatsApp e por CPF.</p>
     </form>
+
+    <p class="legal-l"><a href="termos.html">Termos de Uso</a>·<a href="privacidade.html">Política de Privacidade</a></p>
 
     <div id="jaLogado" class="card oculto" style="margin-top:18px;text-align:center">
       <p style="margin-bottom:12px">Você já está conectado como <b id="emailLog"></b>.</p>
@@ -108,6 +119,7 @@ $("#marcaLado").outerHTML = marcaHTML.replace("marca", "marca\" style=\"color:#f
 $("#marcaMob").innerHTML = marcaHTML;
 if (!configurado) $("#avisoConfig").classList.remove("oculto");
 
+document.addEventListener("click", e => { const b = e.target.closest("[data-olho]"); if (!b) return; const i = b.previousElementSibling; i.type = i.type === "password" ? "text" : "password"; b.textContent = i.type === "password" ? "👁️" : "🙈"; });
 // ---- abas
 function ir(aba) {
   $$(".aba").forEach(f => f.classList.toggle("oculto", f.dataset.aba !== aba));
@@ -155,6 +167,7 @@ $("#fEsqueci").onsubmit = async e => {
 
 // ---- cadastro
 const fc = $("#fCadastro");
+fc.aceite.addEventListener("change", () => $("#boxAceite").classList.remove("erro"));
 mascaraTel(fc.whats);
 fc.cpf.addEventListener("input", () => {
   let n = soNum(fc.cpf.value).slice(0, 11);
@@ -191,6 +204,7 @@ fc.onsubmit = async e => {
   if (whats.length < 12 || whats.length > 13) return falha("Digite o WhatsApp com DDD.");
   if (dono.length < 2) return falha("Digite seu nome.");
   if (!cpfValido(cpf)) return falha("CPF inválido.");
+  if (!fc.aceite.checked) { $("#boxAceite").classList.add("erro"); return falha("Para continuar, marque que aceita os Termos de Uso e a Política de Privacidade."); }
   const bt = $("#btCad"); bt.disabled = true; bt.textContent = "Criando sua loja…";
   try {
     const sd = await F.getDoc(F.doc(db, "slugs", slug));
@@ -211,7 +225,7 @@ fc.onsubmit = async e => {
       pagamentos: ["Pix", "Cartão", "Dinheiro"], chavePix: "", categorias: ["Lanches", "Bebidas"],
       criadoEm: F.serverTimestamp(), pagoAte: F.serverTimestamp()
     };
-    const privado = { cpf, email: user.email, dono };
+    const privado = { cpf, email: user.email, dono, aceiteTermos: "2026-11-10", aceiteEm: F.serverTimestamp() };
     const montar = comTeste => {
       const b = F.writeBatch(db);
       b.set(F.doc(db, "slugs", slug), { uid });

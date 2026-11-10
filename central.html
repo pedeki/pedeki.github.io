@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Central — Pedeki</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+.wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
+.topo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.nums .card{padding:16px}
+.nums small{color:var(--cinza);font-weight:600;font-size:.78rem}
+.nums strong{display:block;font-size:1.5rem;color:var(--escuro)}
+@media(max-width:800px){.nums{grid-template-columns:1fr 1fr}}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{text-align:left;color:var(--cinza);font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;padding:10px;border-bottom:1px solid var(--linha)}
+td{padding:12px 10px;border-bottom:1px solid var(--linha);vertical-align:middle}
+td b{color:var(--escuro)}
+.tab{overflow-x:auto}
+.ff{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.ff input{max-width:280px}
+.ff button{border:1.5px solid var(--linha);background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;color:var(--cinza)}
+.ff button.on{background:var(--escuro);color:#fff;border-color:var(--escuro)}
+.abas{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.abas button{border:1.5px solid var(--linha);background:#fff;border-radius:14px;padding:11px 18px;font-weight:800;cursor:pointer;color:var(--cinza);display:flex;gap:8px;align-items:center}
+.abas button.on{background:var(--escuro);color:#fff;border-color:var(--escuro)}
+.abas .qt{background:var(--cor);color:#fff;border-radius:999px;font-size:.72rem;padding:2px 8px}
+.sup{display:grid;grid-template-columns:320px 1fr;gap:14px}
+@media(max-width:820px){.sup{grid-template-columns:1fr}.sup.aberto .conv-l{display:none}.sup:not(.aberto) .conv-c{display:none}}
+.conv-c{min-width:0}
+.conv-l{padding:8px;min-width:0;max-height:min(70vh,620px);overflow-y:auto}
+.conv{display:block;width:100%;text-align:left;border:0;background:none;border-radius:14px;padding:12px;cursor:pointer;border-bottom:1px solid var(--linha)}
+.conv:hover{background:#FAF7F4}.conv.on{background:var(--cor-claro)}
+.conv b{color:var(--escuro);display:flex;justify-content:space-between;gap:8px}
+.conv b small{color:var(--cinza);font-weight:600;font-size:.72rem;margin-left:auto}
+.conv p{color:var(--cinza);font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv.nl b::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--cor);flex-shrink:0;margin-top:5px}
+.conv.nl p{color:var(--escuro);font-weight:700}
+.conv .badge{margin-top:4px}
+.chat-topo .acs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#btVolta{display:none}@media(max-width:820px){#btVolta{display:inline-grid}}
+</style>
+</head>
+<body>
+<div class="carregando" id="carregando"><div class="giro"></div></div>
+<div class="wrap">
+  <div class="topo"><div id="marca"></div><div style="display:flex;gap:8px"><button class="btn btn-sec btn-mini" id="btAvisos">🔕 Ativar avisos</button><a class="btn btn-sec btn-mini" href="painel.html">Meu painel</a><button class="btn btn-sec btn-mini" id="btSair">Sair</button></div></div>
+  <div class="abas" id="abas"><button data-aba="lojas" class="on">🏪 Lojas</button><button data-aba="suporte">💬 Suporte <span class="qt oculto" id="qtSup"></span></button></div>
+  <div id="corpo"></div>
+  <div id="corpoSup" class="oculto">
+    <div class="sup" id="sup">
+      <div class="card conv-l" id="convL"></div>
+      <div class="conv-c" id="convC"><div class="card vazio"><div class="ic">💬</div><b>Escolha uma conversa</b><p>As mensagens das lojas aparecem aqui.</p></div></div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="mInfo"><div class="modal-box"><button class="fechar" data-fecha>✕</button><div id="infoCorpo"></div></div></div>
+<script src="config.js"></script>
+<script type="module">
+import { auth, db, F, C, $, $$, R, esc, toast, fmtTel, ms, validoAte, lojaAtiva, emTeste, dataBR, diasRestantes, DIA, marcaHTML, linkLoja, erroAmigavel } from "./js/base.js";
+import { desenhaChat, ligaEnvio } from "./js/chat.js";
+$("#marca").innerHTML = marcaHTML;
+$("#btSair").onclick = () => F.signOut(auth).then(() => location.href = "conta.html#entrar");
+document.addEventListener("click", e => { if (e.target.closest("[data-fecha]") || e.target.classList.contains("modal")) e.target.closest(".modal")?.classList.remove("on"); });
+let lojas = [], filtro = "todas", busca = "";
+F.onAuthStateChanged(auth, u => {
+  if (!u) return location.href = "conta.html#entrar";
+  $("#carregando").remove();
+  if (u.email !== C.adminEmail) { $("#corpo").innerHTML = `<div class="card vazio"><div class="ic">🔒</div><b>Área restrita</b><p>Só o administrador pode ver esta página.</p></div>`; return; }
+  if (!u.emailVerified) $("#corpo").insertAdjacentHTML("beforebegin", `<div class="aviso amarelo" style="margin-bottom:14px">Confirme seu e-mail (link enviado no cadastro) para poder liberar dias manualmente. <button class="btn btn-sec btn-mini" id="btRe">Reenviar e-mail</button></div>`);
+  $("#btRe")?.addEventListener("click", () => F.sendEmailVerification(u).then(() => toast("Enviado!")));
+  F.onSnapshot(F.collection(db, "lojas"), s => {
+    lojas = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })).sort((a, b) => ms(b.criadoEm) - ms(a.criadoEm));
+    desenha(); desenhaConversas();
+  }, e => toast(erroAmigavel(e), "erro"));
+  ligaSuporte();
+});
+function situacao(l) {
+  if (!lojaAtiva(l)) return ["Vencida", "b-erro", "vencidas"];
+  if (emTeste(l)) return ["Em teste", "b-novo", "teste"];
+  return ["Pagante", "b-ok", "pagantes"];
+}
+function desenha() {
+  const cont = { teste: 0, pagantes: 0, vencidas: 0 };
+  lojas.forEach(l => cont[situacao(l)[2]]++);
+  const lista = lojas.filter(l => (filtro === "todas" || situacao(l)[2] === filtro) && (!busca || (l.nome + " " + l.slug + " " + l.whatsapp).toLowerCase().includes(busca)));
+  $("#corpo").innerHTML = `
+  <div class="nums">
+    <div class="card"><small>Lojas</small><strong>${lojas.length}</strong></div>
+    <div class="card"><small>Em teste</small><strong>${cont.teste}</strong></div>
+    <div class="card"><small>Pagantes</small><strong>${cont.pagantes}</strong></div>
+    <div class="card"><small>Vencidas</small><strong>${cont.vencidas}</strong></div>
+    <div class="card"><small>Receita/mês (estimada)</small><strong>${R(cont.pagantes * C.preco)}</strong></div>
+  </div>
+  <div class="card">
+    <div class="ff"><input id="busca" placeholder="Buscar loja, link ou WhatsApp" value="${esc(busca)}">
+      ${[["todas", "Todas"], ["teste", "Em teste"], ["pagantes", "Pagantes"], ["vencidas", "Vencidas"]].map(([k, n]) => `<button data-f="${k}" class="${filtro === k ? "on" : ""}">${n}</button>`).join("")}</div>
+    <div class="tab"><table><thead><tr><th>Loja</th><th>WhatsApp</th><th>Criada</th><th>Situação</th><th>Válida até</th><th></th></tr></thead><tbody>
+    ${lista.map(l => { const [n, c] = situacao(l), fim = validoAte(l); return `<tr>
+      <td><b>${esc(l.nome)}</b><br><a href="${linkLoja(l.slug)}" target="_blank" style="color:var(--cinza);font-size:.8rem">/${esc(l.slug)}</a></td>
+      <td><a href="https://wa.me/${esc(l.whatsapp)}" target="_blank">${esc(fmtTel(l.whatsapp))}</a></td>
+      <td>${dataBR(ms(l.criadoEm))}</td><td><span class="badge ${c}">${n}</span></td>
+      <td>${dataBR(fim)}${lojaAtiva(l) ? `<br><small style="color:var(--cinza)">${diasRestantes(fim)} dia(s)</small>` : ""}</td>
+      <td style="white-space:nowrap"><button class="btn btn-sec btn-mini" data-info="${l.id}">Dados</button> <button class="btn btn-pri btn-mini" data-add="${l.id}" data-d="30">+30 dias</button></td></tr>`; }).join("") || '<tr><td colspan="6" style="text-align:center;color:var(--cinza)">Nenhuma loja.</td></tr>'}
+    </tbody></table></div></div>`;
+  $("#busca").oninput = e => { busca = e.target.value.toLowerCase(); const p = e.target.selectionStart; desenha(); $("#busca").focus(); $("#busca").setSelectionRange(p, p); };
+  $$("[data-f]").forEach(b => b.onclick = () => { filtro = b.dataset.f; desenha(); });
+}
+document.addEventListener("click", async e => {
+  const a = e.target.closest("[data-add]"), i = e.target.closest("[data-info]");
+  if (a) {
+    const l = lojas.find(x => x.id === a.dataset.add), base = Math.max(Date.now(), validoAte(l));
+    try { await F.updateDoc(F.doc(db, "lojas", l.id), { pagoAte: F.Timestamp.fromMillis(base + a.dataset.d * DIA) }); toast(`+${a.dataset.d} dias para ${l.nome}`); }
+    catch (er) { toast(erroAmigavel(er), "erro"); }
+  }
+  if (i) {
+    const l = lojas.find(x => x.id === i.dataset.info);
+    let p = {}; try { p = (await F.getDoc(F.doc(db, "lojas", l.id, "privado", "dados"))).data() || {}; } catch {}
+    let pags = []; try { pags = (await F.getDocs(F.query(F.collection(db, "pagamentos"), F.where("loja", "==", l.id)))).docs.map(d => d.data()); } catch {}
+    $("#infoCorpo").innerHTML = `<h2>${esc(l.nome)}</h2>
+      <div class="chave"><div><b>Dono</b><small>${esc(p.dono || "-")}</small></div></div>
+      <div class="chave"><div><b>E-mail</b><small>${esc(p.email || "-")}</small></div></div>
+      <div class="chave"><div><b>CPF</b><small>${esc(p.cpf || "-")}</small></div></div>
+      <div class="chave"><div><b>Teste grátis</b><small>${l.testeDias ? l.testeDias + " dias" : "Não ganhou (WhatsApp/CPF repetido)"}</small></div></div>
+      <div class="chave"><div><b>Pagamentos</b><small>${pags.length ? pags.map(x => `${R(x.valor)} em ${dataBR(ms(x.pagoEm))}`).join("<br>") : "Nenhum"}</small></div></div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-pri" data-add="${l.id}" data-d="30">+30 dias</button><button class="btn btn-sec" data-add="${l.id}" data-d="365">+1 ano</button></div>`;
+    $("#mInfo").classList.add("on");
+  }
+});
+
+// ================= abas
+let aba = "lojas";
+$("#abas").onclick = e => { const b = e.target.closest("[data-aba]"); if (!b) return; aba = b.dataset.aba;
+  $$("[data-aba]").forEach(x => x.classList.toggle("on", x === b));
+  $("#corpo").classList.toggle("oculto", aba !== "lojas"); $("#corpoSup").classList.toggle("oculto", aba !== "suporte");
+  if (aba === "suporte" && aberta) marcaLida(aberta); };
+
+// ================= avisos (som + notificação)
+let audio = null, avisos = false;
+$("#btAvisos").onclick = async () => {
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)(); avisos = true;
+  try { if ("Notification" in window && Notification.permission === "default") await Notification.requestPermission(); } catch {}
+  $("#btAvisos").textContent = "🔔 Avisos ligados"; bip();
+};
+function bip() {
+  if (!avisos || !audio) return;
+  [0, .16].forEach((t, i) => { const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = [700, 1050][i];
+    g.gain.setValueAtTime(.0001, audio.currentTime + t); g.gain.exponentialRampToValueAtTime(.35, audio.currentTime + t + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .3); o.connect(g).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .32); });
+}
+function notifica(titulo, corpo) {
+  bip(); toast(titulo + ": " + corpo);
+  try { if (avisos && "Notification" in window && Notification.permission === "granted" && document.hidden) new Notification(titulo, { body: corpo }); } catch {}
+}
+
+// ================= suporte
+let convs = [], aberta = null, msgsAberta = [], paraMsgs = null, primeiraConv = true;
+const vistos = {};
+function ligaSuporte() {
+  F.onSnapshot(F.collection(db, "suporte"), s => {
+    convs = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })).sort((a, b) => (b.naoLidaAdmin - a.naoLidaAdmin) || (ms(b.ultimaEm) - ms(a.ultimaEm)));
+    convs.forEach(c => { const t = ms(c.ultimaEm), vendo = aba === "suporte" && !document.hidden && aberta === c.id;
+      if (!primeiraConv && c.naoLidaAdmin && t > (vistos[c.id] || 0) && !vendo) notifica("💬 " + (c.nome || "Loja"), c.ultima || "Nova mensagem");
+      vistos[c.id] = Math.max(t, vistos[c.id] || 0); });
+    primeiraConv = false;
+    const n = convs.filter(c => c.naoLidaAdmin).length;
+    $("#qtSup").textContent = n; $("#qtSup").classList.toggle("oculto", !n);
+    document.title = n ? `(${n}) Central — Pedeki` : "Central — Pedeki";
+    desenhaConversas();
+    if (aberta && aba === "suporte" && !document.hidden) marcaLida(aberta);
+  }, e => { $("#convL").innerHTML = `<p style="padding:14px;color:var(--cinza)">${esc(erroAmigavel(e))}</p>`; });
+}
+const ST_SUP = { aberto: ["Aberto", "b-novo"], resolvido: ["Resolvido", "b-ok"] };
+function quando(t) { if (!t) return ""; const d = new Date(t); return d.toDateString() === new Date().toDateString() ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : dataBR(t); }
+function desenhaConversas() {
+  if (!$("#convL")) return;
+  $("#convL").innerHTML = convs.length ? convs.map(c => { const [sn, sc] = ST_SUP[c.status] || ST_SUP.aberto;
+    return `<button class="conv ${c.naoLidaAdmin ? "nl" : ""} ${c.id === aberta ? "on" : ""}" data-conv="${c.id}"><b>${esc(c.nome || "Loja")}<small>${quando(ms(c.ultimaEm))}</small></b><p>${esc(c.ultima || "")}</p><span class="badge ${sc}">${sn}</span></button>`; }).join("")
+    : `<div class="vazio"><div class="ic">📭</div><b>Nenhuma conversa ainda</b><p>Quando uma loja chamar o suporte, aparece aqui.</p></div>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-conv]"); if (b) abreConversa(b.dataset.conv); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && aberta && aba === "suporte") marcaLida(aberta); });
+function marcaLida(id) { const c = convs.find(x => x.id === id); if (c && c.naoLidaAdmin) F.updateDoc(F.doc(db, "suporte", id), { naoLidaAdmin: false }).catch(() => {}); }
+const RAP_ADMIN = ["Olá! 😊 Já vou verificar para você.", "Pode me mandar um print da tela?", "Prontinho, resolvido! Qualquer coisa é só chamar. 🧡", "Vou te chamar no WhatsApp para ajudar melhor."];
+function abreConversa(id) {
+  aberta = id; $("#sup").classList.add("aberto"); desenhaConversas();
+  const c = convs.find(x => x.id === id) || {}, l = lojas.find(x => x.id === id) || {};
+  $("#convC").innerHTML = `<div class="chat">
+    <div class="chat-topo"><button class="ico-btn" id="btVolta" title="Voltar">←</button><div class="av" style="background:var(--escuro);font-weight:800">${esc((c.nome || "L")[0].toUpperCase())}</div>
+      <div style="min-width:0"><b>${esc(c.nome || "Loja")}</b><small style="color:var(--cinza)">/${esc(c.slug || "")}${l.whatsapp ? " · " + esc(fmtTel(l.whatsapp)) : ""}</small></div>
+      <div class="acs">${l.whatsapp ? `<a class="btn btn-zap btn-mini" target="_blank" rel="noopener" href="https://wa.me/${esc(l.whatsapp)}">WhatsApp</a>` : ""}
+        ${l.id ? `<button class="btn btn-sec btn-mini" data-info="${id}">Dados</button>` : ""}
+        <button class="btn btn-sec btn-mini" id="btResolve">${c.status === "resolvido" ? "Reabrir" : "✓ Resolvido"}</button></div></div>
+    <div class="chat-msgs" id="admMsgs"></div>
+    <div class="chat-rap">${RAP_ADMIN.map(t => `<button>${esc(t)}</button>`).join("")}</div>
+    <div class="chat-env"><textarea id="admTxt" rows="1" maxlength="1000" placeholder="Responder ${esc(c.nome || "")}..."></textarea><button class="btn btn-pri" id="admEnv" title="Enviar">➤</button></div></div>`;
+  $("#btVolta").onclick = () => { aberta = null; $("#sup").classList.remove("aberto"); desenhaConversas(); };
+  $("#convC .chat-rap").onclick = e => { const b = e.target.closest("button"); if (b) { $("#admTxt").value = b.textContent; $("#admTxt").focus(); } };
+  $("#btResolve").onclick = async () => { const cc = convs.find(x => x.id === id) || {}, novo = cc.status === "resolvido" ? "aberto" : "resolvido";
+    try { await F.updateDoc(F.doc(db, "suporte", id), { status: novo, naoLidaAdmin: false }); toast(novo === "resolvido" ? "Marcado como resolvido ✓" : "Conversa reaberta"); $("#btResolve").textContent = novo === "resolvido" ? "Reabrir" : "✓ Resolvido"; }
+    catch (er) { toast(erroAmigavel(er), "erro"); } };
+  ligaEnvio($("#admTxt"), $("#admEnv"), async texto => {
+    const b = F.writeBatch(db);
+    b.set(F.doc(F.collection(db, "suporte", id, "msgs")), { de: "admin", texto, em: F.serverTimestamp() });
+    b.update(F.doc(db, "suporte", id), { ultima: "Você: " + texto.slice(0, 110), ultimaEm: F.serverTimestamp(), naoLidaLoja: true, naoLidaAdmin: false, status: "aberto" });
+    try { await b.commit(); } catch (er) { toast(erroAmigavel(er), "erro"); throw er; }
+  });
+  if (paraMsgs) paraMsgs();
+  paraMsgs = F.onSnapshot(F.query(F.collection(db, "suporte", id, "msgs"), F.orderBy("em")), s => {
+    msgsAberta = s.docs.map(d => d.data({ serverTimestamps: "estimate" })); desenhaChat($("#admMsgs"), msgsAberta, true);
+  }, er => toast(erroAmigavel(er), "erro"));
+  marcaLida(id); $("#admTxt").focus();
+}
+</script>
+</body>
+</html>

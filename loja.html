@@ -69,6 +69,17 @@ body{background:#F7F5F2;padding-bottom:110px}
 .bloco-t{font-weight:800;color:var(--escuro);margin:20px 0 10px;font-size:1rem}
 .rodape{text-align:center;color:var(--cinza);font-size:.8rem;margin:30px 0 10px}
 .rodape a{text-decoration:none;font-weight:700;color:var(--escuro)}
+.rodape .lg-l{display:block;margin-top:6px;font-size:.76rem}
+.rodape .lg-l a{color:var(--cinza);font-weight:600;margin:0 5px}
+.consent{font-size:.76rem;color:var(--cinza);text-align:center;margin-top:10px;line-height:1.5}
+.consent a{color:var(--cinza);font-weight:700}
+.esquecer{border:0;background:none;color:var(--cinza);font-size:.78rem;text-decoration:underline;cursor:pointer;padding:0;margin:-4px 0 6px}
+.cab .comp{margin-left:auto;align-self:flex-start;flex-shrink:0}
+.acomp{margin:12px 14px 0;display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--cor);border-radius:18px;padding:12px 14px;text-decoration:none;color:var(--texto);box-shadow:0 8px 20px -14px var(--cor)}
+.acomp .ic{width:42px;height:42px;border-radius:12px;background:var(--cor-claro);display:grid;place-items:center;font-size:1.3rem;flex-shrink:0}
+.acomp b{color:var(--escuro);display:block}
+.acomp small{color:var(--cinza)}
+.acomp .seta{margin-left:auto;color:var(--cor);font-weight:800}
 .fora{max-width:420px;margin:80px auto;text-align:center;padding:20px}
 .fora .ic{font-size:3rem;margin-bottom:10px}
 </style>
@@ -78,13 +89,14 @@ body{background:#F7F5F2;padding-bottom:110px}
 <div id="app" class="oculto">
   <div class="capa" id="capa"></div>
   <div class="wrap">
-    <div class="cab"><div id="logo"></div><div style="min-width:0"><h1 id="nome"></h1><p id="desc"></p></div></div>
+    <div class="cab"><div id="logo"></div><div style="min-width:0"><h1 id="nome"></h1><p id="desc"></p></div><button class="ico-btn comp" id="btCompartilhar" title="Compartilhar cardápio" aria-label="Compartilhar cardápio">📤</button></div>
+    <div id="acompanhar"></div>
     <div class="infos" id="infos"></div>
     <div class="aviso-loja" id="avisoLoja"></div>
     <div class="busca"><input id="busca" placeholder="Buscar no cardápio" autocomplete="off"></div>
     <nav class="cats" id="cats"></nav>
     <div id="cardapio"></div>
-    <p class="rodape">Cardápio digital por <a href="index.html">Pedeki</a></p>
+    <p class="rodape">Cardápio digital por <a href="index.html">Pedeki</a><span class="lg-l"><a href="termos.html">Termos de Uso</a>·<a href="privacidade.html">Privacidade</a></span></p>
   </div>
 </div>
 <div id="foraDoAr" class="fora oculto"></div>
@@ -104,6 +116,7 @@ body{background:#F7F5F2;padding-bottom:110px}
     <div class="bloco-t">Seus dados</div>
     <div class="linha2"><div class="campo"><label>Nome</label><input name="nome" required maxlength="60" autocomplete="name"></div>
       <div class="campo"><label>WhatsApp</label><input name="tel" required inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000"></div></div>
+    <button type="button" class="esquecer oculto" id="btEsquecer">Esquecer meus dados neste aparelho</button>
     <div id="blocoEnd">
       <div class="linha2"><div class="campo"><label>Rua</label><input name="rua" maxlength="80" autocomplete="address-line1"></div><div class="campo"><label>Número</label><input name="numero" maxlength="10"></div></div>
       <div class="linha2"><div class="campo"><label>Bairro</label><input name="bairro" maxlength="50"></div><div class="campo"><label>Complemento / referência</label><input name="comp" maxlength="80"></div></div>
@@ -119,6 +132,7 @@ body{background:#F7F5F2;padding-bottom:110px}
     <div class="resumo" id="resumo"></div>
     <div id="erroPed" class="aviso vermelho oculto" style="margin-top:12px"></div>
     <button class="btn btn-zap btn-bloco" id="btConfirmar" style="margin-top:16px;padding:16px;font-size:1.02rem">Confirmar pedido no WhatsApp</button>
+    <p class="consent">Ao confirmar, seus dados (nome, WhatsApp e endereço) são enviados para <b id="consentLoja">a loja</b> preparar e entregar o pedido. Veja os <a href="termos.html" target="_blank">Termos</a> e a <a href="privacidade.html" target="_blank">Política de Privacidade</a>.</p>
   </form>
 </div></div>
 
@@ -169,8 +183,24 @@ function desenhaLoja() {
     (loja.retiradaAtiva !== false ? "<span>🏪 Retirada</span>" : "") +
     (loja.pedidoMinimo ? `<span>Mínimo ${R(loja.pedidoMinimo)}</span>` : "");
   $("#avisoLoja").innerHTML = ab ? "" : `<div class="aviso amarelo">A loja está fechada agora${loja.abertoModo === "fechado" ? "" : (proximaAbertura(loja) ? " · abre " + proximaAbertura(loja) : "")}. Você pode olhar o cardápio, mas não dá para pedir.</div>`;
-  desenhaCardapio(); atualizaBarra();
+  $("#consentLoja").textContent = loja.nome;
+  desenhaAcompanhar(); desenhaCardapio(); atualizaBarra();
 }
+
+// ===== pedidos recentes neste aparelho (acompanhar)
+const chavePeds = () => "pdk_peds_" + uid;
+function pedsRecentes() {
+  try { return JSON.parse(localStorage.getItem(chavePeds()) || "[]").filter(p => Date.now() - p.em < 12 * 36e5); } catch { return []; }
+}
+function desenhaAcompanhar() {
+  const p = pedsRecentes()[0];
+  $("#acompanhar").innerHTML = p ? `<a class="acomp" href="${linkPedido(uid, p.id)}"><div class="ic">📦</div><div><b>Seu pedido #${p.numero}</b><small>Toque para acompanhar</small></div><span class="seta">→</span></a>` : "";
+}
+$("#btCompartilhar").onclick = async () => {
+  const url = location.href.split("#")[0], dados = { title: loja.nome, text: `Olha o cardápio da ${loja.nome}! Faça seu pedido aqui:`, url };
+  try { if (navigator.share) return await navigator.share(dados); } catch (e) { if (e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(url); toast("Link copiado! Agora é só colar e mandar."); } catch { prompt("Copie o link:", url); }
+};
 
 function cats() {
   const ord = [...(loja.categorias || [])];
@@ -256,7 +286,13 @@ function atualizaBarra() {
 $("#btCarrinho").onclick = abreCar;
 const fp = $("#fPed");
 mascaraTel(fp.tel);
-try { const c = JSON.parse(localStorage.getItem("pdk_cliente") || "{}"); ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => { if (c[k]) fp[k].value = c[k]; }); } catch {}
+try { const c = JSON.parse(localStorage.getItem("pdk_cliente") || "{}"); ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => { if (c[k]) fp[k].value = c[k]; }); if (c.nome || c.tel) $("#btEsquecer").classList.remove("oculto"); } catch {}
+$("#btEsquecer").onclick = () => {
+  try { localStorage.removeItem("pdk_cliente"); Object.keys(localStorage).filter(k => k.startsWith("pdk_peds_")).forEach(k => localStorage.removeItem(k)); } catch {}
+  ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => fp[k].value = "");
+  $("#btEsquecer").classList.add("oculto"); $("#acompanhar").innerHTML = "";
+  toast("Pronto! Seus dados foram apagados deste aparelho.");
+};
 function abreCar() {
   const tipos = [];
   if (loja.entregaAtiva !== false) tipos.push(["entrega", "🛵 Entrega"]);
@@ -342,9 +378,10 @@ fp.onsubmit = async e => {
   const bt = $("#btConfirmar"); bt.disabled = true; bt.textContent = "Enviando pedido…";
   try {
     const cRef = F.doc(db, "contadores", uid), pRef = F.doc(F.collection(db, "lojas", uid, "pedidos"));
+    let n = 0;
     await F.runTransaction(db, async tx => {
       const c = await tx.get(cRef);
-      const n = (c.exists() ? c.data().n : 0) + 1;
+      n = (c.exists() ? c.data().n : 0) + 1;
       tx.update(cRef, { n });
       tx.set(pRef, {
         numero: n, status: "novo", criadoEm: F.serverTimestamp(), tipo,
@@ -354,6 +391,7 @@ fp.onsubmit = async e => {
       });
     });
     car = []; salvaCar(); cupom = null;
+    try { localStorage.setItem(chavePeds(), JSON.stringify([{ id: pRef.id, numero: n, em: Date.now() }, ...pedsRecentes()].slice(0, 5))); } catch {}
     location.href = linkPedido(uid, pRef.id) + "&z=1";
   } catch (er) {
     erro("Não conseguimos enviar seu pedido. Tente de novo." + (er.code === "permission-denied" ? " (loja indisponível)" : ""));
