@@ -218,10 +218,10 @@ F.onAuthStateChanged(auth, async u => {
   await carregaConvite();
   $("#carregando")?.remove();
   if (!u || !u.email || !u.email.endsWith("@entregador.pedeki.app")) {
-    if (u) await F.signOut(auth);
+    // conta de loja aberta neste navegador: NÃO desconecta (antes tirava o dono do painel); só avisa
     user = null;
     $("#vEntrar").classList.remove("oculto"); $("#vApp").classList.add("oculto"); $("#abas").classList.add("oculto"); $("#btSom").classList.add("oculto");
-    $("#conviteFora").innerHTML = htmlConvite(false); $("#ola").textContent = "";
+    $("#conviteFora").innerHTML = (u ? `<div class="card" style="padding:14px 16px;margin-bottom:14px;font-size:.9rem;color:var(--cinza)">🏪 Este navegador está com uma <b>conta de loja</b> aberta. Para usar o app do entregador, entre com a conta de entregador abaixo, ou <a href="painel.html" style="color:var(--cor);font-weight:700">volte para o painel</a>.</div>` : "") + htmlConvite(false); $("#ola").textContent = "";
     return;
   }
   user = u;
