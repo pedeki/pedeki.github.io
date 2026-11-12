@@ -144,8 +144,8 @@ document.addEventListener("click", async e => {
     $("#infoCorpo").innerHTML = `<h2>${esc(l.nome)}</h2>
       <div class="chave"><div><b>Dono</b><small>${esc(p.dono || "-")}</small></div></div>
       <div class="chave"><div><b>E-mail</b><small>${esc(p.email || "-")}</small></div></div>
-      <div class="chave"><div><b>CPF</b><small>${esc(p.cpf || "-")}</small></div></div>
-      <div class="chave"><div><b>Teste grátis</b><small>${l.testeDias ? l.testeDias + " dias" : "Não ganhou (WhatsApp/CPF repetido)"}</small></div></div>
+      ${p.cpf && !p.semCpf ? `<div class="chave"><div><b>CPF</b><small>${esc(p.cpf)}</small></div></div>` : ""}
+      <div class="chave"><div><b>Teste grátis</b><small>${l.testeDias ? l.testeDias + " dias" : "Não ganhou (WhatsApp repetido)"}</small></div></div>
       <div class="chave"><div><b>Pagamentos</b><small>${pags.length ? pags.map(x => `${R(x.valor)} em ${dataBR(ms(x.pagoEm))}`).join("<br>") : "Nenhum"}</small></div></div>
       <div style="display:flex;gap:8px;margin-top:14px"><button class="btn btn-pri" data-add="${l.id}" data-d="30">+30 dias</button><button class="btn btn-sec" data-add="${l.id}" data-d="365">+1 ano</button></div>`;
     $("#mInfo").classList.add("on");

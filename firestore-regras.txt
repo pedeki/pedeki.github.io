@@ -1,0 +1,218 @@
+rules_version = '2';
+// =====================================================
+//  REGRAS DE SEGURANÇA DO PEDEKI
+//  Administrador: davidsoars2266@gmail.com
+// =====================================================
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function logado() { return request.auth != null; }
+    function eu(uid) { return logado() && request.auth.uid == uid; }
+    function admin() {
+      return logado() && request.auth.token.email == "davidsoars2266@gmail.com"
+        && request.auth.token.email_verified == true;
+    }
+    // loja dentro do teste grátis ou do plano pago
+    function ativa(l) {
+      let d = get(/databases/$(db)/documents/lojas/$(l)).data;
+      return d.criadoEm + duration.value(d.testeDias, 'd') > request.time
+        || d.pagoAte > request.time;
+    }
+
+    // o WhatsApp é dessa loja (já era dela) ou está sendo registrado agora
+    function zapDaLoja(uid, w) {
+      let p = /databases/$(db)/documents/whatsapps/$(w);
+      return (exists(p) && get(p).data.uid == uid)
+        || (!exists(p) && getAfter(p).data.uid == uid);
+    }
+
+    function criacaoOk(uid) {
+      let d = request.resource.data;
+      let wp = /databases/$(db)/documents/whatsapps/$(d.whatsapp);
+      return d.keys().hasAll(['nome', 'slug', 'whatsapp', 'criadoEm', 'testeDias', 'pagoAte'])
+        && d.nome is string && d.nome.size() > 0 && d.nome.size() <= 60
+        && d.criadoEm == request.time
+        && d.pagoAte == request.time
+        && d.whatsapp is string && d.whatsapp.matches('^[0-9]{12,13}$')
+        && getAfter(/databases/$(db)/documents/slugs/$(d.slug)).data.uid == uid
+        && (d.testeDias == 0
+            || (d.testeDias == 7
+                && !exists(wp) && getAfter(wp).data.uid == uid));
+    }
+
+    function conviteOk(l, e) {
+      let p = /databases/$(db)/documents/convites/$(request.resource.data.convite);
+      return get(p).data.loja == l && get(p).data.usado == false && getAfter(p).data.usadoPor == e;
+    }
+
+    function pedidoOk(uid) {
+      let d = request.resource.data;
+      let cont = /databases/$(db)/documents/contadores/$(uid);
+      return d.keys().hasOnly(['numero', 'status', 'criadoEm', 'tipo', 'itens', 'subtotal', 'taxa',
+                               'desconto', 'total', 'cupom', 'cliente', 'pagamento', 'troco', 'obs'])
+        && d.status == 'novo'
+        && d.criadoEm == request.time
+        && d.tipo in ['entrega', 'retirada']
+        && d.itens is list && d.itens.size() > 0 && d.itens.size() <= 60
+        && d.total is number && d.total >= 0
+        && d.cliente.nome is string && d.cliente.tel is string
+        && d.numero == get(cont).data.n + 1
+        && d.numero == getAfter(cont).data.n;
+    }
+
+    // ---------- registros únicos (ninguém pode ler) ----------
+    match /slugs/{s} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if logado() && s.matches('^[a-z0-9-]{3,30}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /whatsapps/{w} {
+      allow read: if false;
+      allow create: if logado() && w.matches('^[0-9]{12,13}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /cpfs/{c} {
+      allow read: if false;
+      allow create: if logado() && c.matches('^[0-9]{11}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ---------- lojas ----------
+    match /lojas/{uid} {
+      allow read: if true;
+      allow create: if eu(uid) && criacaoOk(uid);
+      allow update: if
+        (eu(uid)
+          && !request.resource.data.diff(resource.data).affectedKeys()
+               .hasAny(['criadoEm', 'testeDias', 'pagoAte', 'slug'])
+          && request.resource.data.whatsapp.matches('^[0-9]{12,13}$')
+          && (request.resource.data.whatsapp == resource.data.whatsapp
+              || resource.data.pagoAte > request.time
+              || zapDaLoja(uid, request.resource.data.whatsapp)))
+        || (admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pagoAte']));
+      allow delete: if false;
+
+      match /privado/{d} {
+        allow read: if eu(uid) || admin();
+        // CPF não é mais pedido no cadastro (lojas antigas podem ter; não pode ser trocado)
+        allow create: if eu(uid) && d == 'dados'
+          && (!('cpf' in request.resource.data) || (request.resource.data.cpf is string && request.resource.data.cpf.matches('^[0-9]{11}$')));
+        allow update: if eu(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['cpf']);
+        allow delete: if false;
+      }
+      match /produtos/{p} {
+        allow read: if true;
+        allow write: if eu(uid);
+      }
+      match /cupons/{c} {
+        allow get: if true;
+        allow list, write: if eu(uid);
+      }
+      match /pedidos/{p} {
+        allow get: if true;
+        allow list: if eu(uid) || admin();
+        allow create: if ativa(uid) && pedidoOk(uid);
+        allow update: if eu(uid)
+          || (logado() && resource.data.entregadorUid == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+              && request.resource.data.status in ['entrega', 'concluido']);
+        allow delete: if eu(uid);
+      }
+      // entregadores da loja (entram só com convite válido)
+      match /entregadores/{e} {
+        allow read: if eu(uid) || (logado() && request.auth.uid == e);
+        allow create: if logado() && request.auth.uid == e && conviteOk(uid, e);
+        allow update: if eu(uid)
+          || (logado() && request.auth.uid == e && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome', 'tel']));
+        allow delete: if eu(uid) || (logado() && request.auth.uid == e);
+      }
+    }
+
+    // ---------- contador de pedidos (#1, #2, #3...) ----------
+    match /contadores/{uid} {
+      allow read: if true;
+      allow create: if eu(uid) && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 0;
+      allow update: if request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == resource.data.n + 1;
+      allow delete: if false;
+    }
+
+    // ---------- pagamentos (só o Worker grava) ----------
+    // ---------- convites de entregador ----------
+    match /convites/{c} {
+      allow get: if true;
+      allow list: if logado() && resource.data.loja == request.auth.uid;
+      allow create: if logado() && request.resource.data.loja == request.auth.uid
+        && exists(/databases/$(db)/documents/lojas/$(request.auth.uid))
+        && request.resource.data.usado == false
+        && request.resource.data.keys().hasOnly(['loja', 'lojaNome', 'criadoEm', 'usado']);
+      allow update: if (logado() && resource.data.loja == request.auth.uid)
+        || (logado() && resource.data.usado == false
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usado', 'usadoPor'])
+            && request.resource.data.usado == true && request.resource.data.usadoPor == request.auth.uid);
+      allow delete: if logado() && resource.data.loja == request.auth.uid;
+    }
+
+    // ---------- perfil do entregador ----------
+    match /entregadores/{e} {
+      allow read, write: if logado() && request.auth.uid == e;
+    }
+
+    // ---------- entregas (pedido enviado ao entregador) ----------
+    match /entregas/{id} {
+      allow read: if logado() && (resource.data.loja == request.auth.uid || resource.data.entregadorUid == request.auth.uid);
+      allow create: if logado() && request.resource.data.loja == request.auth.uid
+        && exists(/databases/$(db)/documents/lojas/$(request.auth.uid)/entregadores/$(request.resource.data.entregadorUid));
+      allow update: if logado() && (
+        (resource.data.loja == request.auth.uid && request.resource.data.loja == request.auth.uid
+          && exists(/databases/$(db)/documents/lojas/$(request.auth.uid)/entregadores/$(request.resource.data.entregadorUid)))
+        || (resource.data.entregadorUid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'atualizadoEm'])
+            && request.resource.data.status in ['aceito', 'recusado', 'saiu', 'chegou', 'entregue']));
+      allow delete: if logado() && resource.data.loja == request.auth.uid;
+    }
+
+    // ---------- suporte (chat loja <-> Pedeki) ----------
+    match /suporte/{uid} {
+      allow read: if eu(uid) || admin();
+      allow create: if eu(uid)
+        && request.resource.data.keys().hasOnly(['nome', 'slug', 'ultima', 'ultimaEm', 'naoLidaAdmin', 'naoLidaLoja', 'status'])
+        && request.resource.data.ultimaEm == request.time;
+      allow update: if admin()
+        || (eu(uid)
+            && request.resource.data.keys().hasOnly(['nome', 'slug', 'ultima', 'ultimaEm', 'naoLidaAdmin', 'naoLidaLoja', 'status'])
+            && (request.resource.data.ultimaEm == resource.data.ultimaEm || request.resource.data.ultimaEm == request.time));
+      allow delete: if admin();
+      match /msgs/{m} {
+        allow read: if eu(uid) || admin();
+        allow create: if request.resource.data.keys().hasOnly(['de', 'texto', 'em'])
+          && request.resource.data.texto is string
+          && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 1000
+          && request.resource.data.em == request.time
+          && ((eu(uid) && request.resource.data.de == 'loja') || (admin() && request.resource.data.de == 'admin'));
+        allow update: if false;
+        allow delete: if admin();
+      }
+    }
+
+    // ---------- visitas do site (1 por aparelho, só o admin vê) ----------
+    match /visitas/{v} {
+      allow create: if v.matches('^[a-z0-9]{16,40}$')
+        && request.resource.data.keys().hasOnly(['em'])
+        && request.resource.data.em == request.time;
+      allow read: if admin();
+      allow update, delete: if false;
+    }
+
+    match /pagamentos/{id} {
+      allow read: if admin() || (logado() && resource.data.loja == request.auth.uid);
+      allow write: if false;
+    }
+  }
+}

@@ -529,7 +529,7 @@ function desenhaBanners() {
   const b = [];
   let bv = null; try { bv = sessionStorage.getItem("pdk_boasvindas"); } catch {}
   if (bv === "teste") b.push(`<div class="aviso verde">🎉 Sua loja foi criada! Você tem <b>${C.diasTeste} dias grátis</b> para testar tudo.</div>`);
-  if (bv === "semteste") b.push(`<div class="aviso amarelo">Esse WhatsApp ou CPF já usou o teste grátis antes. Para ativar sua loja, é só pagar o plano. <button class="btn btn-pri btn-mini" data-ir="plano">Ativar agora</button></div>`);
+  if (bv === "semteste") b.push(`<div class="aviso amarelo">Esse WhatsApp já usou o teste grátis antes. Para ativar sua loja, é só pagar o plano. <button class="btn btn-pri btn-mini" data-ir="plano">Ativar agora</button></div>`);
   const fim = validoAte(loja), dias = diasRestantes(fim);
   if (!lojaAtiva(loja)) {
     if (bv !== "semteste") b.push(`<div class="aviso vermelho">⛔ Seu plano venceu em ${dataBR(fim)}. Sua loja está fora do ar para os clientes. <button class="btn btn-pri btn-mini" data-ir="plano">Renovar agora</button></div>`);

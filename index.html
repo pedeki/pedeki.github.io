@@ -222,6 +222,29 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
 
 .revela{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
 .revela.vis{opacity:1;transform:none}
+/* a gente monta */
+.monta{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;background:#fff;border:2px dashed #FFC7AE;border-radius:36px;padding:44px}
+@media(max-width:860px){.monta{grid-template-columns:1fr;padding:28px 22px}.monta-ic{display:none!important}}
+.monta h2{margin:8px 0 12px}.monta h2 em{font-style:normal;color:var(--laranja)}
+.monta p{color:var(--cinza);font-size:1.05rem;margin-bottom:16px}.monta p b{color:#14A44D}
+.monta ul{list-style:none;display:grid;gap:8px;margin-bottom:24px;font-weight:600}
+.btn-zap{background:#25D366;color:#fff;font-size:1.02rem}.btn-zap:hover{background:#1fb959}
+.monta-ic{display:flex;flex-direction:column;align-items:center;gap:14px}
+.bolha-m{background:#F4F1EE;border-radius:20px;padding:16px 22px;font-weight:700;box-shadow:var(--sombra)}
+.bolha-m.b-2{background:#E8F9EE;color:#14833F;text-align:center}.bolha-m small{display:block;font-weight:600;color:var(--cinza);font-size:.78rem;margin-top:4px}
+.seta-m{font-size:2rem;color:var(--laranja);transform:rotate(90deg)}
+.btn-borda-b{background:transparent!important;color:#fff!important;border:2px solid rgba(255,255,255,.8)}
+/* whatsapp flutuante */
+.zap-flut{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:10px;background:#25D366;color:#fff;text-decoration:none;font-weight:800;font-size:.9rem;padding:12px 18px 12px 12px;border-radius:999px;box-shadow:0 14px 30px -10px rgba(37,211,102,.7);transition:.2s}
+.zap-flut svg{width:30px;height:30px}.zap-flut:hover{transform:translateY(-3px)}
+.barra-mob{display:none}
+@media(max-width:720px){
+  .zap-flut{bottom:100px;padding:12px}.zap-flut span{display:none}
+  .barra-mob{display:block;position:fixed;left:0;right:0;bottom:0;z-index:59;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);padding:10px 14px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -8px 24px -12px rgba(0,0,0,.2);text-align:center;transform:translateY(110%);transition:.3s}
+  .barra-mob.on{transform:none}
+  .barra-mob .btn{width:100%}.barra-mob small{display:block;color:var(--cinza);font-size:.74rem;margin-top:4px;font-weight:600}
+  footer{padding-bottom:110px}
+}
 </style>
 </head>
 <body>
@@ -261,7 +284,7 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="selo"><span>Novo</span> 7 dias grátis, sem cartão</div>
+      <div class="selo"><span>Grátis</span> 7 dias para testar · sem cartão · sem CPF</div>
       <h1>Seu cardápio digital com pedidos <em>direto no WhatsApp</em></h1>
       <p class="sub">Monte a loja da sua lanchonete, pizzaria ou açaí em minutos. O cliente escolhe, monta o carrinho e o pedido chega pronto no seu WhatsApp. Sem taxa por pedido.</p>
       <div class="hero-btns">
@@ -271,7 +294,8 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
       </div>
       <div class="garantias">
         <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Sem taxa por pedido</div>
-        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Pronto em 10 minutos</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Não pedimos CPF nem cartão</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>A gente monta pra você</div>
         <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Cancele quando quiser</div>
       </div>
     </div>
@@ -407,6 +431,22 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
   </div>
 </section>
 
+<!-- A GENTE MONTA -->
+<section style="padding-top:30px;padding-bottom:30px">
+  <div class="wrap">
+    <div class="monta revela">
+      <div class="monta-txt">
+        <div class="etq">Sem trabalho nenhum</div>
+        <h2>Sem tempo? <em>A gente monta sua loja pra você.</em></h2>
+        <p>Manda as fotos do seu cardápio (ou o link do cardápio que você já usa) no WhatsApp. Em menos de 30 minutos sua loja fica pronta, bonita e com todos os produtos. <b>Grátis.</b></p>
+        <ul><li>📸 Você manda as fotos ou o link</li><li>🛠️ A gente cadastra tudo, com preços e adicionais</li><li>🚀 Você só divulga e recebe pedidos</li></ul>
+        <a class="btn btn-zap" target="_blank" rel="noopener" href="https://wa.me/5582994012972?text=Ol%C3%A1%21%20Quero%20que%20voc%C3%AAs%20montem%20minha%20loja%20na%20Pedeki.">💬 Quero que montem pra mim</a>
+      </div>
+      <div class="monta-ic" aria-hidden="true"><div class="bolha-m">📸 fotos do cardápio</div><div class="seta-m">→</div><div class="bolha-m b-2">✅ Loja pronta em 30 min!<small>com produtos, preços e adicionais</small></div></div>
+    </div>
+  </div>
+</section>
+
 <!-- PREÇO -->
 <section id="preco" style="padding-top:30px">
   <div class="wrap">
@@ -440,6 +480,10 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
   <div class="wrap">
     <div class="titulo-sec revela"><div class="etq">Dúvidas</div><h2>Perguntas frequentes</h2></div>
     <div class="faq">
+      <details open><summary>Precisa de CPF ou cartão para criar a loja?</summary><p>Não. Para criar sua loja você só precisa do nome da loja, do WhatsApp, de um e-mail e de uma senha. Nada de CPF, nada de cartão.</p></details>
+      <details><summary>Não tenho tempo de montar o cardápio. E agora?</summary><p>A gente monta pra você, de graça. É só mandar as fotos do cardápio (ou o link do cardápio que você já usa) no nosso WhatsApp e em menos de 30 minutos sua loja fica pronta.</p></details>
+      <details><summary>Já estou no iFood. Vale a pena?</summary><p>Vale. Coloque o link da Pedeki no Instagram, no status e no WhatsApp da loja: os pedidos que vierem por ali não pagam comissão nenhuma. Você continua no iFood se quiser.</p></details>
+      <details><summary>Meus dados e os dos meus clientes ficam seguros?</summary><p>Sim. Usamos conexão segura e o banco de dados do Google (Firebase). Cada loja só enxerga os próprios pedidos. Seguimos a LGPD: veja nossa <a href="privacidade.html">Política de Privacidade</a>.</p></details>
       <details><summary>Preciso pagar alguma coisa para testar?</summary><p>Não. Você tem 7 dias grátis com tudo liberado e não precisa cadastrar cartão.</p></details>
       <details><summary>Vocês cobram taxa em cima dos meus pedidos?</summary><p>Não. Você paga só a mensalidade. Todo o dinheiro das vendas é seu.</p></details>
       <details><summary>Como o pedido chega pra mim?</summary><p>Quando o cliente confirma, abre o WhatsApp com o pedido completo: itens, adicionais, forma de pagamento, endereço e total. Ele também aparece no seu painel com aviso sonoro.</p></details>
@@ -455,11 +499,17 @@ footer{padding:40px 0 50px;color:var(--cinza);font-size:.9rem}
     <div class="cta revela">
       <h2>Bora vender mais pelo WhatsApp?</h2>
       <p>Crie sua loja agora e comece a receber pedidos hoje mesmo.</p>
-      <button class="btn" data-abre="cadastro">Criar minha loja grátis →</button>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative">
+        <button class="btn" data-abre="cadastro">Criar minha loja grátis →</button>
+        <a class="btn btn-borda-b" target="_blank" rel="noopener" href="https://wa.me/5582994012972?text=Ol%C3%A1%21%20Tenho%20uma%20d%C3%BAvida%20sobre%20a%20Pedeki.">💬 Tirar dúvida no WhatsApp</a>
+      </div>
     </div>
   </div>
 </section>
 </main>
+
+<a class="zap-flut" target="_blank" rel="noopener" href="https://wa.me/5582994012972?text=Ol%C3%A1%21%20Vi%20o%20site%20da%20Pedeki%20e%20tenho%20uma%20d%C3%BAvida." aria-label="Falar no WhatsApp"><svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.9-1.6l-.4-.3-3.8 1.2 1.2-3.7-.3-.4a10.4 10.4 0 01-1.7-5.8C5.1 10 10 5.3 16 5.3S26.9 10 26.9 15.8 22 26.4 16 26.4zm6-7.9c-.3-.2-1.9-1-2.2-1.1-.3-.1-.5-.2-.7.2l-1 1.2c-.2.2-.4.2-.7.1a8.7 8.7 0 01-4.3-3.7c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5 1.9.8 2.6.9 3.6.7.6-.1 1.9-.8 2.1-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.6-.3z"/></svg><span>Dúvidas? Fale com a gente</span></a>
+<div class="barra-mob"><button class="btn btn-pri" data-abre="cadastro">Criar minha loja grátis</button><small>7 dias grátis · sem cartão · sem CPF</small></div>
 
 <footer>
   <div class="wrap rod">
@@ -565,6 +615,7 @@ $("zapEnvia").onclick=function(){
 };
 
 // ===== botões de entrar/cadastrar
+addEventListener("scroll",()=>{const b=document.querySelector(".barra-mob");if(b)b.classList.toggle("on",scrollY>520)},{passive:true});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-abre]");if(b){e.preventDefault();location.href="conta.html#"+b.dataset.abre;}});
 try{const ex=(window.PEDEKI&&window.PEDEKI.lojaExemplo)||"exemplo";document.querySelectorAll("[data-exemplo]").forEach(a=>a.href="loja.html?l="+encodeURIComponent(ex));}catch(e){}
 

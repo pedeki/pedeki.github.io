@@ -34,6 +34,11 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
 .olho{position:relative}.olho input{padding-right:46px}
 .olho button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;cursor:pointer;font-size:1.05rem;padding:6px}
 @media(max-width:860px){body{grid-template-columns:1fr}.lado{display:none}.topo-mob{display:block;margin-bottom:22px}}
+.confia{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 18px}
+.confia span{background:#EAF8EF;color:#14833F;font-weight:700;font-size:.76rem;padding:6px 10px;border-radius:999px}
+.ajuda-montar{display:block;margin-top:16px;border:1.5px dashed var(--linha);border-radius:16px;padding:14px 16px;text-align:center;text-decoration:none;color:var(--texto);transition:.15s}
+.ajuda-montar:hover{border-color:var(--verde);background:#F3FBF6}
+.ajuda-montar b{display:block;color:var(--escuro);margin-bottom:2px}.ajuda-montar span{font-size:.84rem;color:var(--cinza)}
 </style>
 </head>
 <body>
@@ -80,17 +85,15 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
     <!-- CADASTRO -->
     <form id="fCadastro" class="aba oculto" data-aba="cadastro" novalidate>
       <h2>Crie sua loja 🚀</h2>
-      <p class="sub">7 dias grátis com tudo liberado.</p>
+      <p class="sub">7 dias grátis com tudo liberado. Leva menos de 1 minuto.</p>
+      <div class="confia"><span>🔒 Não pedimos CPF</span><span>💳 Sem cartão</span><span>✓ Cancele quando quiser</span></div>
       <div class="campo"><label>Nome da loja</label><input name="nome" required maxlength="60" placeholder="Ex.: Burger da Vila"></div>
       <div class="campo"><label>Link da sua loja</label>
         <div class="prefixo"><span>pedeki/</span><input name="slug" required maxlength="30" placeholder="burger-da-vila"></div>
         <div class="status-slug" id="stSlug"></div>
       </div>
       <div class="campo"><label>WhatsApp da loja (onde chegam os pedidos)</label><input name="whats" required inputmode="tel" placeholder="(00) 00000-0000"></div>
-      <div class="linha2">
-        <div class="campo"><label>Seu nome</label><input name="dono" required maxlength="60"></div>
-        <div class="campo"><label>CPF</label><input name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></div>
-      </div>
+      <div class="campo"><label>Seu nome</label><input name="dono" required maxlength="60" autocomplete="name" placeholder="Como podemos te chamar?"></div>
       <div id="blocoLogin">
         <div class="campo"><label>E-mail</label><input name="email" type="email" required autocomplete="email"></div>
         <div class="campo"><label>Senha</label><div class="olho"><input name="senha" type="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres"><button type="button" data-olho title="Mostrar senha">👁️</button></div></div>
@@ -98,7 +101,8 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
       <label class="aceite" id="boxAceite"><input type="checkbox" name="aceite" id="aceite"><span>Tenho 18 anos ou mais e li e aceito os <a href="termos.html" target="_blank">Termos de Uso</a> e a <a href="privacidade.html" target="_blank">Política de Privacidade</a> da Pedeki.</span></label>
       <div id="erroCad" class="aviso vermelho oculto" style="margin-bottom:12px"></div>
       <button class="btn btn-pri btn-bloco" type="submit" id="btCad">Criar minha loja grátis</button>
-      <p style="font-size:.78rem;color:var(--cinza);text-align:center;margin-top:12px">O teste grátis é 1 por WhatsApp e por CPF.</p>
+      <p style="font-size:.78rem;color:var(--cinza);text-align:center;margin-top:12px">O teste grátis é 1 por número de WhatsApp.</p>
+      <a class="ajuda-montar" target="_blank" rel="noopener" href="https://wa.me/5582994012972?text=Ol%C3%A1!%20Quero%20que%20voc%C3%AAs%20montem%20minha%20loja%20na%20Pedeki."><b>🛠️ Prefere que a gente monte pra você?</b><span>Manda as fotos do cardápio no WhatsApp que a gente deixa pronto. Grátis.</span></a>
     </form>
 
     <p class="legal-l"><a href="termos.html">Termos de Uso</a>·<a href="privacidade.html">Política de Privacidade</a></p>
@@ -113,7 +117,7 @@ h2{font-size:1.6rem;letter-spacing:-.03em;color:var(--escuro);margin-bottom:4px}
 
 <script src="config.js"></script>
 <script type="module">
-import { auth, db, F, $, $$, toast, soNum, zapNum, cpfValido, slugify, mascaraTel, erroAmigavel, configurado, marcaHTML, horariosPadrao } from "./js/base.js";
+import { auth, db, F, $, $$, toast, soNum, zapNum, slugify, mascaraTel, erroAmigavel, configurado, marcaHTML, horariosPadrao } from "./js/base.js";
 
 $("#marcaLado").outerHTML = marcaHTML.replace("marca", "marca\" style=\"color:#fff");
 $("#marcaMob").innerHTML = marcaHTML;
@@ -169,10 +173,6 @@ $("#fEsqueci").onsubmit = async e => {
 const fc = $("#fCadastro");
 fc.aceite.addEventListener("change", () => $("#boxAceite").classList.remove("erro"));
 mascaraTel(fc.whats);
-fc.cpf.addEventListener("input", () => {
-  let n = soNum(fc.cpf.value).slice(0, 11);
-  fc.cpf.value = n.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-});
 let slugMexido = false;
 fc.nome.addEventListener("input", () => { if (!slugMexido) { fc.slug.value = slugify(fc.nome.value); checaSlug(); } });
 fc.slug.addEventListener("input", () => { slugMexido = true; fc.slug.value = slugify(fc.slug.value); checaSlug(); });
@@ -198,12 +198,11 @@ fc.onsubmit = async e => {
   e.preventDefault();
   $("#erroCad").classList.add("oculto");
   const nome = fc.nome.value.trim(), slug = fc.slug.value, whats = zapNum(fc.whats.value),
-        dono = fc.dono.value.trim(), cpf = soNum(fc.cpf.value);
+        dono = fc.dono.value.trim();
   if (nome.length < 2) return falha("Digite o nome da loja.");
   if (slug.length < 3) return falha("O link precisa ter pelo menos 3 letras.");
   if (whats.length < 12 || whats.length > 13) return falha("Digite o WhatsApp com DDD.");
   if (dono.length < 2) return falha("Digite seu nome.");
-  if (!cpfValido(cpf)) return falha("CPF inválido.");
   if (!fc.aceite.checked) { $("#boxAceite").classList.add("erro"); return falha("Para continuar, marque que aceita os Termos de Uso e a Política de Privacidade."); }
   const bt = $("#btCad"); bt.disabled = true; bt.textContent = "Criando sua loja…";
   try {
@@ -225,13 +224,15 @@ fc.onsubmit = async e => {
       pagamentos: ["Pix", "Cartão", "Dinheiro"], chavePix: "", categorias: ["Lanches", "Bebidas"],
       criadoEm: F.serverTimestamp(), pagoAte: F.serverTimestamp()
     };
-    const privado = { cpf, email: user.email, dono, aceiteTermos: "2026-11-10", aceiteEm: F.serverTimestamp() };
+    // "cpf" aqui NÃO é CPF: é um código aleatório interno (as regras antigas do banco exigem esse campo). O cliente não informa CPF.
+    const codigo = String(Date.now()).slice(-6) + String(Math.floor(Math.random() * 1e5)).padStart(5, "0");
+    const privado = { cpf: codigo, semCpf: true, email: user.email, dono, aceiteTermos: "2026-11-10", aceiteEm: F.serverTimestamp() };
     const montar = comTeste => {
       const b = F.writeBatch(db);
       b.set(F.doc(db, "slugs", slug), { uid });
       if (comTeste) {
         b.set(F.doc(db, "whatsapps", whats), { uid });
-        b.set(F.doc(db, "cpfs", cpf), { uid });
+        b.set(F.doc(db, "cpfs", codigo), { uid });
       }
       b.set(F.doc(db, "lojas", uid, "privado", "dados"), privado);
       b.set(F.doc(db, "lojas", uid), { ...loja, testeDias: comTeste ? 7 : 0 });
