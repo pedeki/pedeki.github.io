@@ -10,6 +10,7 @@
 <style>
 .wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.topo>div:last-child{flex-wrap:wrap}
 .nums{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px}
 .nums.vis{grid-template-columns:repeat(3,1fr);margin-bottom:18px}
 .nums.vis .card{background:linear-gradient(135deg,#fff,var(--cor-claro))}
@@ -49,7 +50,7 @@ td b{color:var(--escuro)}
 <body>
 <div class="carregando" id="carregando"><div class="giro"></div></div>
 <div class="wrap">
-  <div class="topo"><div id="marca"></div><div style="display:flex;gap:8px"><button class="btn btn-sec btn-mini" id="btAvisos">🔕 Ativar avisos</button><a class="btn btn-sec btn-mini" href="painel.html">Meu painel</a><button class="btn btn-sec btn-mini" id="btSair">Sair</button></div></div>
+  <div class="topo"><div id="marca"></div><div style="display:flex;gap:8px"><button class="btn btn-sec btn-mini" id="btBackup" title="Baixa uma cópia de todas as lojas e cardápios para o seu computador">💾 Backup</button><button class="btn btn-sec btn-mini" id="btAvisos">🔕 Ativar avisos</button><a class="btn btn-sec btn-mini" href="painel.html">Meu painel</a><button class="btn btn-sec btn-mini" id="btSair">Sair</button></div></div>
   <div class="abas" id="abas"><button data-aba="lojas" class="on">🏪 Lojas</button><button data-aba="suporte">💬 Suporte <span class="qt oculto" id="qtSup"></span></button></div>
   <div id="corpo"></div>
   <div id="corpoSup" class="oculto">
@@ -68,6 +69,7 @@ $("#marca").innerHTML = marcaHTML;
 $("#btSair").onclick = () => F.signOut(auth).then(() => location.href = "conta.html#entrar");
 document.addEventListener("click", e => { if (e.target.closest("[data-fecha]") || e.target.classList.contains("modal")) e.target.closest(".modal")?.classList.remove("on"); });
 let lojas = [], filtro = "todas", busca = "";
+const nProd = {}; // quantos produtos cada loja tem
 F.onAuthStateChanged(auth, u => {
   if (!u) return location.href = "conta.html#entrar";
   $("#carregando").remove();
@@ -76,8 +78,9 @@ F.onAuthStateChanged(auth, u => {
   $("#btRe")?.addEventListener("click", () => F.sendEmailVerification(u).then(() => toast("Enviado!")));
   F.onSnapshot(F.collection(db, "lojas"), s => {
     lojas = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })).sort((a, b) => ms(b.criadoEm) - ms(a.criadoEm));
-    desenha(); desenhaConversas();
+    desenha(); desenhaConversas(); contaProdutos();
   }, e => toast(erroAmigavel(e), "erro"));
+  setInterval(() => contaProdutos(true), 120000);
   ligaSuporte();
   try { localStorage.setItem("pdk_vis", "admin"); } catch {}
   contaVisitas(); setInterval(contaVisitas, 60000);
@@ -94,6 +97,16 @@ async function contaVisitas() {
   } catch (e) { vis = { total: "—", hoje: "—", d7: "—" }; }
   [["#visTotal", vis.total], ["#visHoje", vis.hoje], ["#vis7", vis.d7]].forEach(([s, v]) => { const el = $(s); if (el) el.textContent = typeof v === "number" ? v.toLocaleString("pt-BR") : v; });
 }
+async function contaProdutos(todas) {
+  const faltam = lojas.filter(l => todas || nProd[l.id] === undefined);
+  if (!faltam.length) return;
+  await Promise.all(faltam.map(async l => { try { nProd[l.id] = (await F.getCountFromServer(F.collection(db, "lojas", l.id, "produtos"))).data().count; } catch { nProd[l.id] = null; } }));
+  if (aba === "lojas" && document.activeElement?.id !== "busca") desenha();
+}
+const semCardapio = l => nProd[l.id] === 0;
+function msgMontar(l) {
+  return `Olá, tudo bem? Aqui é da Pedeki 😊\n\nVi que você criou o cardápio da *${l.nome}*, mas ele ainda está vazio. Quer que a gente monte pra você, sem custo nenhum?\n\nÉ só me mandar aqui:\n📸 Sua logo\n🍽️ Os produtos (nome e preço) — pode ser foto do cardápio de papel\n➕ Os adicionais, se tiver\n🕒 Horário de funcionamento\n\nAssim que eu receber tudo, deixo seu cardápio pronto em até 30 minutos, já recebendo pedidos no seu WhatsApp. 🚀`;
+}
 function situacao(l) {
   if (!lojaAtiva(l)) return ["Vencida", "b-erro", "vencidas"];
   if (emTeste(l)) return ["Em teste", "b-novo", "teste"];
@@ -102,7 +115,8 @@ function situacao(l) {
 function desenha() {
   const cont = { teste: 0, pagantes: 0, vencidas: 0 };
   lojas.forEach(l => cont[situacao(l)[2]]++);
-  const lista = lojas.filter(l => (filtro === "todas" || situacao(l)[2] === filtro) && (!busca || (l.nome + " " + l.slug + " " + l.whatsapp).toLowerCase().includes(busca)));
+  const vazias = lojas.filter(l => lojaAtiva(l) && semCardapio(l));
+  const lista = lojas.filter(l => (filtro === "todas" || (filtro === "vazias" ? vazias.includes(l) : situacao(l)[2] === filtro)) && (!busca || (l.nome + " " + l.slug + " " + l.whatsapp).toLowerCase().includes(busca)));
   $("#corpo").innerHTML = `
   <div class="nums">
     <div class="card"><small>Lojas</small><strong>${lojas.length}</strong></div>
@@ -116,16 +130,20 @@ function desenha() {
     <div class="card"><small>Visitas hoje</small><strong id="visHoje">${vis.hoje ?? "…"}</strong></div>
     <div class="card"><small>Últimos 7 dias</small><strong id="vis7">${vis.d7 ?? "…"}</strong></div>
   </div>
+  ${vazias.length ? `<div class="aviso amarelo" style="margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">⚠️ <span><b>${vazias.length} loja(s) ativa(s) ainda sem nenhum produto.</b> Chame no WhatsApp e ofereça para montar o cardápio, antes do teste acabar.</span> <button class="btn btn-pri btn-mini" data-f="vazias">Ver lojas</button></div>` : ""}
   <div class="card">
     <div class="ff"><input id="busca" placeholder="Buscar loja, link ou WhatsApp" value="${esc(busca)}">
-      ${[["todas", "Todas"], ["teste", "Em teste"], ["pagantes", "Pagantes"], ["vencidas", "Vencidas"]].map(([k, n]) => `<button data-f="${k}" class="${filtro === k ? "on" : ""}">${n}</button>`).join("")}</div>
-    <div class="tab"><table><thead><tr><th>Loja</th><th>WhatsApp</th><th>Criada</th><th>Situação</th><th>Válida até</th><th></th></tr></thead><tbody>
+      ${[["todas", "Todas"], ["teste", "Em teste"], ["pagantes", "Pagantes"], ["vencidas", "Vencidas"], ["vazias", "Sem cardápio"]].map(([k, n]) => `<button data-f="${k}" class="${filtro === k ? "on" : ""}">${n}</button>`).join("")}</div>
+    <div class="tab"><table><thead><tr><th>Loja</th><th>WhatsApp</th><th>Criada</th><th>Situação</th><th>Cardápio</th><th>Válida até</th><th></th></tr></thead><tbody>
     ${lista.map(l => { const [n, c] = situacao(l), fim = validoAte(l); return `<tr>
       <td><b>${esc(l.nome)}</b><br><a href="${linkLoja(l.slug)}" target="_blank" style="color:var(--cinza);font-size:.8rem">/${esc(l.slug)}</a></td>
       <td><a href="https://wa.me/${esc(l.whatsapp)}" target="_blank">${esc(fmtTel(l.whatsapp))}</a></td>
       <td>${dataBR(ms(l.criadoEm))}</td><td><span class="badge ${c}">${n}</span></td>
+      <td>${nProd[l.id] === undefined ? '<small style="color:var(--cinza)">…</small>' : nProd[l.id] === null ? "—" : nProd[l.id] === 0
+        ? `<span class="badge b-erro">Vazio</span><br><a class="btn btn-zap btn-mini" style="margin-top:4px;padding:5px 10px" target="_blank" rel="noopener" href="https://wa.me/${esc(l.whatsapp)}?text=${encodeURIComponent(msgMontar(l))}">💬 Chamar</a>`
+        : `${nProd[l.id]} produto(s)`}</td>
       <td>${dataBR(fim)}${lojaAtiva(l) ? `<br><small style="color:var(--cinza)">${diasRestantes(fim)} dia(s)</small>` : ""}</td>
-      <td style="white-space:nowrap"><button class="btn btn-sec btn-mini" data-info="${l.id}">Dados</button> <button class="btn btn-pri btn-mini" data-add="${l.id}" data-d="30">+30 dias</button></td></tr>`; }).join("") || '<tr><td colspan="6" style="text-align:center;color:var(--cinza)">Nenhuma loja.</td></tr>'}
+      <td style="white-space:nowrap"><button class="btn btn-sec btn-mini" data-info="${l.id}">Dados</button> <button class="btn btn-pri btn-mini" data-add="${l.id}" data-d="30">+30 dias</button></td></tr>`; }).join("") || '<tr><td colspan="7" style="text-align:center;color:var(--cinza)">Nenhuma loja.</td></tr>'}
     </tbody></table></div></div>`;
   $("#busca").oninput = e => { busca = e.target.value.toLowerCase(); const p = e.target.selectionStart; desenha(); $("#busca").focus(); $("#busca").setSelectionRange(p, p); };
   $$("[data-f]").forEach(b => b.onclick = () => { filtro = b.dataset.f; desenha(); });
@@ -151,6 +169,34 @@ document.addEventListener("click", async e => {
     $("#mInfo").classList.add("on");
   }
 });
+
+// ================= backup (só baixa, não muda nada)
+const paraJSON = v => {
+  if (v && typeof v.toDate === "function") return v.toDate().toISOString();
+  if (Array.isArray(v)) return v.map(paraJSON);
+  if (v && typeof v === "object") { const o = {}; for (const k in v) o[k] = paraJSON(v[k]); return o; }
+  return v;
+};
+$("#btBackup").onclick = async () => {
+  const b = $("#btBackup"); b.disabled = true; b.textContent = "⏳ Juntando…";
+  try {
+    const saida = { feitoEm: new Date().toISOString(), lojas: [], pagamentos: [] };
+    for (const l of lojas) {
+      const item = { id: l.id, dados: paraJSON((await F.getDoc(F.doc(db, "lojas", l.id))).data()), privado: null, produtos: [] };
+      try { item.privado = paraJSON((await F.getDoc(F.doc(db, "lojas", l.id, "privado", "dados"))).data() || null); } catch {}
+      try { item.produtos = (await F.getDocs(F.collection(db, "lojas", l.id, "produtos"))).docs.map(d => ({ id: d.id, ...paraJSON(d.data()) })); } catch {}
+      saida.lojas.push(item);
+      b.textContent = `⏳ ${saida.lojas.length}/${lojas.length}`;
+    }
+    try { saida.pagamentos = (await F.getDocs(F.collection(db, "pagamentos"))).docs.map(d => ({ id: d.id, ...paraJSON(d.data()) })); } catch {}
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(saida, null, 1)], { type: "application/json" }));
+    a.download = `pedeki-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    toast(`Backup baixado: ${saida.lojas.length} loja(s) ✓`);
+  } catch (e) { toast("Não consegui fazer o backup: " + erroAmigavel(e), "erro"); }
+  b.disabled = false; b.textContent = "💾 Backup";
+};
 
 // ================= abas
 let aba = "lojas";

@@ -81,6 +81,25 @@ body{background:#F7F5F2;padding-bottom:110px}
 .acomp small{color:var(--cinza)}
 .acomp .seta{margin-left:auto;color:var(--cor);font-weight:800}
 .fora{max-width:420px;margin:80px auto;text-align:center;padding:20px}
+/* novidades */
+.top-b{display:inline-block;background:#FFF4D6;color:#9A6B00;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:999px;margin-bottom:4px;letter-spacing:.01em}
+.repetir{margin:12px 14px 0;background:#fff;border:1px solid var(--linha);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.repetir .ic{width:42px;height:42px;border-radius:12px;background:var(--cor-claro);display:grid;place-items:center;font-size:1.25rem;flex-shrink:0}
+.repetir .tx{flex:1;min-width:0}
+.repetir b{color:var(--escuro);display:block;font-size:.92rem}
+.repetir small{color:var(--cinza);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem}
+.repetir button{flex-shrink:0;border:0;background:var(--cor);color:#fff;font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;font-size:.85rem}
+.sug-t{font-weight:800;color:var(--escuro);margin:16px 0 8px;font-size:.95rem}
+.sug{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;margin:0 -2px}
+.sug::-webkit-scrollbar{display:none}
+.sug-i{flex:0 0 132px;background:#FBF9F7;border:1px solid var(--linha);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.sug-i .ft{width:100%;height:78px;border-radius:12px;object-fit:cover;background:#F3EFEA;display:grid;place-items:center;font-size:1.6rem}
+.sug-i b{font-size:.8rem;color:var(--escuro);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2em}
+.sug-i .pr{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:.82rem;color:var(--escuro)}
+.sug-i button{width:28px;height:28px;border-radius:9px;border:0;background:var(--cor);color:#fff;font-weight:800;font-size:1.05rem;cursor:pointer}
+.frete{background:var(--verde-claro);border-radius:14px;padding:10px 12px;margin-top:14px;font-size:.85rem;color:var(--escuro)}
+.frete .tr{display:block;height:7px;background:#fff;border-radius:9px;margin-top:7px;overflow:hidden}
+.frete .tr i{display:block;height:100%;background:var(--verde);border-radius:9px;transition:width .4s}
 .fora .ic{font-size:3rem;margin-bottom:10px}
 </style>
 </head>
@@ -91,6 +110,7 @@ body{background:#F7F5F2;padding-bottom:110px}
   <div class="wrap">
     <div class="cab"><div id="logo"></div><div style="min-width:0"><h1 id="nome"></h1><p id="desc"></p></div><button class="ico-btn comp" id="btCompartilhar" title="Compartilhar cardápio" aria-label="Compartilhar cardápio">📤</button></div>
     <div id="acompanhar"></div>
+    <div id="repetir"></div>
     <div class="infos" id="infos"></div>
     <div class="aviso-loja" id="avisoLoja"></div>
     <div class="busca"><input id="busca" placeholder="Buscar no cardápio" autocomplete="off"></div>
@@ -110,6 +130,7 @@ body{background:#F7F5F2;padding-bottom:110px}
   <button class="fechar" data-fecha>✕</button>
   <h2>Seu pedido</h2>
   <div id="itensCar"></div>
+  <div id="sugCar"></div>
   <form id="fPed">
     <div class="bloco-t">Como você quer receber?</div>
     <div class="pilulas" id="tipos"></div>
@@ -179,12 +200,13 @@ function desenhaLoja() {
   const ab = abertaAgora(loja);
   $("#infos").innerHTML = `<span style="color:${ab ? "var(--verde)" : "var(--vermelho)"}">● ${ab ? "Aberto agora" : "Fechado"}</span>` +
     (loja.entregaAtiva !== false ? `<span>🛵 ${loja.taxaEntrega ? "Entrega " + R(loja.taxaEntrega) : "Entrega grátis"}</span>` : "") +
+    (loja.entregaAtiva !== false && loja.taxaEntrega && loja.freteGratisAcima > 0 ? `<span style="color:var(--verde)">🎁 Grátis acima de ${R(loja.freteGratisAcima)}</span>` : "") +
     (loja.tempoEntrega ? `<span>⏱ ${esc(loja.tempoEntrega)}</span>` : "") +
     (loja.retiradaAtiva !== false ? "<span>🏪 Retirada</span>" : "") +
     (loja.pedidoMinimo ? `<span>Mínimo ${R(loja.pedidoMinimo)}</span>` : "");
   $("#avisoLoja").innerHTML = ab ? "" : `<div class="aviso amarelo">A loja está fechada agora${loja.abertoModo === "fechado" ? "" : (proximaAbertura(loja) ? " · abre " + proximaAbertura(loja) : "")}. Você pode olhar o cardápio, mas não dá para pedir.</div>`;
   $("#consentLoja").textContent = loja.nome;
-  desenhaAcompanhar(); desenhaCardapio(); atualizaBarra();
+  desenhaAcompanhar(); desenhaRepetir(); desenhaCardapio(); atualizaBarra();
 }
 
 // ===== pedidos recentes neste aparelho (acompanhar)
@@ -202,16 +224,20 @@ $("#btCompartilhar").onclick = async () => {
   try { await navigator.clipboard.writeText(url); toast("Link copiado! Agora é só colar e mandar."); } catch { prompt("Copie o link:", url); }
 };
 
+const TOP = "⭐ Mais pedidos", PROMO = "🔥 Promoções";
+// produtos mais vendidos (o painel da loja calcula e salva sozinho)
+const destaques = () => (loja.destaques || []).map(id => produtos.find(p => p.id === id)).filter(p => p && p.estoque !== 0);
+const ehTop = p => (loja.destaques || []).includes(p.id);
 function cats() {
   const ord = [...(loja.categorias || [])];
   const temPromo = produtos.some(p => p.precoDe > p.preco);
   produtos.forEach(p => { if (!ord.includes(p.categoria)) ord.push(p.categoria); });
-  return (temPromo ? ["🔥 Promoções"] : []).concat(ord.filter(c => produtos.some(p => p.categoria === c)));
+  return (destaques().length && produtos.length >= 4 ? [TOP] : []).concat(temPromo ? [PROMO] : []).concat(ord.filter(c => produtos.some(p => p.categoria === c)));
 }
 function cardProd(p) {
   const esg = p.estoque === 0, promo = p.precoDe > p.preco;
   return `<div class="prod ${esg ? "esg" : ""}" data-p="${p.id}">
-    <div class="tx"><h3>${esc(p.nome)}</h3><p>${esc(p.descricao || "")}</p>
+    <div class="tx">${ehTop(p) && !esg ? '<span class="top-b">⭐ Mais pedido</span>' : ""}<h3>${esc(p.nome)}</h3><p>${esc(p.descricao || "")}</p>
     <div class="preco">${esg ? '<span style="color:var(--vermelho)">Esgotado</span>' : R(p.preco) + (promo ? `<s>${R(p.precoDe)}</s><span class="off">-${Math.round((1 - p.preco / p.precoDe) * 100)}%</span>` : "")}</div></div>
     ${p.foto ? `<img class="ft" src="${p.foto}" alt="" loading="lazy">` : '<div class="ft">🍽️</div>'}</div>`;
 }
@@ -223,7 +249,7 @@ function desenhaCardapio() {
   if (!produtos.length) { $("#cardapio").innerHTML = `<div class="vazio"><div class="ic">🍽️</div>O cardápio ainda está sendo montado.</div>`; return; }
   if (termo) { $("#cardapio").innerHTML = `<div class="secao"><h2>Resultados</h2>${lista.map(cardProd).join("") || '<p style="color:var(--cinza)">Nada encontrado.</p>'}</div>`; return; }
   $("#cardapio").innerHTML = cs.map((c, i) => {
-    const ps = c === "🔥 Promoções" ? produtos.filter(p => p.precoDe > p.preco) : produtos.filter(p => p.categoria === c);
+    const ps = c === TOP ? destaques() : c === PROMO ? produtos.filter(p => p.precoDe > p.preco) : produtos.filter(p => p.categoria === c);
     return `<div class="secao" id="sec${i}"><h2>${esc(c)}</h2>${ps.map(cardProd).join("")}</div>`;
   }).join("");
 }
@@ -232,6 +258,37 @@ $("#cats").onclick = e => { const b = e.target.closest("[data-c]"); if (!b) retu
 $("#cardapio").onclick = e => { const c = e.target.closest("[data-p]"); if (c) abreProd(produtos.find(p => p.id === c.dataset.p)); };
 const obs = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { const i = x.target.id.slice(3); $$("#cats button").forEach(b => b.classList.toggle("on", b.dataset.c === i)); } }), { rootMargin: "-40% 0px -55% 0px" });
 new MutationObserver(() => $$(".secao[id]").forEach(s => obs.observe(s))).observe($("#cardapio"), { childList: true });
+
+// ===== pedir de novo (fica salvo só neste aparelho)
+const chaveUlt = () => "pdk_ult_" + uid;
+function ultimoPedido() {
+  try { const u = JSON.parse(localStorage.getItem(chaveUlt()) || "null"); return u && Array.isArray(u.itens) ? u : null; } catch { return null; }
+}
+function itensRepetiveis(u) {
+  return (u.itens || []).map(i => {
+    const p = produtos.find(x => x.id === i.pid);
+    if (!p || p.estoque === 0) return null;
+    const ads = (i.adicionais || []).filter(a => (p.adicionais || []).some(g => g.opcoes.some(o => o.nome === a.nome)))
+      .map(a => { let pr = a.preco || 0; (p.adicionais || []).forEach(g => g.opcoes.forEach(o => { if (o.nome === a.nome) pr = o.preco || 0; })); return { ...a, preco: pr }; });
+    return { pid: p.id, nome: p.nome, qtd: i.qtd, unit: p.preco + ads.reduce((s, a) => s + a.preco, 0), adicionais: ads, obs: i.obs || "" };
+  }).filter(Boolean);
+}
+function desenhaRepetir() {
+  const u = ultimoPedido(), its = u ? itensRepetiveis(u) : [];
+  if (!its.length) { $("#repetir").innerHTML = ""; return; }
+  const total = its.reduce((s, i) => s + i.unit * i.qtd, 0);
+  $("#repetir").innerHTML = `<div class="repetir"><div class="ic">🔁</div><div class="tx"><b>Pedir de novo</b><small>${esc(its.map(i => i.qtd + "x " + i.nome).join(", "))}</small><small>${R(total)}</small></div><button id="btRepetir">Repetir</button></div>`;
+  $("#btRepetir").onclick = () => {
+    const novos = itensRepetiveis(ultimoPedido() || {});
+    for (const i of novos) {
+      const p = produtos.find(x => x.id === i.pid), ja = car.filter(x => x.pid === i.pid).reduce((s, x) => s + x.qtd, 0);
+      if (typeof p.estoque === "number" && ja + i.qtd > p.estoque) { i.qtd = p.estoque - ja; if (i.qtd <= 0) continue; }
+      car.push(i);
+    }
+    salvaCar(); atualizaBarra();
+    if (car.length) { toast("Itens do seu último pedido no carrinho ✓"); abreCar(); }
+  };
+}
 
 // ===== produto
 let pAtual, qtd = 1, escolhas = {};
@@ -288,9 +345,9 @@ const fp = $("#fPed");
 mascaraTel(fp.tel);
 try { const c = JSON.parse(localStorage.getItem("pdk_cliente") || "{}"); ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => { if (c[k]) fp[k].value = c[k]; }); if (c.nome || c.tel) $("#btEsquecer").classList.remove("oculto"); } catch {}
 $("#btEsquecer").onclick = () => {
-  try { localStorage.removeItem("pdk_cliente"); Object.keys(localStorage).filter(k => k.startsWith("pdk_peds_")).forEach(k => localStorage.removeItem(k)); } catch {}
+  try { localStorage.removeItem("pdk_cliente"); Object.keys(localStorage).filter(k => k.startsWith("pdk_peds_") || k.startsWith("pdk_ult_")).forEach(k => localStorage.removeItem(k)); } catch {}
   ["nome", "tel", "rua", "numero", "bairro", "comp"].forEach(k => fp[k].value = "");
-  $("#btEsquecer").classList.add("oculto"); $("#acompanhar").innerHTML = "";
+  $("#btEsquecer").classList.add("oculto"); $("#acompanhar").innerHTML = ""; $("#repetir").innerHTML = "";
   toast("Pronto! Seus dados foram apagados deste aparelho.");
 };
 function abreCar() {
@@ -305,7 +362,8 @@ function abreCar() {
 }
 function totais() {
   const sub = car.reduce((s, i) => s + i.unit * i.qtd, 0);
-  const taxa = tipo === "entrega" ? (loja.taxaEntrega || 0) : 0;
+  const fg = loja.freteGratisAcima || 0;
+  const taxa = tipo === "entrega" && !(fg > 0 && sub >= fg) ? (loja.taxaEntrega || 0) : 0;
   let desc = 0;
   if (cupom) {
     if (sub < (cupom.minimo || 0)) desc = 0;
@@ -327,7 +385,11 @@ function desenhaCar() {
   $("#infoPix").innerHTML = `Chave Pix da loja: <b>${esc(loja.chavePix || "")}</b><br><small>Mande o comprovante no WhatsApp junto com o pedido.</small>`;
   const t = totais();
   const falta = (loja.pedidoMinimo || 0) - t.sub;
-  $("#resumo").innerHTML = `<div style="margin-top:18px"><span>Subtotal</span><span>${R(t.sub)}</span></div>` +
+  desenhaSugestoes();
+  const fg = loja.freteGratisAcima || 0, mostraFrete = tipo === "entrega" && fg > 0 && (loja.taxaEntrega || 0) > 0;
+  const frete = !mostraFrete ? "" : t.sub >= fg ? `<p class="frete">🎉 <b>Você ganhou entrega grátis!</b><span class="tr"><i style="width:100%"></i></span></p>`
+    : `<p class="frete" style="background:#FFF7D6">🛵 Faltam <b>${R(fg - t.sub)}</b> para a <b>entrega grátis</b><span class="tr"><i style="width:${Math.min(100, t.sub / fg * 100)}%"></i></span></p>`;
+  $("#resumo").innerHTML = frete + `<div style="margin-top:18px"><span>Subtotal</span><span>${R(t.sub)}</span></div>` +
     (tipo === "entrega" ? `<div><span>Taxa de entrega</span><span>${t.taxa ? R(t.taxa) : "Grátis"}</span></div>` : "") +
     (t.desc ? `<div style="color:var(--verde)"><span>Cupom ${esc(cupom.codigo)}</span><span>- ${R(t.desc)}</span></div>` : "") +
     `<div class="tot"><span>Total</span><span>${R(t.tot)}</span></div>` +
@@ -337,6 +399,26 @@ function desenhaCar() {
   $("#btConfirmar").textContent = ab ? "Confirmar pedido no WhatsApp" : "Loja fechada no momento";
   atualizaBarra();
 }
+// ===== sugestões no carrinho ("que tal levar também?")
+function desenhaSugestoes() {
+  const noCar = new Set(car.map(i => i.pid));
+  const catsCar = new Set(car.map(i => (produtos.find(p => p.id === i.pid) || {}).categoria));
+  const top = loja.destaques || [];
+  const outra = p => catsCar.has(p.categoria) ? 0 : 1, emTop = p => top.includes(p.id) ? 1 : 0;
+  const lista = produtos.filter(p => !noCar.has(p.id) && p.estoque !== 0)
+    .sort((a, b) => (outra(b) - outra(a)) || (emTop(b) - emTop(a)) || (a.preco - b.preco)).slice(0, 8);
+  $("#sugCar").innerHTML = lista.length ? `<div class="sug-t">😋 Que tal levar também?</div><div class="sug">${lista.map(p => `<div class="sug-i">
+    ${p.foto ? `<img class="ft" src="${p.foto}" alt="" loading="lazy">` : '<div class="ft">🍽️</div>'}<b>${esc(p.nome)}</b>
+    <div class="pr"><span>${R(p.preco)}</span><button type="button" data-sug="${p.id}" aria-label="Adicionar ${esc(p.nome)}">+</button></div></div>`).join("")}</div>` : "";
+}
+$("#sugCar").onclick = e => {
+  const b = e.target.closest("[data-sug]"); if (!b) return;
+  const p = produtos.find(x => x.id === b.dataset.sug); if (!p) return;
+  if ((p.adicionais || []).some(g => (g.min || 0) > 0)) { $("#mCar").classList.remove("on"); abreProd(p); return; }
+  const ja = car.find(i => i.pid === p.id && !i.adicionais.length && !i.obs);
+  if (ja) ja.qtd++; else car.push({ pid: p.id, nome: p.nome, qtd: 1, unit: p.preco, adicionais: [], obs: "" });
+  salvaCar(); desenhaCar(); toast(p.nome + " adicionado ✓");
+};
 $("#itensCar").onclick = e => {
   const m = e.target.closest("[data-cm]"), p = e.target.closest("[data-cp]");
   if (m) { const i = car[m.dataset.cm]; i.qtd > 1 ? i.qtd-- : car.splice(m.dataset.cm, 1); }
@@ -390,6 +472,7 @@ fp.onsubmit = async e => {
         cliente: { nome: fp.nome.value.trim(), tel, endereco }, pagamento: pag, troco, obs: fp.obs.value.trim()
       });
     });
+    try { localStorage.setItem(chaveUlt(), JSON.stringify({ em: Date.now(), itens: car.map(i => ({ pid: i.pid, nome: i.nome, qtd: i.qtd, adicionais: i.adicionais, obs: i.obs })) })); } catch {}
     car = []; salvaCar(); cupom = null;
     try { localStorage.setItem(chavePeds(), JSON.stringify([{ id: pRef.id, numero: n, em: Date.now() }, ...pedsRecentes()].slice(0, 5))); } catch {}
     location.href = linkPedido(uid, pRef.id) + "&z=1";

@@ -30,12 +30,19 @@ body{background:#F7F5F2}
 .i{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.92rem}
 .ad{color:var(--cinza);font-size:.82rem;padding-left:14px}
 .tot{font-weight:800;color:var(--escuro);border-top:1px dashed var(--linha);margin-top:8px;padding-top:10px}
+.pix{background:#fff;border-radius:24px;padding:20px;text-align:center;margin-bottom:14px;border:2px solid #32BCAD}
+.pix h3{color:var(--escuro);font-size:1.1rem;margin-bottom:2px}
+.pix .val{font-size:1.6rem;font-weight:800;color:var(--escuro);letter-spacing:-.02em}
+.pix img{width:210px;height:210px;margin:10px auto;image-rendering:pixelated;border-radius:12px}
+.pix .cod{font-size:.72rem;color:var(--cinza);word-break:break-all;background:#F7F5F2;border-radius:12px;padding:8px 10px;margin:6px 0 10px;max-height:58px;overflow:hidden}
+.pix small{color:var(--cinza);display:block;margin-top:8px;font-size:.8rem}
 </style>
 </head>
 <body>
 <div class="carregando" id="carregando"><div class="giro"></div></div>
 <div class="wrap" id="app"></div>
 <script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script type="module">
 import { db, F, $, R, esc, fmtTel, ms, horaBR, dataBR, zapLink, textoPedido, linkLoja } from "./js/base.js";
 const q = new URLSearchParams(location.search), l = q.get("l"), p = q.get("p");
@@ -60,6 +67,58 @@ function falha(t) { $("#carregando")?.remove(); $("#app").innerHTML = `<div clas
     }, () => falha("Não foi possível carregar o pedido"));
   } catch { falha("Não foi possível carregar o pedido"); }
 })();
+// ===== Pix com o valor certinho (QR Code + copia e cola)
+function chavePixNormal(k) {
+  k = String(k || "").trim();
+  if (!k) return null;
+  if (k.includes("@")) return k.toLowerCase();
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(k)) return k.toLowerCase();
+  const d = k.replace(/\D/g, "");
+  const pareceTel = /^\+|\(/.test(k), pareceDoc = /\d\.\d|\d\/\d/.test(k);
+  if (d.length === 14 && !pareceTel) return d;
+  if ((d.length === 12 || d.length === 13) && d.startsWith("55")) return "+" + d;
+  if (d.length === 11 && pareceDoc) return d;
+  if (d.length === 11 && !pareceTel && cpfOk(d)) return d;
+  if (d.length === 10 || d.length === 11) return "+55" + d;
+  return null;
+}
+function cpfOk(c) {
+  if (/^(\d)\1+$/.test(c)) return false;
+  for (let t = 9; t < 11; t++) { let s = 0; for (let i = 0; i < t; i++) s += +c[i] * (t + 1 - i); if (((10 * s) % 11) % 10 !== +c[t]) return false; }
+  return true;
+}
+const limpo = (s, n) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9 ]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+function crc16(s) {
+  let c = 0xFFFF;
+  for (let i = 0; i < s.length; i++) { c ^= s.charCodeAt(i) << 8; for (let j = 0; j < 8; j++) c = c & 0x8000 ? ((c << 1) ^ 0x1021) & 0xFFFF : (c << 1) & 0xFFFF; }
+  return c.toString(16).toUpperCase().padStart(4, "0");
+}
+function pixCodigo(chave, nome, valor, ref) {
+  const f = (id, v) => id + String(v.length).padStart(2, "0") + v;
+  const p = f("00", "01") + f("26", f("00", "br.gov.bcb.pix") + f("01", chave)) + f("52", "0000") + f("53", "986") +
+    (valor > 0 ? f("54", valor.toFixed(2)) : "") + f("58", "BR") + f("59", limpo(nome, 25) || "LOJA") + f("60", "BRASIL") +
+    f("62", f("05", (limpo(ref, 25).replace(/ /g, "") || "***"))) + "6304";
+  return p + crc16(p);
+}
+let codigoPix = "";
+function blocoPix() {
+  codigoPix = "";
+  if (!/pix/i.test(ped.pagamento || "") || !loja.chavePix || ["cancelado", "concluido"].includes(ped.status)) return "";
+  const chave = chavePixNormal(loja.chavePix);
+  if (!chave || !window.qrcode) return `<div class="pix"><h3>💠 Pague com Pix</h3><div class="val">${R(ped.total)}</div><div class="cod" style="max-height:none">Chave Pix: <b>${esc(loja.chavePix)}</b></div><button class="btn btn-sec btn-mini" data-copia="${esc(loja.chavePix)}">📋 Copiar chave</button><small>Depois, mande o comprovante no WhatsApp da loja.</small></div>`;
+  codigoPix = pixCodigo(chave, loja.nome, Math.round(ped.total * 100) / 100, "PEDIDO" + ped.numero);
+  let img = "";
+  try { const q = qrcode(0, "M"); q.addData(codigoPix); q.make(); img = `<img src="${q.createDataURL(6, 2)}" alt="QR Code Pix">`; } catch {}
+  return `<div class="pix"><h3>💠 Pague com Pix</h3><div class="val">${R(ped.total)}</div>${img}
+    <div class="cod">${esc(codigoPix)}</div>
+    <button class="btn btn-pri btn-bloco" data-copia="1" style="background:#32BCAD">📋 Copiar código Pix (copia e cola)</button>
+    <small>Abra o app do seu banco, escolha <b>Pix copia e cola</b> e cole o código. O valor já vem certinho.<br>Depois, mande o comprovante no WhatsApp da loja.</small></div>`;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-copia]"); if (!b) return;
+  const t = b.dataset.copia === "1" ? codigoPix : b.dataset.copia;
+  try { await navigator.clipboard.writeText(t); b.textContent = "✓ Copiado!"; } catch { prompt("Copie o código:", t); }
+});
 const linkZap = () => zapLink(loja.whatsapp, textoPedido(ped, loja, location.href.split("&z=")[0]));
 function desenha() {
   $("#carregando")?.remove();
@@ -80,6 +139,7 @@ function desenha() {
     <div class="status"><div class="ic">${info[0]}</div><h2>${info[1]}</h2><p>${info[2]}</p>
       ${ped.status === "cancelado" ? "" : `<div class="linha-t"><div class="barra" style="width:calc(${Math.max(0, at) / 3 * 100}% - ${Math.max(0, at) / 3 * 36}px)"></div>${nomes.map((n, i) => `<div class="passo ${i < at || ped.status === "concluido" ? "ok" : i === at ? "at" : ""}"><div class="b">${i < at || ped.status === "concluido" ? "✓" : ic[i]}</div><small>${n}</small></div>`).join("")}</div>`}
     </div>
+    ${blocoPix()}
     <a class="btn btn-zap btn-bloco" style="padding:15px;margin-bottom:14px" href="${linkZap()}">💬 ${ped.status === "novo" ? "Enviar pedido no WhatsApp" : "Falar com a loja"}</a>
     <div class="card">
       <h3>Resumo</h3>

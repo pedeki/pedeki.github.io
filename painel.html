@@ -199,6 +199,12 @@ a.nav-b{text-decoration:none}
         <div class="card"><h3>👥 Melhores clientes</h3><div class="top-l" id="topCli"></div></div>
         <div class="card"><h3>🏷️ Cupons usados</h3><div class="top-l" id="topCup"></div></div>
       </div>
+      <div class="card" style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin:0">💔 Clientes sumidos</h3>
+          <div class="periodo" id="sumDias"></div></div>
+        <p style="color:var(--cinza);font-size:.86rem;margin:6px 0 10px">Clientes que já compraram e não voltaram. Chame no WhatsApp com uma mensagem pronta e traga eles de volta.</p>
+        <div id="sumidos"></div>
+      </div>
       <p style="color:var(--cinza);font-size:.8rem;margin-top:12px">Conta só pedidos não cancelados dos últimos 500 pedidos.</p>
     </section>
 
@@ -234,7 +240,10 @@ a.nav-b{text-decoration:none}
               <div class="campo"><label>Tempo estimado</label><input name="tempoEntrega" placeholder="30–50 min"></div>
             </div>
             <div class="chave"><div><b>Retirada no local</b><small>Cliente busca na loja</small></div><label class="sw"><input type="checkbox" name="retiradaAtiva"><span></span></label></div>
-            <div class="campo" style="margin-top:12px"><label>Pedido mínimo (R$)</label><input name="pedidoMinimo" inputmode="decimal" placeholder="0,00"></div>
+            <div class="linha2" style="margin-top:12px">
+              <div class="campo"><label>Pedido mínimo (R$)</label><input name="pedidoMinimo" inputmode="decimal" placeholder="0,00"></div>
+              <div class="campo"><label>🎁 Entrega grátis acima de (R$)</label><input name="freteGratisAcima" inputmode="decimal" placeholder="Ex.: 50,00"><small>Vazio = desligado. O cliente vê quanto falta.</small></div>
+            </div>
           </div>
           <div class="card">
             <h3>💳 Formas de pagamento</h3>
@@ -301,7 +310,7 @@ a.nav-b{text-decoration:none}
         <div class="card" style="text-align:center">
           <h3>📱 QR Code</h3>
           <div id="qrLoja"></div>
-          <a class="btn btn-escuro" id="btBaixaQR" download="qrcode-loja.png">Baixar QR Code</a>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn btn-escuro" id="btBaixaQR" download="qrcode-loja.png">Baixar QR Code</a><button class="btn btn-pri" id="btCartaz">🖨️ Imprimir cartaz</button></div>
           <p style="color:var(--cinza);font-size:.85rem;margin-top:10px">Imprima e coloque no balcão, nas mesas e nas embalagens.</p>
         </div>
       </div>
@@ -479,7 +488,7 @@ F.onAuthStateChanged(auth, async u => {
   });
   F.onSnapshot(F.query(F.collection(db, "lojas", uid, "produtos"), F.orderBy("ordem")), snap => {
     produtos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    desenhaProdutos(); desenhaPassos();
+    desenhaProdutos(); desenhaPassos(); salvaDestaques();
   });
   F.onSnapshot(F.collection(db, "lojas", uid, "cupons"), snap => {
     cupons = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -494,7 +503,7 @@ F.onAuthStateChanged(auth, async u => {
       if (novos.length) { tocar(); toast(`🔔 Novo pedido #${novos[0].numero}!`); piscarTitulo(); }
     }
     primeiraLeva = false;
-    desenhaPedidos(); desenhaRelatorios();
+    desenhaPedidos(); desenhaRelatorios(); salvaDestaques();
   });
   ligaSuporte();
   F.onSnapshot(F.collection(db, "lojas", uid, "entregadores"), snap => {
@@ -934,6 +943,7 @@ function preencheEntrega() {
   f.entregaAtiva.checked = loja.entregaAtiva !== false; f.retiradaAtiva.checked = loja.retiradaAtiva !== false;
   f.taxaEntrega.value = dinheiroInput(loja.taxaEntrega || 0); f.tempoEntrega.value = loja.tempoEntrega || "";
   f.pedidoMinimo.value = dinheiroInput(loja.pedidoMinimo || 0); f.chavePix.value = loja.chavePix || "";
+  f.freteGratisAcima.value = loja.freteGratisAcima ? dinheiroInput(loja.freteGratisAcima) : "";
   $("#pilPag").innerHTML = PAGS.map(p => `<label><input type="checkbox" value="${p}" ${(loja.pagamentos || []).includes(p) ? "checked" : ""}><span>${p}</span></label>`).join("");
 }
 $("#fEntrega").onsubmit = async e => {
@@ -941,7 +951,7 @@ $("#fEntrega").onsubmit = async e => {
   const pags = $$("#pilPag input:checked").map(i => i.value);
   if (!pags.length) return toast("Escolha pelo menos uma forma de pagamento.", "erro");
   if (!f.entregaAtiva.checked && !f.retiradaAtiva.checked) return toast("Ative entrega ou retirada (ou os dois).", "erro");
-  await F.updateDoc(lojaRef(), { entregaAtiva: f.entregaAtiva.checked, retiradaAtiva: f.retiradaAtiva.checked, taxaEntrega: num(f.taxaEntrega.value), tempoEntrega: f.tempoEntrega.value.trim(), pedidoMinimo: num(f.pedidoMinimo.value), pagamentos: pags, chavePix: f.chavePix.value.trim(), entregaConfigurada: true });
+  await F.updateDoc(lojaRef(), { entregaAtiva: f.entregaAtiva.checked, retiradaAtiva: f.retiradaAtiva.checked, taxaEntrega: num(f.taxaEntrega.value), tempoEntrega: f.tempoEntrega.value.trim(), pedidoMinimo: num(f.pedidoMinimo.value), freteGratisAcima: num(f.freteGratisAcima.value), pagamentos: pags, chavePix: f.chavePix.value.trim(), entregaConfigurada: true });
   toast("Salvo!");
 };
 
@@ -1063,6 +1073,7 @@ function desenhaRelatorios() {
   listaTop("#topTipo", agrupa(ok, p => p.tipo === "entrega" ? "🛵 Entrega" : "🏪 Retirada", () => 1).map(([n, [q]]) => [n, q, ok.length ? Math.round(q / ok.length * 100) + "%" : ""]), q => q + " pedido(s)");
   listaTop("#topCli", agrupa(ok, p => p.cliente?.tel ? p.cliente.nome + " · " + fmtTel(p.cliente.tel) : "", p => p.total).slice(0, 5).map(([n, [v, q]]) => [n, v, q + " pedido(s)"]), R);
   listaTop("#topCup", agrupa(ok, p => p.cupom, p => p.desconto || 0).map(([n, [v, q]]) => [n, q, "-" + R(v)]), q => q + " uso(s)");
+  desenhaSumidos();
 }
 $("#periodo").addEventListener("click", e => { const b = e.target.closest("[data-per]"); if (b) { periodo = b.dataset.per; desenhaRelatorios(); } });
 $("#btCsv").onclick = () => {
@@ -1126,6 +1137,70 @@ $("#btLimpaPed").onclick = async () => {
     for (let i = 0; i < velhos.length; i += 400) { const b = F.writeBatch(db); velhos.slice(i, i + 400).forEach(p => b.delete(F.doc(db, "lojas", uid, "pedidos", p.id))); await b.commit(); }
     toast(`${velhos.length} pedido(s) apagado(s).`);
   } catch (e) { toast(erroAmigavel(e), "erro"); }
+};
+
+// ================= "mais pedidos" no cardápio (calcula e salva sozinho)
+let destaquesPronto = false;
+function salvaDestaques() {
+  if (!loja || !produtos.length || !lojaAtiva(loja)) return;
+  if (!destaquesPronto) { destaquesPronto = true; return setTimeout(salvaDestaques, 3000); } // espera carregar tudo
+  const lim = Date.now() - 30 * 864e5, q = {};
+  pedidos.filter(p => p.status !== "cancelado" && ms(p.criadoEm) >= lim).forEach(p => p.itens.forEach(i => { if (i.pid) q[i.pid] = (q[i.pid] || 0) + i.qtd; }));
+  const top = Object.entries(q).filter(([id, n]) => n >= 2 && produtos.some(p => p.id === id && p.ativo !== false)).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]);
+  if (JSON.stringify(top) === JSON.stringify(loja.destaques || [])) return;
+  F.updateDoc(lojaRef(), { destaques: top }).catch(() => {});
+}
+
+// ================= clientes sumidos
+let sumDias = 15;
+function desenhaSumidos() {
+  if (!$("#sumidos")) return;
+  $("#sumDias").innerHTML = [[15, "15+ dias"], [30, "30+ dias"], [60, "60+ dias"]].map(([d, n]) => `<button class="${sumDias === d ? "on" : ""}" data-sd="${d}">${n}</button>`).join("");
+  const cli = {};
+  pedidos.filter(p => p.status !== "cancelado" && p.cliente?.tel).forEach(p => {
+    const t = ms(p.criadoEm), c = cli[p.cliente.tel] = cli[p.cliente.tel] || { nome: p.cliente.nome, tel: p.cliente.tel, ult: 0, n: 0, total: 0 };
+    c.n++; c.total += p.total; if (t > c.ult) { c.ult = t; c.nome = p.cliente.nome; }
+  });
+  const lim = Date.now() - sumDias * 864e5;
+  const lista = Object.values(cli).filter(c => c.ult < lim).sort((a, b) => b.total - a.total).slice(0, 15);
+  if (!lista.length) { $("#sumidos").innerHTML = '<p style="color:var(--cinza);font-size:.88rem">Nenhum cliente sumido. Seus clientes estão voltando! 🎉</p>'; return; }
+  const cup = cupons.find(c => c.ativo);
+  $("#sumidos").innerHTML = lista.map(c => {
+    const dias = Math.floor((Date.now() - c.ult) / 864e5), n = c.nome.split(" ")[0];
+    const msg = `Oi, ${n}! 😊 Aqui é da *${loja.nome}*.\nFaz tempo que você não pede com a gente e estamos com saudade! 🧡` +
+      (cup ? `\n\nPreparamos um presente: use o cupom *${cup.id}* e ganhe ${cup.tipo === "pct" ? cup.valor + "% de desconto" : R(cup.valor) + " de desconto"}${cup.minimo ? " (pedidos acima de " + R(cup.minimo) + ")" : ""}.` : "") +
+      `\n\nOlha o cardápio aqui 👇\n${linkLoja(loja.slug)}`;
+    return `<div class="chave"><div><b>${esc(c.nome)}</b><small>${esc(fmtTel(c.tel))} · ${c.n} pedido(s) · ${R(c.total)} · último há ${dias} dias</small></div>
+      <a class="btn btn-zap btn-mini" target="_blank" rel="noopener" href="${zapLink(c.tel, msg)}">💬 Chamar</a></div>`;
+  }).join("") + (cup ? "" : `<p style="color:var(--cinza);font-size:.8rem;margin-top:8px">Dica: crie um cupom em <b>Cupons</b> e ele entra sozinho na mensagem.</p>`);
+}
+$("#sumDias").addEventListener("click", e => { const b = e.target.closest("[data-sd]"); if (b) { sumDias = +b.dataset.sd; desenhaSumidos(); } });
+
+// ================= cartaz para imprimir
+$("#btCartaz").onclick = () => {
+  const qr = $("#qrLoja canvas")?.toDataURL("image/png") || $("#qrLoja img")?.src;
+  if (!qr) return toast("Espere o QR Code aparecer e tente de novo.", "erro");
+  const cor = loja.cor || "#FF5A1F", link = linkLoja(loja.slug);
+  const w = window.open("", "_blank");
+  if (!w) return toast("Libere as janelas (pop-up) para imprimir.", "erro");
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Cartaz — ${esc(loja.nome)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:"Plus Jakarta Sans",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.a4{width:210mm;height:296mm;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden;background:#fff}
+.topo{width:100%;background:${cor};color:#fff;padding:16mm 12mm 26mm}
+.lg{width:36mm;height:36mm;border-radius:9mm;object-fit:cover;border:2mm solid #fff;margin:-18mm auto 0;background:#17151F;color:#FFB547;display:grid;place-items:center;font-weight:800;font-size:13mm}
+h1{font-size:15mm;letter-spacing:-.04em;line-height:1.05}h2{font-size:8mm;color:#17151F;margin:8mm 0 2mm;letter-spacing:-.02em}
+.sub{font-size:5mm;opacity:.95;margin-top:3mm}.qr{width:95mm;height:95mm;margin:6mm auto;padding:4mm;border:1.2mm solid ${cor};border-radius:7mm;image-rendering:pixelated}
+.passos{display:flex;gap:6mm;justify-content:center;font-size:4.2mm;color:#2B2836;font-weight:700;margin-top:2mm}.passos span{background:#F7F5F2;border-radius:4mm;padding:3mm 4mm}
+.link{font-size:4mm;color:#6E6A7C;margin-top:7mm;word-break:break-all;padding:0 14mm}.pd{margin-top:auto;padding:7mm;font-size:3.6mm;color:#6E6A7C}
+@media screen{body{background:#eee;padding:10px}.a4{box-shadow:0 4px 20px rgba(0,0,0,.2)}}</style></head><body><div class="a4">
+<div class="topo"><h1>${esc(loja.nome)}</h1><div class="sub">${esc(loja.descricao || "Faça seu pedido pelo celular")}</div></div>
+${loja.logo ? `<img class="lg" src="${loja.logo}">` : `<div class="lg">${esc(loja.nome.slice(0, 2).toUpperCase())}</div>`}
+<h2>📱 Aponte a câmera e peça agora!</h2><img class="qr" src="${qr}">
+<div class="passos"><span>1. Escolha</span><span>2. Monte o pedido</span><span>3. Envie no WhatsApp</span></div>
+<div class="link">${esc(link)}</div><div class="pd">Cardápio digital por <b>Pedeki</b></div></div>
+<script>window.onload=()=>setTimeout(()=>window.print(),600)<\/script></body></html>`);
+  w.document.close(); marcaDivulgou();
 };
 
 // ================= divulgar
