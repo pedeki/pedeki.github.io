@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Montar cardápio — Pedeki</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<style>
+body{background:var(--fundo)}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 80px}
+.topo{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+h1{font-size:1.4rem;color:var(--escuro);letter-spacing:-.02em}
+.card{background:#fff;border:1px solid var(--linha);border-radius:20px;padding:18px;margin-bottom:14px}
+.card h2{font-size:1.02rem;color:var(--escuro);margin-bottom:4px}
+.card p.d{color:var(--cinza);font-size:.86rem;margin-bottom:12px}
+.linha{display:flex;gap:8px;flex-wrap:wrap}
+.linha input{flex:1;min-width:200px}
+input,textarea{width:100%;border:1.5px solid var(--linha);border-radius:12px;padding:11px 12px;font:inherit;background:#fff}
+textarea{min-height:220px;font-family:ui-monospace,Consolas,monospace;font-size:.82rem;resize:vertical}
+.loja{display:flex;gap:12px;align-items:center}
+.loja img,.loja .lg{width:52px;height:52px;border-radius:14px;object-fit:cover;background:var(--escuro);color:#FFB547;display:grid;place-items:center;font-weight:800}
+.prev .cat{font-weight:800;color:var(--escuro);margin:14px 0 6px}
+.prev .it{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--linha);font-size:.9rem}
+.prev .it img{width:44px;height:44px;border-radius:10px;object-fit:cover}
+.prev .it .ft{width:44px;height:44px;border-radius:10px;background:#F3EFEA;display:grid;place-items:center}
+.prev .it .tx{flex:1;min-width:0}
+.prev .it small{color:var(--cinza);display:block}
+.tag{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:999px;background:#FDECEC;color:#C93B3B}
+.tag.ja{background:#F0EEF4;color:var(--cinza)}
+.chk{display:flex;gap:8px;align-items:center;font-size:.9rem;margin-top:10px}
+.chk input{width:auto}
+.oculto{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topo"><h1>🧩 Montar cardápio de uma loja</h1><a class="btn btn-sec btn-mini" href="central.html">← Central</a></div>
+  <div id="corpo"><div class="card">Carregando…</div></div>
+</div>
+<script src="config.js"></script>
+<script type="module">
+import { auth, db, F, C, $, esc, R, toast, comprimir, erroAmigavel, linkLoja } from "./js/base.js";
+
+let lojaUid = null, loja = null, existentes = [], dados = null;
+
+F.onAuthStateChanged(auth, u => {
+  if (!u) { location.href = "conta.html#entrar"; return; }
+  if (u.email !== C.adminEmail) { $("#corpo").innerHTML = `<div class="card">🔒 Só o administrador pode usar esta página.</div>`; return; }
+  desenha();
+});
+
+function desenha() {
+  $("#corpo").innerHTML = `
+  <div class="card">
+    <h2>1. Qual loja?</h2>
+    <p class="d">Digite o endereço da loja (o que vem depois de <b>?l=</b> no link, ex.: <b>acai-da-nuvem</b>).</p>
+    <div class="linha"><input id="slug" placeholder="endereço-da-loja"><button class="btn btn-escuro" id="btAchar">Buscar</button></div>
+    <div id="lojaInfo" style="margin-top:12px"></div>
+  </div>
+  <div class="card oculto" id="passo2">
+    <h2>2. Cardápio</h2>
+    <p class="d">Cole o cardápio no formato JSON (o Claude Code gera) <b>ou</b> puxe de uma prévia já feita.</p>
+    <div class="linha" style="margin-bottom:10px"><input id="previaId" placeholder="ID da prévia (opcional), ex.: faby-refeicoes-escada-m3x8"><button class="btn btn-sec" id="btPrevia">Puxar da prévia</button></div>
+    <textarea id="json" placeholder='{ "logo": "...", "categorias": [ { "nome": "Pizzas", "produtos": [ { "nome": "Calabresa", "descricao": "...", "preco": 45, "foto": "", "adicionais": [] } ] } ] }'></textarea>
+    <label class="chk"><input type="checkbox" id="trocaLogo"> Trocar a logo e a cor da loja (se vierem no cardápio)</label>
+    <div style="margin-top:12px"><button class="btn btn-escuro" id="btVer">Conferir</button></div>
+  </div>
+  <div class="card oculto" id="passo3">
+    <h2>3. Conferir e salvar</h2>
+    <p class="d">Nada é apagado: os produtos são <b>adicionados</b>. Produtos com o mesmo nome de um que a loja já tem são pulados. Produtos sem preço entram <b>pausados</b> para a loja revisar.</p>
+    <div class="prev" id="prev"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-pri" id="btSalvar">💾 Salvar no cardápio da loja</button><span id="prog" style="align-self:center;color:var(--cinza);font-size:.88rem"></span></div>
+  </div>`;
+  $("#btAchar").onclick = acharLoja;
+  $("#slug").onkeydown = e => { if (e.key === "Enter") acharLoja(); };
+  $("#btPrevia").onclick = puxarPrevia;
+  $("#btVer").onclick = conferir;
+  $("#btSalvar").onclick = salvar;
+}
+
+async function acharLoja() {
+  const slug = $("#slug").value.trim().toLowerCase().replace(/^.*\?l=/, "");
+  if (!slug) return;
+  try {
+    const s = await F.getDoc(F.doc(db, "slugs", slug));
+    if (!s.exists()) return toast("Não achei loja com esse endereço.", "erro");
+    lojaUid = s.data().uid;
+    loja = (await F.getDoc(F.doc(db, "lojas", lojaUid))).data();
+    existentes = (await F.getDocs(F.collection(db, "lojas", lojaUid, "produtos"))).docs.map(d => ({ id: d.id, ...d.data() }));
+    $("#lojaInfo").innerHTML = `<div class="loja">${loja.logo ? `<img src="${loja.logo}" alt="">` : `<div class="lg">${esc(loja.nome.slice(0, 2).toUpperCase())}</div>`}
+      <div><b>${esc(loja.nome)}</b><br><small style="color:var(--cinza)">${existentes.length} produto(s) hoje · <a href="${linkLoja(loja.slug)}" target="_blank">ver loja ↗</a></small></div></div>`;
+    $("#passo2").classList.remove("oculto");
+  } catch (e) { toast(erroAmigavel(e), "erro"); }
+}
+
+async function puxarPrevia() {
+  const id = $("#previaId").value.trim().replace(/^.*[?&]p=/, "").replace(/^.*previas\//, "").replace(/\.html$/, "");
+  if (!id) return;
+  try {
+    const r = await fetch(`previas/${encodeURIComponent(id)}.json`, { cache: "no-cache" });
+    if (!r.ok) throw new Error("Prévia não encontrada");
+    const d = await r.json();
+    const fixa = u => u && !/^(https?:|data:)/.test(u) ? "previas/" + u.replace(/^\/+|^previas\//g, "") : u;
+    d.logo = fixa(d.logo);
+    (d.categorias || []).forEach(c => (c.produtos || []).forEach(p => { p.foto = fixa(p.foto); }));
+    delete d.whatsapp; delete d.instagram; delete d.expiraEm; delete d.criadoEm;
+    $("#json").value = JSON.stringify(d, null, 1);
+    toast("Prévia carregada. Agora clique em Conferir.");
+  } catch (e) { toast(e.message, "erro"); }
+}
+
+const chave = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+function conferir() {
+  try { dados = JSON.parse($("#json").value); } catch { return toast("O texto não é um JSON válido.", "erro"); }
+  if (!Array.isArray(dados.categorias) || !dados.categorias.length) return toast("Não achei 'categorias' no JSON.", "erro");
+  const ja = new Set(existentes.map(p => chave(p.nome)));
+  let novos = 0;
+  $("#prev").innerHTML = dados.categorias.map(c => `<div class="cat">${esc(c.nome)}</div>` + (c.produtos || []).map(p => {
+    const rep = ja.has(chave(p.nome)); if (!rep) novos++;
+    return `<div class="it">${p.foto ? `<img src="${esc(p.foto)}" alt="" onerror="this.outerHTML='<div class=ft>⚠️</div>'">` : `<div class="ft">🍽️</div>`}
+      <div class="tx"><b>${esc(p.nome)}</b>${p.descricao ? `<small>${esc(p.descricao)}</small>` : ""}${(p.adicionais || []).length ? `<small>+ ${p.adicionais.length} grupo(s) de adicionais</small>` : ""}</div>
+      ${rep ? `<span class="tag ja">já existe</span>` : p.preco > 0 ? `<b>${R(p.preco)}</b>` : `<span class="tag">sem preço · pausado</span>`}</div>`;
+  }).join("")).join("") + `<p style="margin-top:12px;font-weight:700">${novos} produto(s) novo(s) para salvar.</p>`;
+  $("#passo3").classList.remove("oculto");
+  $("#passo3").scrollIntoView({ behavior: "smooth" });
+}
+
+// baixa a imagem (do próprio site ou data:) e diminui para caber no banco
+async function imagem(url, w, h, q) {
+  if (!url) return null;
+  try { const b = await (await fetch(url)).blob(); return await comprimir(b, w, h, q); } catch { return null; }
+}
+
+async function salvar() {
+  if (!dados || !lojaUid) return;
+  const bt = $("#btSalvar"); bt.disabled = true;
+  try {
+    const ja = new Set(existentes.map(p => chave(p.nome)));
+    let ordem = Math.max(0, ...existentes.map(p => p.ordem || 0)) + 1, feitos = 0, pulados = 0;
+    const total = dados.categorias.reduce((s, c) => s + (c.produtos || []).length, 0);
+    // categorias: junta as novas com as que já existem (nunca apaga)
+    const cats = [...(loja.categorias || [])];
+    dados.categorias.forEach(c => { const n = String(c.nome || "").trim().slice(0, 40); if (n && !cats.includes(n)) cats.push(n); });
+    const mud = { categorias: cats };
+    if ($("#trocaLogo").checked) {
+      const lg = await imagem(dados.logo, 300, 300, .85); if (lg) mud.logo = lg;
+      if (/^#[0-9a-f]{6}$/i.test(dados.cor || "")) mud.cor = dados.cor;
+    }
+    await F.updateDoc(F.doc(db, "lojas", lojaUid), mud);
+    for (const c of dados.categorias) {
+      const cat = String(c.nome || "").trim().slice(0, 40);
+      for (const p of c.produtos || []) {
+        $("#prog").textContent = `Salvando ${feitos + pulados + 1} de ${total}…`;
+        const nome = String(p.nome || "").trim().slice(0, 70);
+        if (!nome || ja.has(chave(nome))) { pulados++; continue; }
+        const preco = Math.round((+p.preco || 0) * 100) / 100, precoDe = +p.precoDe || 0;
+        const ads = (p.adicionais || []).map(g => ({
+          nome: String(g.nome || "Adicionais").slice(0, 40), min: Math.max(0, +g.min || 0), max: Math.max(1, +g.max || 1),
+          opcoes: (g.opcoes || []).filter(o => o && o.nome).map(o => ({ nome: String(o.nome).slice(0, 50), preco: Math.max(0, +o.preco || 0) }))
+        })).filter(g => g.opcoes.length).map(g => ({ ...g, min: Math.min(g.min, g.max) }));
+        await F.addDoc(F.collection(db, "lojas", lojaUid, "produtos"), {
+          nome, descricao: String(p.descricao || "").trim().slice(0, 300), categoria: cat,
+          preco: preco > 0 ? preco : 0, precoDe: precoDe > preco ? precoDe : null, estoque: null,
+          ativo: preco > 0, foto: await imagem(p.foto, 640, 640, .75), adicionais: ads, ordem: ordem++
+        });
+        ja.add(chave(nome)); feitos++;
+      }
+    }
+    $("#prog").textContent = "";
+    toast(`Pronto! ${feitos} produto(s) salvos${pulados ? `, ${pulados} pulado(s)` : ""}.`);
+    await acharLoja();
+  } catch (e) { toast("Parou no meio: " + erroAmigavel(e) + " (o que já foi salvo continua lá)", "erro"); }
+  bt.disabled = false;
+}
+</script>
+</body>
+</html>
