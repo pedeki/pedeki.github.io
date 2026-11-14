@@ -1,0 +1,59 @@
+{
+  "nome": "Anna Pizza Delivery",
+  "tipo": "Pizzaria",
+  "bairro": "Parque Residencial",
+  "cidade": "",
+  "cor": "#D7141A",
+  "logo": "img/anna-pizza-delivery-r4w8/logo.jpg",
+  "capa": "",
+  "retirada": false,
+  "whatsapp": "5574988541437",
+  "instagram": "https://instagram.com/annapizzadelivery",
+  "criadoEm": "2026-11-14",
+  "expiraEm": "2026-12-14",
+  "categorias": [
+    { "nome": "Promoções", "produtos": [
+      { "nome": "Pizza Dois Sabores (inauguração)", "descricao": "Calabresa e Frango com Catupiry", "preco": 35.99, "precoDe": 0, "foto": "" },
+      { "nome": "2 Pizzas + Refrigerante 2L", "descricao": "Promoção de segunda a sexta: 2 pizzas e ganha 1 refrigerante de 2 litros", "preco": 79.99, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Pizzas tradicionais", "produtos": [
+      { "nome": "Mussarela", "descricao": "Molho de tomate, mussarela e orégano", "preco": 38.0, "precoDe": 0, "foto": "" },
+      { "nome": "Calabresa", "descricao": "Molho de tomate, mussarela, calabresa e orégano", "preco": 38.0, "precoDe": 0, "foto": "" },
+      { "nome": "Portuguesa", "descricao": "Molho de tomate, mussarela, presunto, ovos, cebola, tomate e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Frango com Catupiry", "descricao": "Molho de tomate, frango desfiado, catupiry e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Margherita", "descricao": "Molho de tomate, mussarela, tomate, manjericão e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Vegetariana", "descricao": "Molho de tomate, mussarela, tomate, cebola, pimentão, azeitona e orégano", "preco": 45.99, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Pizzas especiais", "produtos": [
+      { "nome": "4 Queijos", "descricao": "Molho de tomate, mussarela, provolone, parmesão, gorgonzola e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Atum", "descricao": "Molho de tomate, mussarela, atum, cebola e orégano", "preco": 55.9, "precoDe": 0, "foto": "" },
+      { "nome": "Bacon", "descricao": "Molho de tomate, mussarela, bacon e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Toscana", "descricao": "Molho de tomate, mussarela, calabresa, bacon, cebola e orégano", "preco": 45.99, "precoDe": 0, "foto": "" },
+      { "nome": "Especial da Casa", "descricao": "Molho de tomate, mussarela, calabresa, bacon, presunto, azeitona, cebola, tomate e orégano", "preco": 52.99, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Pizzas de carne", "produtos": [
+      { "nome": "Carne Seca", "descricao": "Molho de tomate, mussarela, carne seca, cebola e orégano", "preco": 59.9, "precoDe": 0, "foto": "" },
+      { "nome": "Churrasco", "descricao": "Molho de tomate, mussarela, carne bovina, cebola, tomate e orégano", "preco": 59.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Cachorro-quente no prato", "produtos": [
+      { "nome": "Cachorro-quente Simples", "descricao": "Pão, carne moída, salsicha em rodelas e batata palha", "preco": 13.0, "precoDe": 0, "foto": "" },
+      { "nome": "Cachorro-quente Completo", "descricao": "Pão, carne moída, salsicha em rodelas, batata palha e purê de batata", "preco": 15.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Refrigerante (lata)", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante (2 litros)", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Água mineral", "descricao": "", "preco": 3.0, "precoDe": 0, "foto": "" },
+      { "nome": "Suco (lata)", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Adicionais", "produtos": [
+      { "nome": "Adicional de mussarela", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de calabresa", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de presunto", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de bacon", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de frango", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de catupiry", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de carne seca", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Adicional de 4 queijos", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

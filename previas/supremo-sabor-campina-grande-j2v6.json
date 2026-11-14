@@ -1,0 +1,38 @@
+{
+  "nome": "Supremo Sabor Lanchonete",
+  "tipo": "Lanchonete",
+  "bairro": "Nova Brasília",
+  "cidade": "Campina Grande - PB",
+  "cor": "#C8102E",
+  "logo": "img/supremo-sabor-campina-grande-j2v6/logo.jpg",
+  "capa": "",
+  "whatsapp": "5583989147320",
+  "instagram": "https://instagram.com/supremosabor.pb",
+  "criadoEm": "2026-11-14",
+  "expiraEm": "2026-12-14",
+  "categorias": [
+    { "nome": "Hambúrgueres", "produtos": [
+      { "nome": "Hambúrguer Tradicional", "descricao": "Pão tradicional, blend de carne, queijo e molho da casa", "preco": 18.0, "precoDe": 0, "foto": "" },
+      { "nome": "Hambúrguer Salada", "descricao": "Pão tradicional, blend de carne, queijo, tomate, alface, cebola e molho da casa", "preco": 22.0, "precoDe": 0, "foto": "" },
+      { "nome": "Hambúrguer Bacon", "descricao": "Pão tradicional, blend de carne, queijo, bacon, cebola caramelizada e molho da casa", "preco": 25.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Cachorros-quentes", "produtos": [
+      { "nome": "Cachorro-quente de Carne", "descricao": "Pão seda, salsicha, carne, verdura, ovo de codorna, batata palha e molhos", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Cachorro-quente de Frango", "descricao": "Pão seda, salsicha, frango, verdura, ovo de codorna, batata palha e molhos", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Cachorro-quente Misto", "descricao": "Pão seda, salsicha, carne e frango, verdura, ovo de codorna, batata palha e molhos", "preco": 15.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Dogão", "produtos": [
+      { "nome": "Dogão de Carne", "descricao": "Pão seda 20cm, salsicha grande, carne, verdura, 3 ovos de codorna, batata palha e molhos", "preco": 19.99, "precoDe": 0, "foto": "" },
+      { "nome": "Dogão de Frango", "descricao": "Pão seda 20cm, salsicha grande, frango, verdura, 3 ovos de codorna, batata palha e molhos", "preco": 19.99, "precoDe": 0, "foto": "" },
+      { "nome": "Dogão Misto", "descricao": "Pão seda 20cm, salsicha grande, carne e frango, verdura, 3 ovos de codorna, batata palha e molhos", "preco": 24.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Água sem gás", "descricao": "", "preco": 3.0, "precoDe": 0, "foto": "" },
+      { "nome": "Água com gás", "descricao": "", "preco": 5.0, "precoDe": 0, "foto": "" },
+      { "nome": "Suco da fruta", "descricao": "Consultar sabores", "preco": 5.0, "precoDe": 0, "foto": "" },
+      { "nome": "H2O", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante lata", "descricao": "", "preco": 6.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante 1 litro", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

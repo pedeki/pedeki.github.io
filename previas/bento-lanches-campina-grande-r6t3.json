@@ -1,0 +1,34 @@
+{
+  "nome": "Bento Lanches CG",
+  "tipo": "Lanchonete / Refeições / Salgados",
+  "bairro": "Bento Figueiredo",
+  "cidade": "Campina Grande - PB",
+  "cor": "#C4161C",
+  "logo": "img/bento-lanches-campina-grande-r6t3/logo.jpg",
+  "capa": "",
+  "pagamentos": "💠 Pix · 💵 Dinheiro · 💳 Cartão",
+  "whatsapp": "5583986522352",
+  "instagram": "https://instagram.com/bentolanchescg",
+  "criadoEm": "2026-11-14",
+  "expiraEm": "2026-12-14",
+  "categorias": [
+    { "nome": "Salgados para festas", "produtos": [
+      { "nome": "Cento de salgados", "descricao": "Pode escolher até 2 sabores por cento: coxinha, empadinha, pastel misto, pastel de queijo, pastel agridoce, bolinho de queijo ou bolinho de carne", "preco": 50.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Lanches", "produtos": [
+      { "nome": "Combo Hambúrguer", "descricao": "Hambúrguer (pão bola, presunto, hambúrguer, mussarela e molho) + batata frita 200g + Coca lata 350ml", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Salgados", "descricao": "Coxinha, empadinha, pastel e bolinhos", "preco": 0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Refeições", "produtos": [
+      { "nome": "Quentinha", "descricao": "De domingo a domingo", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Lasanha", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Salpicão", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Doces e bebidas", "produtos": [
+      { "nome": "Brigadeiro com amendoim", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/bento-lanches-campina-grande-r6t3/brigadeiro.jpg" },
+      { "nome": "Torta", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Suco da fruta", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}
