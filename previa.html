@@ -85,7 +85,7 @@ function falha(t) { $("#carregando")?.remove(); $("#app").innerHTML = `<div clas
       ${d.logo ? `<img class="logo" src="${esc(img(d.logo))}" alt="">` : `<div class="logo">${esc(ini)}</div>`}
       <div style="min-width:0"><h1>${esc(d.nome)}</h1><p>${esc([d.tipo, [d.bairro, d.cidade].filter(Boolean).join(", ")].filter(Boolean).join(" · "))}</p></div>
     </div>
-    <div class="infos"><span style="color:var(--verde)">● Aberto</span><span>🛵 Entrega</span><span>🏪 Retirada</span><span>💠 Pix · 💵 Dinheiro · 💳 Cartão</span></div>
+    <div class="infos"><span style="color:var(--verde)">● Aberto</span>${d.entrega === false ? "" : "<span>🛵 Entrega</span>"}${d.retirada === false ? "" : "<span>🏪 Retirada</span>"}<span>${esc(d.pagamentos || "💠 Pix · 💵 Dinheiro · 💳 Cartão")}</span></div>
     <nav class="cats" id="cats">${cats.map((c, i) => `<a href="#c${i}" class="${i ? "" : "on"}">${esc(c.nome)}</a>`).join("")}</nav>
     ${cats.map((c, i) => `<section class="sec" id="c${i}"><h2>${esc(c.nome)}</h2>${c.produtos.map(p => `
       <div class="prod" data-p>
