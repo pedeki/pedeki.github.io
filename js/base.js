@@ -2,7 +2,10 @@ import * as F from "./fb.js";
 
 export const C = window.PEDEKI;
 export const configurado = C && C.firebase && C.firebase.apiKey && C.firebase.apiKey !== "COLE_AQUI";
-export const app = F.initializeApp(C.firebase);
+// O app do entregador usa um login SEPARADO do painel da loja.
+// Assim, entrar como entregador não tira o dono da loja do painel (e vice-versa) no mesmo celular.
+const NOME_APP = /entregador/i.test(location.pathname) ? "entregador" : "[DEFAULT]";
+export const app = F.initializeApp(C.firebase, NOME_APP);
 export const auth = F.getAuth(app);
 export const db = F.getFirestore(app);
 export { F };

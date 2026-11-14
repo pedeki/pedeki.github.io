@@ -259,6 +259,14 @@ $("#cardapio").onclick = e => { const c = e.target.closest("[data-p]"); if (c) a
 const obs = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { const i = x.target.id.slice(3); $$("#cats button").forEach(b => b.classList.toggle("on", b.dataset.c === i)); } }), { rootMargin: "-40% 0px -55% 0px" });
 new MutationObserver(() => $$(".secao[id]").forEach(s => obs.observe(s))).observe($("#cardapio"), { childList: true });
 
+// avisa o celular da loja que chegou pedido (não trava o pedido se falhar)
+function avisaLoja(pid) {
+  try {
+    if (!window.PEDEKI.worker) return;
+    fetch(window.PEDEKI.worker.replace(/\/$/, "") + "/push/pedido", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ uid, pid }) }).catch(() => {});
+  } catch {}
+}
+
 // ===== pedir de novo (fica salvo só neste aparelho)
 const chaveUlt = () => "pdk_ult_" + uid;
 function ultimoPedido() {
@@ -472,6 +480,7 @@ fp.onsubmit = async e => {
         cliente: { nome: fp.nome.value.trim(), tel, endereco }, pagamento: pag, troco, obs: fp.obs.value.trim()
       });
     });
+    avisaLoja(pRef.id);
     try { localStorage.setItem(chaveUlt(), JSON.stringify({ em: Date.now(), itens: car.map(i => ({ pid: i.pid, nome: i.nome, qtd: i.qtd, adicionais: i.adicionais, obs: i.obs })) })); } catch {}
     car = []; salvaCar(); cupom = null;
     try { localStorage.setItem(chavePeds(), JSON.stringify([{ id: pRef.id, numero: n, em: Date.now() }, ...pedsRecentes()].slice(0, 5))); } catch {}

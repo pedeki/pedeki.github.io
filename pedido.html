@@ -61,6 +61,8 @@ function falha(t) { $("#carregando")?.remove(); $("#app").innerHTML = `<div clas
       desenha();
       if (q.get("z") === "1" && !enviou) {
         enviou = true;
+        // reforço: avisa o celular da loja (o servidor só manda 1 aviso por pedido)
+        try { if (window.PEDEKI.worker) fetch(window.PEDEKI.worker.replace(/\/$/, "") + "/push/pedido", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ uid: l, pid: p }) }).catch(() => {}); } catch {}
         try { history.replaceState(null, "", location.pathname + `?l=${encodeURIComponent(l)}&p=${encodeURIComponent(p)}`); } catch {}
         setTimeout(() => { location.href = linkZap(); }, 900);
       }

@@ -1,5 +1,5 @@
 // Pedeki Entregador - deixa o app instalável e abre mais rápido
-const CACHE = "pedeki-entregador-v1";
+const CACHE = "pedeki-entregador-v2";
 const BASE = ["entregador.html", "css/app.css", "js/base.js", "js/fb.js", "config.js", "icones/entregador-192.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE)).catch(() => {})); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });

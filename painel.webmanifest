@@ -1,0 +1,16 @@
+{
+  "name": "Pedeki Painel",
+  "short_name": "Pedeki",
+  "description": "Painel da sua loja Pedeki: pedidos, cardápio e entregas.",
+  "lang": "pt-BR",
+  "start_url": "painel.html",
+  "scope": "painel",
+  "display": "standalone",
+  "background_color": "#FFFAF5",
+  "theme_color": "#17151F",
+  "icons": [
+    { "src": "pedeki-icone.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "pedeki-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "pedeki-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

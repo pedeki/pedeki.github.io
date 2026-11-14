@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel — Pedeki</title>
+<link rel="manifest" href="painel.webmanifest">
+<meta name="theme-color" content="#17151F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pedeki">
+<link rel="apple-touch-icon" href="pedeki-icone.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/app.css">
 <style>
@@ -154,6 +159,7 @@ a.nav-b{text-decoration:none}
     <div class="acoes">
       <button class="btn btn-sec btn-mini oculto" id="btAbreFecha"></button>
       <button class="btn btn-sec btn-mini" id="btSom">🔕 Ativar som</button>
+      <button class="btn btn-sec btn-mini" id="btAvisoCel">📲 Avisos no celular</button>
       <a class="btn btn-pri btn-mini" id="btVerLoja" target="_blank">Ver minha loja ↗</a>
     </div>
   </header>
@@ -435,7 +441,7 @@ a.nav-b{text-decoration:none}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script type="module">
-import { auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, num, dinheiroInput, zapLink, comprimir,
+import { app, auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, num, dinheiroInput, zapLink, comprimir,
   ms, fimTeste, validoAte, lojaAtiva, emTeste, dataBR, horaBR, diasRestantes, DIAS, DIAS_NOME, horariosPadrao, abertaAgora,
   erroAmigavel, marcaHTML, linkLoja, linkPedido, LOGO } from "./js/base.js";
 import { desenhaChat, ligaEnvio } from "./js/chat.js";
@@ -503,9 +509,9 @@ F.onAuthStateChanged(auth, async u => {
       if (novos.length) { tocar(); toast(`🔔 Novo pedido #${novos[0].numero}!`); piscarTitulo(); }
     }
     primeiraLeva = false;
-    desenhaPedidos(); desenhaRelatorios(); salvaDestaques();
+    desenhaPedidos(); desenhaRelatorios(); salvaDestaques(); checaAlarme();
   });
-  ligaSuporte();
+  ligaSuporte(); renovaAvisos();
   F.onSnapshot(F.collection(db, "lojas", uid, "entregadores"), snap => {
     entregadoresLoja = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
     desenhaEntregadores();
@@ -562,25 +568,105 @@ function desenhaPassos() {
   $("#passosIni").innerHTML = passos.map(([s, t, ok], i) => `<button class="${ok ? "feito" : ""}" data-ir="${s}"><span class="n">${ok ? "✓" : i + 1}</span>${t}</button>`).join("");
 }
 
-// ================= som e título
-let audio = null, somLigado = false;
-$("#btSom").onclick = () => {
+// ================= som de pedido (toca alto e repete até aceitar)
+let audio = null, somLigado = false, alarmeT = null;
+const guarda = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+const lido = k => { try { return localStorage.getItem(k); } catch { return null; } };
+function ligaSom(silencioso) {
   try {
     audio = audio || new (window.AudioContext || window.webkitAudioContext)();
-    audio.resume(); somLigado = true;
-    $("#btSom").textContent = "🔔 Som ligado"; tocar();
+    audio.resume(); somLigado = true; guarda("pdk_som", "1");
+    $("#btSom").textContent = "🔔 Som ligado";
+    if (!silencioso) tocar();
+    checaAlarme();
   } catch { toast("Seu navegador não liberou o som.", "erro"); }
+}
+$("#btSom").onclick = () => {
+  if (!somLigado) return ligaSom();
+  somLigado = false; guarda("pdk_som", null); clearInterval(alarmeT); alarmeT = null;
+  $("#btSom").textContent = "🔕 Ativar som";
 };
+// o navegador só deixa tocar depois de um toque: se já estava ligado, liga no primeiro toque na tela
+if (lido("pdk_som") === "1") {
+  $("#btSom").textContent = "👆 Toque na tela p/ ligar o som";
+  const auto = e => { if (!somLigado && !(e.target.closest && e.target.closest("#btSom"))) ligaSom(true); };
+  ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, auto, { once: true, capture: true }));
+}
 function tocar() {
+  try { navigator.vibrate && navigator.vibrate([500, 150, 500]); } catch {}
   if (!somLigado || !audio) return;
-  [0, .18, .36].forEach((t, i) => {
+  // toque de "pedido chegando": 2 rajadas fortes
+  const t0 = audio.currentTime;
+  [0, .14, .28, .42, .9, 1.04, 1.18, 1.32].forEach((t, i) => {
     const o = audio.createOscillator(), g = audio.createGain();
-    o.type = "sine"; o.frequency.value = [880, 1100, 1320][i];
-    g.gain.setValueAtTime(.0001, audio.currentTime + t);
-    g.gain.exponentialRampToValueAtTime(.4, audio.currentTime + t + .02);
-    g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .16);
-    o.connect(g).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .18);
+    o.type = "square"; o.frequency.value = i % 2 ? 1318 : 988;
+    g.gain.setValueAtTime(.0001, t0 + t);
+    g.gain.exponentialRampToValueAtTime(.35, t0 + t + .015);
+    g.gain.exponentialRampToValueAtTime(.0001, t0 + t + .12);
+    o.connect(g).connect(audio.destination); o.start(t0 + t); o.stop(t0 + t + .13);
   });
+}
+const temNovoRecente = () => pedidos.some(p => p.status === "novo" && Date.now() - ms(p.criadoEm) < 3 * 3600e3);
+function checaAlarme() {
+  if (!somLigado || !temNovoRecente() || alarmeT) return;
+  tocar();
+  alarmeT = setInterval(() => {
+    if (!somLigado || !temNovoRecente()) { clearInterval(alarmeT); alarmeT = null; return; }
+    tocar();
+  }, 4000);
+}
+
+// painel instalável como app (ícone na tela inicial)
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw-entregador.js").catch(() => {});
+
+// ================= avisos no celular (mesmo com o painel fechado)
+const suportaPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+const ehIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+let regPush = null;
+async function pegaToken() {
+  regPush = await navigator.serviceWorker.register("firebase-messaging-sw.js", { scope: "./avisos-pedeki/" });
+  const sw = regPush.installing || regPush.waiting || regPush.active;
+  if (sw && sw.state !== "activated") await new Promise(r => { sw.addEventListener("statechange", () => sw.state === "activated" && r()); setTimeout(r, 8000); });
+  const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
+  return getToken(getMessaging(app), { serviceWorkerRegistration: regPush });
+}
+async function registraAparelho() {
+  const token = await pegaToken();
+  if (!token) throw new Error("Não consegui ligar os avisos neste aparelho.");
+  const r = await fetch(C.worker.replace(/\/$/, "") + "/push/registrar", {
+    method: "POST", headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify({ idToken: await user.getIdToken(), token })
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.erro || "Erro ao ligar os avisos.");
+  guarda("pdk_push", "1");
+  return j;
+}
+function botaoAviso() {
+  const on = lido("pdk_push") === "1" && "Notification" in window && Notification.permission === "granted";
+  $("#btAvisoCel").textContent = on ? "📲 Avisos ligados ✓" : "📲 Avisos no celular";
+  $("#btAvisoCel").classList.toggle("btn-pri", !on); $("#btAvisoCel").classList.toggle("btn-sec", on);
+  return on;
+}
+$("#btAvisoCel").onclick = async () => {
+  const b = $("#btAvisoCel");
+  if (botaoAviso() && regPush) {
+    regPush.showNotification("🔔 Teste do Pedeki", { body: "É assim que o aviso de novo pedido vai chegar.", icon: "pedeki-icone.png", badge: "pedeki-badge.png", vibrate: [600, 200, 600, 200, 1000], tag: "teste", renotify: true });
+    return toast("Mandei um aviso de teste 🔔");
+  }
+  if (!suportaPush()) return toast(ehIOS ? "No iPhone: toque em Compartilhar ↑ > \"Adicionar à Tela de Início\", abra o painel por esse ícone e ative aqui." : "Este navegador não aceita avisos. Use o Google Chrome.", "erro");
+  if (Notification.permission === "denied") return toast("As notificações estão bloqueadas. Toque no cadeado 🔒 ao lado do endereço do site > Notificações > Permitir. Depois tente de novo.", "erro");
+  b.disabled = true; b.textContent = "⏳ Ligando…";
+  try {
+    if ((await Notification.requestPermission()) !== "granted") throw new Error("Você precisa tocar em PERMITIR para receber os avisos.");
+    await registraAparelho();
+    toast("Pronto! Este aparelho vai avisar quando chegar pedido 🔔");
+  } catch (e) { toast(e.message || "Não consegui ligar os avisos.", "erro"); }
+  b.disabled = false; botaoAviso();
+};
+async function renovaAvisos() {
+  if (!botaoAviso() || !suportaPush()) return;
+  try { await registraAparelho(); } catch {}
 }
 let tituloT;
 function piscarTitulo() {
@@ -753,6 +839,8 @@ async function enviarPara(eid) {
     b.update(F.doc(db, "lojas", uid, "pedidos", p.id), { entregadorUid: e.id, entregadorNome: e.nome });
     await b.commit();
     fechar("mEnviar"); toast(`Pedido #${p.numero} enviado para ${e.nome} 🏍️`);
+    // avisa o celular do entregador (mesmo com o app fechado)
+    try { fetch(C.worker.replace(/\/$/, "") + "/push/entrega", { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ id: p.id }) }).catch(() => {}); } catch {}
   } catch (er) { toast(erroAmigavel(er), "erro"); }
 }
 

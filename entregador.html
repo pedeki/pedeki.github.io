@@ -76,13 +76,53 @@ h2.t{font-size:1.25rem;color:var(--escuro);margin:4px 0 12px;letter-spacing:-.02
 .instalar{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px dashed var(--cor);border-radius:18px;padding:12px 14px;margin-bottom:14px}
 .instalar .tx{flex:1;font-size:.88rem}
 .instalar b{color:var(--escuro)}
+/* ===== visual novo ===== */
+.topo{background:linear-gradient(135deg,#17151F 0%,#2a1a14 60%,#4a2410 100%)}
+.topo .som{display:flex;align-items:center;gap:6px}
+.topo .som.on{background:#1FAF5A}
+.topo .som.alerta{background:#E5484D;animation:pisca 1s infinite}
+@keyframes pisca{50%{opacity:.55}}
+.avisos{background:#fff;border-radius:22px;padding:16px;margin-bottom:14px;border:2px solid var(--cor);display:flex;gap:12px;align-items:center}
+.avisos .ic{width:48px;height:48px;border-radius:14px;background:var(--cor-claro);display:grid;place-items:center;font-size:1.5rem;flex-shrink:0}
+.avisos .tx{flex:1;font-size:.86rem;color:var(--cinza);line-height:1.4}
+.avisos .tx b{display:block;color:var(--escuro);font-size:.98rem}
+.resumo .card{border-radius:18px;border:1px solid var(--linha);margin:0}
+.resumo .card.ganho strong{color:var(--verde)}
+.semana{text-align:center;color:var(--cinza);font-size:.8rem;margin:-6px 0 14px}
+.ent{border-radius:24px;padding:0;overflow:hidden;box-shadow:0 10px 30px -18px rgba(23,21,31,.35)}
+.ent .cab{padding:14px 16px 10px;display:flex;align-items:center;gap:8px}
+.ent .cab b{font-size:1.1rem;color:var(--escuro)}
+.ent .cab .badge{margin-left:auto}
+.ent .corpo{padding:0 16px 16px}
+.passos{display:flex;align-items:center;gap:4px;padding:0 16px 12px}
+.passos i{flex:1;height:6px;border-radius:9px;background:#EDE8E3}
+.passos i.ok{background:var(--verde)}
+.passos i.agora{background:var(--cor);animation:pisca 1.2s infinite}
+.passos-n{display:flex;justify-content:space-between;padding:0 16px 10px;font-size:.68rem;font-weight:700;color:var(--cinza)}
+.end{border-radius:16px;padding:14px;position:relative}
+.end .rua{font-size:1.08rem;padding-right:34px}
+.end .copiar{position:absolute;top:10px;right:10px;border:0;background:#fff;border-radius:10px;width:32px;height:32px;cursor:pointer;font-size:1rem;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.cobrar{display:flex;justify-content:space-between;align-items:center;background:var(--escuro);color:#fff;border-radius:16px;padding:12px 14px;margin:10px 0}
+.cobrar small{opacity:.7;display:block;font-size:.75rem}
+.cobrar b{font-size:1.25rem}
+.cobrar .pg{background:rgba(255,255,255,.14);border-radius:999px;padding:4px 10px;font-weight:700;font-size:.8rem}
+.troco{background:#FFF7D6;color:#7A5B00;border-radius:12px;padding:8px 12px;font-weight:700;font-size:.88rem;margin-bottom:8px}
+.itens{background:#FAF7F4;border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:.88rem}
+.itens summary{cursor:pointer;font-weight:700;color:var(--escuro);list-style:none}
+.itens summary::-webkit-details-marker{display:none}
+.itens ul{margin:8px 0 0 18px;color:var(--texto)}
+.atalhos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.atalhos a{display:flex;flex-direction:column;align-items:center;gap:4px;background:#F4F1ED;border-radius:14px;padding:10px 4px;font-size:.72rem;font-weight:700;color:var(--escuro);text-decoration:none}
+.atalhos a span{font-size:1.25rem}
+.btn-grande{padding:17px;font-size:1.05rem;border-radius:18px}
+.ent.nova .cab{background:var(--cor-claro)}
 </style>
 </head>
 <body>
 <div class="carregando" id="carregando"><div class="giro"></div></div>
 
 <header class="topo">
-  <div class="linha"><span id="marca"></span><span class="tag">Entregador</span><button class="som oculto" id="btSom">🔕 Ativar som</button></div>
+  <div class="linha"><span id="marca"></span><span class="tag">Entregador</span><button class="som oculto" id="btSom">🔕 Avisos</button></div>
   <div class="ola" id="ola"></div>
 </header>
 
@@ -111,14 +151,16 @@ h2.t{font-size:1.25rem;color:var(--escuro);margin:4px 0 12px;letter-spacing:-.02
 <!-- COM LOGIN -->
 <main class="wrap oculto" id="vApp">
   <div id="conviteDentro"></div>
+  <div class="avisos oculto" id="boxAvisos"><div class="ic">🔔</div><div class="tx"><b>Ligue os avisos de entrega</b>Som alto, vibração e notificação no celular, mesmo com o app fechado.</div><button class="btn btn-pri btn-mini" id="btAvisos">Ligar</button></div>
   <div class="instalar oculto" id="boxInstalar"><span style="font-size:1.6rem">📲</span><div class="tx"><b>Instale o app</b><br><span id="txInstalar">Fica na tela inicial do celular, igual um app.</span></div><button class="btn btn-pri btn-mini" id="btInstalar">Instalar</button></div>
 
   <section class="tela on" data-t="entregas">
     <div class="resumo">
       <div class="card"><small>Hoje</small><strong id="rHoje">0</strong></div>
       <div class="card"><small>Em andamento</small><strong id="rAnd">0</strong></div>
-      <div class="card"><small>Taxas hoje</small><strong id="rTaxa">R$ 0</strong></div>
+      <div class="card ganho"><small>Ganhos hoje</small><strong id="rTaxa">R$ 0</strong></div>
     </div>
+    <div class="semana" id="rSemana"></div>
     <div id="listaAtivas"></div>
   </section>
 
@@ -148,7 +190,7 @@ h2.t{font-size:1.25rem;color:var(--escuro);margin:4px 0 12px;letter-spacing:-.02
 
 <script src="config.js"></script>
 <script type="module">
-import { auth, db, F, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, zapLink, ms, dataBR, horaBR, erroAmigavel, marcaHTML } from "./js/base.js";
+import { app, auth, db, F, C, $, $$, R, esc, toast, soNum, zapNum, fmtTel, mascaraTel, zapLink, ms, dataBR, horaBR, erroAmigavel, marcaHTML } from "./js/base.js";
 
 const ZAP_SVG = `<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.4-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .6l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.6-.1 1.1z"/></svg>`;
 $("#marca").innerHTML = marcaHTML;
@@ -226,6 +268,7 @@ F.onAuthStateChanged(auth, async u => {
   }
   user = u;
   $("#vEntrar").classList.add("oculto"); $("#vApp").classList.remove("oculto"); $("#abas").classList.remove("oculto"); $("#btSom").classList.remove("oculto");
+  estadoAvisos(); renovaPush();
   parar.push(F.onSnapshot(F.doc(db, "entregadores", u.uid), async s => {
     perfil = s.data() || { nome: "", tel: u.email.split("@")[0], lojas: {} };
     lojasOk = {};
@@ -239,9 +282,9 @@ F.onAuthStateChanged(auth, async u => {
     const antes = new Set(entregas.filter(x => x.status === "enviado").map(x => x.id));
     entregas = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })).sort((a, b) => ms(b.criadoEm) - ms(a.criadoEm));
     const novas = entregas.filter(x => x.status === "enviado" && !antes.has(x.id));
-    if (!primeira && novas.length) { tocar(); toast("🔔 Nova entrega da " + novas[0].lojaNome + "!"); try { navigator.vibrate && navigator.vibrate([300, 150, 300, 150, 300]); } catch {} ir("entregas"); }
+    if (!primeira && novas.length) { tocar(); toast("🔔 Nova entrega da " + novas[0].lojaNome + "!"); ir("entregas"); }
     primeira = false;
-    desenhaEntregas(); desenhaHistorico();
+    desenhaEntregas(); desenhaHistorico(); checaAlarme();
   }, er => toast(erroAmigavel(er), "erro")));
 });
 
@@ -270,16 +313,26 @@ $("#fPerfil").onsubmit = async e => {
 
 const ST = { enviado: ["Nova entrega", "b-novo", "🔔"], aceito: ["Aceita", "b-prep", "✅"], saiu: ["A caminho", "b-prep", "🛵"], chegou: ["No local", "b-ok", "📍"], entregue: ["Entregue", "b-ok", "🎉"], recusado: ["Recusada", "b-cinza", "↩️"], cancelado: ["Cancelada", "b-erro", "✕"] };
 const ATIVAS = ["enviado", "aceito", "saiu", "chegou"];
+const ETAPAS = ["aceito", "saiu", "chegou", "entregue"];
+function barra(st) {
+  const i = ETAPAS.indexOf(st);
+  return `<div class="passos">${ETAPAS.map((_, k) => `<i class="${k < i ? "ok" : k === i ? "agora" : ""}"></i>`).join("")}</div>
+    <div class="passos-n"><span>Aceita</span><span>A caminho</span><span>No local</span><span>Entregue</span></div>`;
+}
 function desenhaEntregas() {
   const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-  const ent = entregas.filter(x => x.status === "entregue" && ms(x.atualizadoEm || x.criadoEm) >= hoje.getTime());
+  const semana = new Date(hoje); semana.setDate(semana.getDate() - ((semana.getDay() + 6) % 7));
+  const quando = x => ms(x.atualizadoEm || x.criadoEm);
+  const ent = entregas.filter(x => x.status === "entregue" && quando(x) >= hoje.getTime());
+  const sem = entregas.filter(x => x.status === "entregue" && quando(x) >= semana.getTime());
   const ativas = entregas.filter(x => ATIVAS.includes(x.status));
   $("#rHoje").textContent = ent.length; $("#rAnd").textContent = ativas.length;
   $("#rTaxa").textContent = R(ent.reduce((s, x) => s + (x.taxa || 0), 0)).replace(",00", "");
+  $("#rSemana").textContent = sem.length ? `Esta semana: ${sem.length} entrega(s) · ${R(sem.reduce((s, x) => s + (x.taxa || 0), 0))}` : "";
   const novas = entregas.filter(x => x.status === "enviado").length;
   $("#bNovas").textContent = novas; $("#bNovas").classList.toggle("oculto", !novas);
   if (!ativas.length) {
-    $("#listaAtivas").innerHTML = `<div class="card vazio"><div class="ic">🛵</div><b>Nenhuma entrega agora</b><p>Quando a loja te mandar uma entrega, ela aparece aqui${somLigado ? "" : "<br>Toque em <b>Ativar som</b> lá em cima para ouvir o aviso"}.</p></div>`;
+    $("#listaAtivas").innerHTML = `<div class="card vazio"><div class="ic">🛵</div><b>Nenhuma entrega agora</b><p>Quando a loja te mandar uma entrega, ela aparece aqui${somLigado ? " e o celular toca" : "<br>Toque em <b>Ligar</b> nos avisos para ouvir o alarme"}.</p></div>`;
     return;
   }
   $("#listaAtivas").innerHTML = ativas.map(x => {
@@ -289,18 +342,27 @@ function desenhaEntregas() {
     if (x.status === "aceito") ac = `<button class="btn btn-pri btn-bloco btn-grande" data-a="saiu" data-id="${x.id}">🛵 Saí para entrega</button>`;
     if (x.status === "saiu") ac = `<button class="btn btn-escuro btn-bloco btn-grande" data-a="chegou" data-id="${x.id}">📍 Cheguei</button>`;
     if (x.status === "chegou") ac = `<button class="btn btn-pri btn-bloco btn-grande" style="background:var(--verde)" data-a="entregue" data-id="${x.id}">✓ Confirmar entrega</button>`;
-    const mostra = x.status !== "enviado";
+    const aceita = x.status !== "enviado";
+    const endQ = encodeURIComponent(x.cliente.endereco || "");
+    const dinheiro = /dinheiro/i.test(x.pagamento || "");
     return `<div class="ent ${x.status === "enviado" ? "nova" : ""}">
-      <div class="ent-top"><span class="lojinha">${esc(x.lojaNome)}</span><b>#${x.numero}</b><span class="badge ${stC}">${stN}</span></div>
-      <div class="end"><small>📍 Entregar em</small><div class="rua">${esc(x.cliente.endereco)}</div><small>${esc(x.cliente.nome)} · ${horaBR(ms(x.criadoEm))}</small></div>
-      <div class="info"><span>Itens</span><b>${(x.itens || []).length} item(ns)</b></div>
-      <div class="info"><span>Cobrar do cliente</span><b>${R(x.total)} · ${esc(x.pagamento)}</b></div>
-      ${x.troco ? `<div class="info"><span>Levar troco para</span><b>${R(x.troco)}</b></div>` : ""}
-      <div class="info"><span>Sua taxa</span><b style="color:var(--verde)">${R(x.taxa || 0)}</b></div>
-      ${x.obs ? `<div class="aviso amarelo" style="margin-top:8px;font-size:.84rem">📝 ${esc(x.obs)}</div>` : ""}
-      <div class="bts">
-        ${mostra ? `<div class="bts2"><a class="btn btn-sec" target="_blank" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.cliente.endereco)}">🗺️ Ver no mapa</a><a class="btn btn-zap" target="_blank" href="${zapLink(x.cliente.tel, "Olá, " + x.cliente.nome.split(" ")[0] + "! Sou o entregador da " + x.lojaNome + ", sobre seu pedido #" + x.numero + ".")}">${ZAP_SVG} Cliente</a></div>` : ""}
-        ${ac}
+      <div class="cab"><span class="lojinha">${esc(x.lojaNome)}</span><b>#${x.numero}</b><span class="badge ${stC}">${stN}</span></div>
+      ${aceita ? barra(x.status) : ""}
+      <div class="corpo">
+        <div class="end"><small>📍 Entregar em</small><div class="rua">${esc(x.cliente.endereco)}</div><small>${esc(x.cliente.nome)} · pedido às ${horaBR(ms(x.criadoEm))}</small>
+          <button class="copiar" title="Copiar endereço" data-copia="${esc(x.cliente.endereco)}">📋</button></div>
+        <div class="cobrar"><div><small>${dinheiro ? "Cobrar do cliente" : "Valor do pedido"}</small><b>${R(x.total)}</b></div><span class="pg">${esc(x.pagamento || "")}</span></div>
+        ${x.troco ? `<div class="troco">💵 Levar troco para ${R(x.troco)} (troco: ${R(x.troco - x.total)})</div>` : ""}
+        ${(x.itens || []).length ? `<details class="itens"><summary>🧾 ${(x.itens || []).length} item(ns) · ver</summary><ul>${x.itens.map(i => `<li>${esc(i)}</li>`).join("")}</ul></details>` : ""}
+        <div class="info"><span>Sua taxa</span><b style="color:var(--verde)">${R(x.taxa || 0)}</b></div>
+        ${x.obs ? `<div class="aviso amarelo" style="margin-top:8px;font-size:.84rem">📝 ${esc(x.obs)}</div>` : ""}
+        ${aceita ? `<div class="atalhos">
+          <a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${endQ}"><span>🗺️</span>Maps</a>
+          <a target="_blank" href="https://waze.com/ul?q=${endQ}&navigate=yes"><span>🚗</span>Waze</a>
+          <a href="tel:+${zapNum(x.cliente.tel)}"><span>📞</span>Ligar</a>
+          <a target="_blank" href="${zapLink(x.cliente.tel, "Olá, " + x.cliente.nome.split(" ")[0] + "! Sou o entregador da " + x.lojaNome + ", sobre seu pedido #" + x.numero + ".")}"><span>💬</span>WhatsApp</a>
+        </div>` : ""}
+        <div class="bts">${ac}</div>
       </div></div>`;
   }).join("");
 }
@@ -314,6 +376,8 @@ function desenhaHistorico() {
 }
 
 document.addEventListener("click", async e => {
+  const cp = e.target.closest("[data-copia]");
+  if (cp) { try { await navigator.clipboard.writeText(cp.dataset.copia); toast("Endereço copiado ✓"); } catch { prompt("Copie o endereço:", cp.dataset.copia); } return; }
   const b = e.target.closest("[data-a]"); if (!b) return;
   const x = entregas.find(y => y.id === b.dataset.id); if (!x) return;
   const a = b.dataset.a;
@@ -335,13 +399,79 @@ document.addEventListener("click", async e => {
   } catch (er) { toast(erroAmigavel(er), "erro"); b.disabled = false; }
 });
 
-// ---------- som
-let audio = null, somLigado = false;
-$("#btSom").onclick = () => { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); somLigado = true; $("#btSom").textContent = "🔔 Som ligado"; tocar(); } catch {} };
-function tocar() {
-  if (!somLigado || !audio) return;
-  [0, .2, .4, .8, 1, 1.2].forEach((t, i) => { const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = [880, 1100, 1320][i % 3]; g.gain.setValueAtTime(.0001, audio.currentTime + t); g.gain.exponentialRampToValueAtTime(.5, audio.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + t + .17); o.connect(g).connect(audio.destination); o.start(audio.currentTime + t); o.stop(audio.currentTime + t + .19); });
+// ---------- avisos: alarme alto (que repete até aceitar), vibração, tela acesa e notificação
+let audio = null, somLigado = false, alarmeT = null, travaTela = null;
+const guarda = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+const lido = k => { try { return localStorage.getItem(k); } catch { return null; } };
+function ligaSom() {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    audio.resume(); somLigado = true; guarda("pdk_ent_som", "1");
+  } catch {}
+  telaAcesa(); estadoAvisos(); checaAlarme();
 }
+// o celular só deixa tocar som depois de um toque na tela: se já estava ligado, liga no primeiro toque
+if (lido("pdk_ent_som") === "1") ["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, e => { if (!somLigado && !(e.target.closest && e.target.closest("#btSom, #btAvisos"))) ligaSom(); }, { once: true, capture: true }));
+function tocar() {
+  try { navigator.vibrate && navigator.vibrate([600, 200, 600, 200, 900]); } catch {}
+  if (!somLigado || !audio) return;
+  const t0 = audio.currentTime;
+  [0, .14, .28, .42, .9, 1.04, 1.18, 1.32].forEach((t, i) => {
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = "square"; o.frequency.value = i % 2 ? 1318 : 988;
+    g.gain.setValueAtTime(.0001, t0 + t); g.gain.exponentialRampToValueAtTime(.35, t0 + t + .015); g.gain.exponentialRampToValueAtTime(.0001, t0 + t + .12);
+    o.connect(g).connect(audio.destination); o.start(t0 + t); o.stop(t0 + t + .13);
+  });
+}
+const temNova = () => entregas.some(x => x.status === "enviado" && Date.now() - ms(x.atualizadoEm || x.criadoEm) < 2 * 3600e3);
+function checaAlarme() {
+  $("#btSom").classList.toggle("alerta", temNova());
+  if (!somLigado || !temNova() || alarmeT) return;
+  tocar();
+  alarmeT = setInterval(() => { if (!somLigado || !temNova()) { clearInterval(alarmeT); alarmeT = null; $("#btSom").classList.remove("alerta"); return; } tocar(); }, 3500);
+}
+// mantém a tela acesa enquanto o app está aberto (para o alarme tocar)
+async function telaAcesa() {
+  try { if ("wakeLock" in navigator && document.visibilityState === "visible" && !travaTela) { travaTela = await navigator.wakeLock.request("screen"); travaTela.addEventListener("release", () => { travaTela = null; }); } } catch {}
+}
+document.addEventListener("visibilitychange", () => { if (somLigado) telaAcesa(); });
+
+// notificação no celular (mesmo com o app fechado)
+const suportaPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+async function registraPush() {
+  const reg = await navigator.serviceWorker.register("firebase-messaging-sw.js", { scope: "./avisos-pedeki/" });
+  const sw = reg.installing || reg.waiting || reg.active;
+  if (sw && sw.state !== "activated") await new Promise(r => { sw.addEventListener("statechange", () => sw.state === "activated" && r()); setTimeout(r, 8000); });
+  const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
+  const token = await getToken(getMessaging(app), { serviceWorkerRegistration: reg });
+  if (!token) throw new Error("Não consegui ligar as notificações.");
+  const r = await fetch(C.worker.replace(/\/$/, "") + "/push/registrar", { method: "POST", headers: { "Content-Type": "text/plain" }, body: JSON.stringify({ idToken: await user.getIdToken(), token }) });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).erro || "Erro ao ligar as notificações.");
+  guarda("pdk_ent_push", "1");
+}
+async function renovaPush() {
+  if (lido("pdk_ent_push") === "1" && suportaPush() && Notification.permission === "granted") { try { await registraPush(); } catch {} }
+}
+function estadoAvisos() {
+  const pushOk = lido("pdk_ent_push") === "1" && "Notification" in window && Notification.permission === "granted";
+  const tudo = somLigado && (pushOk || !suportaPush());
+  $("#boxAvisos").classList.toggle("oculto", tudo);
+  $("#btSom").textContent = somLigado ? "🔔 Avisos ligados" : "🔕 Avisos";
+  $("#btSom").classList.toggle("on", somLigado);
+}
+async function ligarAvisos() {
+  ligaSom(); tocar();
+  if (suportaPush()) {
+    if (Notification.permission === "denied") toast("As notificações estão bloqueadas: toque no cadeado 🔒 do navegador > Notificações > Permitir.", "erro");
+    else {
+      try { if ((await Notification.requestPermission()) === "granted") { await registraPush(); toast("Pronto! Você vai ser avisado das entregas 🔔"); } }
+      catch (er) { toast(er.message || "Não consegui ligar as notificações.", "erro"); }
+    }
+  } else if (/iphone|ipad/i.test(navigator.userAgent)) toast("No iPhone, instale o app na tela de início para receber notificações.");
+  estadoAvisos();
+}
+$("#btAvisos").onclick = ligarAvisos;
+$("#btSom").onclick = () => { if (somLigado) { somLigado = false; guarda("pdk_ent_som", null); clearInterval(alarmeT); alarmeT = null; travaTela?.release().catch(() => {}); estadoAvisos(); toast("Som desligado"); } else ligarAvisos(); };
 </script>
 </body>
 </html>
