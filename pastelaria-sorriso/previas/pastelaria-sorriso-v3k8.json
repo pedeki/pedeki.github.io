@@ -1,0 +1,32 @@
+{
+  "nome": "Pastelaria Sorriso",
+  "tipo": "Pastelaria e Lanches",
+  "bairro": "",
+  "cidade": "",
+  "cor": "#E2231A",
+  "logo": "img/pastelaria-sorriso-v3k8/logo.jpg",
+  "capa": "img/pastelaria-sorriso-v3k8/capa.jpg",
+  "entrega": false,
+  "whatsapp": "",
+  "instagram": "",
+  "criadoEm": "2026-11-14",
+  "expiraEm": "2026-12-14",
+  "categorias": [
+    { "nome": "Salgados", "produtos": [
+      { "nome": "Pastel", "descricao": "Pastel crocante e bem recheado", "preco": 5, "foto": "img/pastelaria-sorriso-v3k8/pastel.jpg" },
+      { "nome": "Coxinha", "descricao": "Coxinha de frango sequinha e crocante", "preco": 5, "foto": "img/pastelaria-sorriso-v3k8/coxinha.jpg" },
+      { "nome": "Enroladinho", "descricao": "Enroladinho de salsicha douradinho", "preco": 5, "foto": "img/pastelaria-sorriso-v3k8/enroladinho.jpg" }
+    ]},
+    { "nome": "Sanduíches", "produtos": [
+      { "nome": "Americano", "preco": 13, "foto": "img/pastelaria-sorriso-v3k8/sanduiche.jpg" },
+      { "nome": "Minuano", "preco": 15 },
+      { "nome": "X-Bacon", "preco": 18 },
+      { "nome": "X-Frango", "preco": 18 },
+      { "nome": "X-Calabresa", "preco": 18 },
+      { "nome": "X-Tudo", "descricao": "O mais completo da casa", "preco": 20, "foto": "img/pastelaria-sorriso-v3k8/sanduiche.jpg" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Suco 300ml", "preco": 2 }
+    ]}
+  ]
+}
