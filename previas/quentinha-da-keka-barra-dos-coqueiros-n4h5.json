@@ -1,0 +1,30 @@
+{
+  "nome": "Quentinha da Keka",
+  "tipo": "Marmitaria",
+  "bairro": "Olimar",
+  "cidade": "Barra dos Coqueiros - SE",
+  "cor": "#F2A900",
+  "logo": "img/quentinha-da-keka-barra-dos-coqueiros-n4h5/logo.jpg",
+  "capa": "",
+  "whatsapp": "5579998526646",
+  "instagram": "https://instagram.com/quentinhadakeka",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Quentinhas (a partir de R$ 13,00)", "produtos": [
+      { "nome": "Feijoada", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/quentinha-da-keka-barra-dos-coqueiros-n4h5/p1.jpg" },
+      { "nome": "Sarapatel", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Peito de frango assado", "descricao": "Com purê de batata cremoso", "preco": 0, "precoDe": 0, "foto": "img/quentinha-da-keka-barra-dos-coqueiros-n4h5/p3.jpg" },
+      { "nome": "Costela com pirão", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/quentinha-da-keka-barra-dos-coqueiros-n4h5/p2.jpg" },
+      { "nome": "Carne moída com batata", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/quentinha-da-keka-barra-dos-coqueiros-n4h5/p4.jpg" },
+      { "nome": "Estrogonofe de frango", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Sobremesas", "produtos": [
+      { "nome": "Mousse de maracujá", "descricao": "", "preco": 5.0, "precoDe": 0, "foto": "" },
+      { "nome": "Mousse de morango", "descricao": "", "preco": 5.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Suco de goiaba ou maracujá", "descricao": "A partir de R$ 6,00", "preco": 6.0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

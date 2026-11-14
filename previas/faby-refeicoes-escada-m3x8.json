@@ -1,0 +1,35 @@
+{
+  "nome": "Faby Refeições",
+  "tipo": "Marmitaria",
+  "bairro": "",
+  "cidade": "Escada - PE",
+  "cor": "#9B2C1F",
+  "logo": "img/faby-refeicoes-escada-m3x8/logo.jpg",
+  "capa": "",
+  "whatsapp": "5581991815651",
+  "instagram": "https://instagram.com/faby_refeicoes23",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Almoço", "produtos": [
+      { "nome": "Almoço completo com 2 opções de carne", "descricao": "Almoço completo com duas carnes à escolha", "preco": 18.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p1.jpg" },
+      { "nome": "Coxa e sobrecoxa ao forno", "descricao": "Almoço completo", "preco": 15.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p2.jpg" },
+      { "nome": "Picadinho de charque com calabresa", "descricao": "Almoço completo", "preco": 15.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p3.jpg" },
+      { "nome": "Filé de frango assado", "descricao": "Almoço completo", "preco": 15.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p4.jpg" },
+      { "nome": "Bisteca suína", "descricao": "Almoço completo", "preco": 15.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p5.jpg" },
+      { "nome": "Fígado ao molho", "descricao": "Almoço completo", "preco": 15.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p6.jpg" }
+    ]},
+    { "nome": "Salgados", "produtos": [
+      { "nome": "Empadão de frango com catupiry", "descricao": "Crocante por fora, cremoso por dentro. Acompanha 1 Caçulinha grátis", "preco": 18.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p7.jpg" }
+    ]},
+    { "nome": "Açaí", "produtos": [
+      { "nome": "Açaí com creme de avelã e creme de ninho P", "descricao": "Tamanho P", "preco": 10.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p8.jpg" },
+      { "nome": "Açaí com creme de avelã e creme de ninho M", "descricao": "Tamanho M", "preco": 14.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p8.jpg" },
+      { "nome": "Açaí com creme de amendoim", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p9.jpg" },
+      { "nome": "Açaí com creme de cookies", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p10.jpg" }
+    ]},
+    { "nome": "Sobremesas", "produtos": [
+      { "nome": "Bolo de noiva (super fatia)", "descricao": "1 fatia por R$ 17,00 ou 2 por R$ 30,00", "preco": 17.0, "precoDe": 0, "foto": "img/faby-refeicoes-escada-m3x8/p11.jpg" }
+    ]}
+  ]
+}

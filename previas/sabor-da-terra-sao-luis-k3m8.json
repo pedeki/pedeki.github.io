@@ -1,0 +1,29 @@
+{
+  "nome": "Sabor da Terra",
+  "tipo": "Restaurante & Lanchonete",
+  "bairro": "Ivar Saldanha",
+  "cidade": "São Luís - MA",
+  "cor": "#E65100",
+  "logo": "img/sabor-da-terra-sao-luis-k3m8/logo.jpg",
+  "capa": "",
+  "whatsapp": "5598920027668",
+  "instagram": "https://instagram.com/sabordaterraslz_",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Marmitas (a partir de R$ 9,99)", "produtos": [
+      { "nome": "Feijoada", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/sabor-da-terra-sao-luis-k3m8/p1.jpg" },
+      { "nome": "Mocotó", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/sabor-da-terra-sao-luis-k3m8/p2.jpg" },
+      { "nome": "Camarão", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/sabor-da-terra-sao-luis-k3m8/p3.jpg" },
+      { "nome": "Bisteca de porco", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/sabor-da-terra-sao-luis-k3m8/p4.jpg" },
+      { "nome": "Camaroada", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/sabor-da-terra-sao-luis-k3m8/p5.jpg" },
+      { "nome": "Calabresa acebolada", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Fígado acebolado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Estrogonofe", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Panqueca", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Frango assado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Carne de sol", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Peixinho frito", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

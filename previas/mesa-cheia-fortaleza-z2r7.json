@@ -1,0 +1,27 @@
+{
+  "nome": "Mesa Cheia Self-Service",
+  "tipo": "Restaurante / Marmitas",
+  "bairro": "Aldeota",
+  "cidade": "Fortaleza - CE",
+  "cor": "#E07B12",
+  "logo": "img/mesa-cheia-fortaleza-z2r7/logo.jpg",
+  "capa": "",
+  "whatsapp": "5585986717107",
+  "instagram": "https://instagram.com/mesacheia_selfservice",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Pratos do dia", "produtos": [
+      { "nome": "Filé de peixe frito", "descricao": "Crocante", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p1.jpg" },
+      { "nome": "Creme de galinha", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p2.jpg" },
+      { "nome": "Almôndega", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p3.jpg" },
+      { "nome": "Fígado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p4.jpg" },
+      { "nome": "Cupim", "descricao": "Preparado no fogo", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p5.jpg" },
+      { "nome": "Carne trinchada com linguiça", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/mesa-cheia-fortaleza-z2r7/p6.jpg" }
+    ]},
+    { "nome": "Acompanhamentos", "produtos": [
+      { "nome": "Baião", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Batata frita", "descricao": "Crocante", "preco": 0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

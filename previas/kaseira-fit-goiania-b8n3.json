@@ -1,0 +1,26 @@
+{
+  "nome": "Kaseira Fit",
+  "tipo": "Marmitas fit",
+  "bairro": "",
+  "cidade": "Goiânia - GO",
+  "cor": "#1F5B2E",
+  "logo": "img/kaseira-fit-goiania-b8n3/logo.jpg",
+  "capa": "",
+  "whatsapp": "5562982724984",
+  "instagram": "https://instagram.com/marmitakaseirafit",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Marmitas fit (350g) — combos a partir de 6 unidades", "produtos": [
+      { "nome": "Carne de panela recheada com cenoura", "descricao": "Arroz integral, carne de panela recheada com cenoura e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p1.jpg" },
+      { "nome": "Almôndegas ao molho fresco", "descricao": "Macarrão integral, almôndegas ao molho fresco e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p2.jpg" },
+      { "nome": "Medalhão de carne de panela", "descricao": "Macarrão integral, medalhão de carne de panela recheado com cenoura e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p3.jpg" },
+      { "nome": "Escondidinho fit de carne", "descricao": "Purê de batata, carne moída ao molho fresco e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p4.jpg" },
+      { "nome": "Bife rolê ao molho fresco", "descricao": "Arroz integral, bife rolê ao molho fresco e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p5.jpg" },
+      { "nome": "Carne cozida recheada de legumes", "descricao": "Purê de batata, carne cozida recheada de legumes e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p6.jpg" },
+      { "nome": "Polpetone de carne", "descricao": "Macarrão integral, polpetone de carne e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p7.jpg" },
+      { "nome": "Frango em tirinhas ao molho bechamel", "descricao": "Arroz integral, peito de frango em tirinhas cremoso ao molho bechamel e mix de legumes. 350g R$ 22,00 / 500g R$ 25,00", "preco": 22.0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p8.jpg" },
+      { "nome": "Panqueca fit", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/kaseira-fit-goiania-b8n3/p9.jpg" }
+    ]}
+  ]
+}

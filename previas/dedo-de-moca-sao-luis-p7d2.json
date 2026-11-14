@@ -1,0 +1,34 @@
+{
+  "nome": "Restaurante Dedo de Moça",
+  "tipo": "Restaurante / Marmitas",
+  "bairro": "Cidade Operária",
+  "cidade": "São Luís - MA",
+  "cor": "#C9A24A",
+  "logo": "img/dedo-de-moca-sao-luis-p7d2/logo.jpg",
+  "capa": "",
+  "whatsapp": "5598988822040",
+  "instagram": "https://instagram.com/restaurantededodemoca.slz",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Sábado (10h30 às 14h30)", "produtos": [
+      { "nome": "Feijoada individual", "descricao": "Arroz, couve, laranja e torresmo", "preco": 25.99, "precoDe": 0, "foto": "" },
+      { "nome": "Feijoada para duas pessoas", "descricao": "Arroz, couve, laranja e torresmo", "preco": 40.99, "precoDe": 0, "foto": "" },
+      { "nome": "Mocotó individual", "descricao": "Arroz, farofa e pirão", "preco": 25.99, "precoDe": 0, "foto": "img/dedo-de-moca-sao-luis-p7d2/p1.jpg" },
+      { "nome": "Mocotó para duas pessoas", "descricao": "Arroz, farofa e pirão", "preco": 34.99, "precoDe": 0, "foto": "img/dedo-de-moca-sao-luis-p7d2/p1.jpg" }
+    ]},
+    { "nome": "Pratos do dia", "produtos": [
+      { "nome": "Barriga de porco à pururuca", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/dedo-de-moca-sao-luis-p7d2/p3.jpg" },
+      { "nome": "Camarão ao alho e óleo", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Fígado acebolado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/dedo-de-moca-sao-luis-p7d2/p4.jpg" },
+      { "nome": "Assado de panela bovino", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Parmegiana de frango", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Torta de camarão seco", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Refrigerante 350 ml", "descricao": "", "preco": 6.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante 1 L", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Suco natural", "descricao": "Acerola ou caju", "preco": 6.0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "nome": "Delícias da Mamãe",
+  "tipo": "Restaurante / Marmitas",
+  "bairro": "",
+  "cidade": "Belém - PA",
+  "cor": "#C2185B",
+  "logo": "img/delicias-da-mamae-belem-v6c9/logo.jpg",
+  "capa": "",
+  "whatsapp": "5591981346140",
+  "instagram": "https://instagram.com/deliciasdamamae4",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Almocinho", "produtos": [
+      { "nome": "Almocinho - Frango na chapa", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 17.0, "precoDe": 0, "foto": "img/delicias-da-mamae-belem-v6c9/p1.jpg" },
+      { "nome": "Almocinho - Frango empanado", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 17.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Chapa mista", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 18.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Picadinho com legumes", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 18.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Filé de dourada frita", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 19.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Bife acebolado", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 19.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Bife a cavalo", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 19.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Bife de panela", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 19.0, "precoDe": 0, "foto": "" },
+      { "nome": "Almocinho - Carne assada de panela", "descricao": "Acompanha arroz, feijão, batata frita ou purê, salada e farofa", "preco": 21.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Refeição", "produtos": [
+      { "nome": "Refeição - Frango na chapa", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 20.0, "precoDe": 0, "foto": "img/delicias-da-mamae-belem-v6c9/p2.jpg" },
+      { "nome": "Refeição - Frango empanado", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 20.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Chapa mista", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 21.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Picadinho com legumes", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 21.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Filé de dourada frita", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 22.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Bife acebolado", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 22.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Bife a cavalo", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 22.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Bife de panela", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 22.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refeição - Carne assada de panela", "descricao": "Acompanha arroz, macarrão, feijão, batata frita ou purê, salada e farofa", "preco": 24.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Diversos", "produtos": [
+      { "nome": "Arroz com galinha", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Empadão de frango", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Torta salgada de frango", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Sanduíche natural de frango", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Bolo de chocolate", "descricao": "", "preco": 10.0, "precoDe": 0, "foto": "" },
+      { "nome": "Pudim de leite", "descricao": "", "preco": 7.0, "precoDe": 0, "foto": "" },
+      { "nome": "Batata frita P", "descricao": "", "preco": 13.0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Suco natural de frutas 275 ml", "descricao": "Acerola, goiaba, maracujá, caju ou cupuaçu", "preco": 6.0, "precoDe": 0, "foto": "" },
+      { "nome": "Suco jarra de 1 litro", "descricao": "Acerola, goiaba, maracujá, caju ou cupuaçu", "preco": 14.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante lata 220 ml", "descricao": "", "preco": 5.0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante lata 350 ml", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Refrigerante 1 litro", "descricao": "", "preco": 12.0, "precoDe": 0, "foto": "" },
+      { "nome": "Água mineral 500 ml", "descricao": "", "preco": 5.0, "precoDe": 0, "foto": "" },
+      { "nome": "H2O", "descricao": "", "preco": 8.0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

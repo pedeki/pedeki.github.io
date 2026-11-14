@@ -1,0 +1,33 @@
+{
+  "nome": "AP Refeições",
+  "tipo": "Marmitaria",
+  "bairro": "Maranguape II",
+  "cidade": "Paulista - PE",
+  "cor": "#C0151F",
+  "logo": "img/ap-refeicoes-paulista-t9k4/logo.jpg",
+  "capa": "",
+  "whatsapp": "5581993707946",
+  "instagram": "https://instagram.com/ap_refeicoes_104",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Almoço", "produtos": [
+      { "nome": "Almoço do dia", "descricao": "A partir de R$ 18,00", "preco": 18.0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p1.jpg" },
+      { "nome": "Fígado ao molho", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p2.jpg" },
+      { "nome": "Bobó de camarão", "descricao": "Pote de 500 ml, com arroz e batata palha", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p3.jpg" },
+      { "nome": "Cozido", "descricao": "Acompanhamentos: arroz, pirão e legumes", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p12.jpg" },
+      { "nome": "Arrumadinho de charque / carne de sol", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p11.jpg" }
+    ]},
+    { "nome": "Macaxeira", "produtos": [
+      { "nome": "Macaxeira com fígado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p4.jpg" },
+      { "nome": "Macaxeira com charque", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p5.jpg" },
+      { "nome": "Macaxeira com carne de sol", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p6.jpg" },
+      { "nome": "Macaxeira com galinha guisada", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p7.jpg" },
+      { "nome": "Macaxeira com guisado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p8.jpg" }
+    ]},
+    { "nome": "Cuscuz", "produtos": [
+      { "nome": "Cuscuz com charque e queijo", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/ap-refeicoes-paulista-t9k4/p9.jpg" },
+      { "nome": "Cuscuz recheado", "descricao": "", "preco": 0, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}

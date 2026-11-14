@@ -1,0 +1,32 @@
+{
+  "nome": "Natal Açaí & Doces",
+  "tipo": "Açaiteria",
+  "bairro": "",
+  "cidade": "Natal - RN",
+  "cor": "#5B1A8C",
+  "logo": "img/natal-acai-doces-natal-q5w1/logo.jpg",
+  "capa": "",
+  "whatsapp": "5584988673965",
+  "instagram": "https://instagram.com/natal.acai.doces",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Açaí na garrafa", "produtos": [
+      { "nome": "Açaí com creme de maracujá", "descricao": "Açaí na garrafa", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p1.jpg" },
+      { "nome": "Açaí com creme de paçoca", "descricao": "Açaí na garrafa", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p2.jpg" }
+    ]},
+    { "nome": "Shakes e batidas", "produtos": [
+      { "nome": "Shake de maracujá tradicional", "descricao": "Feito com a fruta", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p3.jpg" },
+      { "nome": "Shake de maracujá com Nutella", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p4.jpg" },
+      { "nome": "Shake de limão com Nutella", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p5.jpg" },
+      { "nome": "Batida de maracujá", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p6.jpg" }
+    ]},
+    { "nome": "Brigadeiros", "produtos": [
+      { "nome": "Brigadeiro de beijinho", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p7.jpg" },
+      { "nome": "Brigadeiro de chocolate branco", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p8.jpg" },
+      { "nome": "Brigadeiro de paçoca", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p8.jpg" },
+      { "nome": "Brigadeiro tradicional (chocolate 50%)", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p9.jpg" },
+      { "nome": "Brigadeiro chocolate 50% com amendoim", "descricao": "", "preco": 0, "precoDe": 0, "foto": "img/natal-acai-doces-natal-q5w1/p9.jpg" }
+    ]}
+  ]
+}

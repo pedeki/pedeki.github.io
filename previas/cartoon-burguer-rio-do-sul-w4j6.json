@@ -1,0 +1,47 @@
+{
+  "nome": "Cartoon Burguer e Marmitas",
+  "tipo": "Marmitaria / Hamburgueria",
+  "bairro": "",
+  "cidade": "Rio do Sul - SC",
+  "cor": "#F2B705",
+  "logo": "img/cartoon-burguer-rio-do-sul-w4j6/logo.jpg",
+  "capa": "",
+  "whatsapp": "5547984561374",
+  "instagram": "https://instagram.com/cartoonburguermarmitas",
+  "criadoEm": "2026-11-13",
+  "expiraEm": "2026-12-13",
+  "categorias": [
+    { "nome": "Marmitas especiais (acompanha refri mini + entrega grátis)", "produtos": [
+      { "nome": "Bem Bolado", "descricao": "Arroz soltinho, feijão caseiro, farofa caseira, batata frita e duas opções de carne. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "img/cartoon-burguer-rio-do-sul-w4j6/p1.jpg" },
+      { "nome": "Strogonoff de frango", "descricao": "Arroz, purê de batata, batata frita, farofa caseira, strogonoff de frango e carne de sua preferência. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "" },
+      { "nome": "Macarronese caseira", "descricao": "Arroz soltinho, feijão caseiro, batata frita, macarronese, farofa caseira e carne de sua preferência. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "" },
+      { "nome": "Macarrão com carne", "descricao": "Arroz, feijão, batata frita, macarrão, farofa caseira e carne de sua preferência. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "img/cartoon-burguer-rio-do-sul-w4j6/p2.jpg" },
+      { "nome": "Marmita do dia", "descricao": "Arroz soltinho, feijão caseiro, batata frita, farofa caseira e carne de sua escolha. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "img/cartoon-burguer-rio-do-sul-w4j6/p4.jpg" },
+      { "nome": "Purê de batata", "descricao": "Arroz, feijão, farofa, purê de batata e carne de sua preferência. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "" },
+      { "nome": "Batata doce", "descricao": "Arroz, feijão, farofa caseira, batata doce e carne de sua preferência. Valor no Pix ou dinheiro", "preco": 30.0, "precoDe": 0, "foto": "img/cartoon-burguer-rio-do-sul-w4j6/p5.jpg" },
+      { "nome": "Marmita fitness", "descricao": "Salada, bife chapeado, frango chapeado e batata doce + água com ou sem gás. Opções: galinha colonial ensopada, bife chapeado, frango à milanesa ou frango chapeado", "preco": 29.9, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Reforce sua marmita (porção individual)", "produtos": [
+      { "nome": "Ovo", "descricao": "", "preco": 3.0, "precoDe": 0, "foto": "" },
+      { "nome": "Bife chapeado", "descricao": "", "preco": 12.9, "precoDe": 0, "foto": "" },
+      { "nome": "Frango chapeado", "descricao": "", "preco": 12.9, "precoDe": 0, "foto": "" },
+      { "nome": "Frango à milanesa", "descricao": "", "preco": 12.9, "precoDe": 0, "foto": "" },
+      { "nome": "Fritas com bacon", "descricao": "", "preco": 12.9, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Shawarma", "produtos": [
+      { "nome": "Shawarma de frango", "descricao": "Pão sírio artesanal, filé de peito de frango, salada, vinagrete da casa, batata frita e molho de alho cremoso", "preco": 0, "precoDe": 0, "foto": "img/cartoon-burguer-rio-do-sul-w4j6/p3.jpg" },
+      { "nome": "Shawarma de carne", "descricao": "Pão sírio artesanal, filé de carne, salada, vinagrete da casa, batata frita e molho de alho cremoso", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Shawarma americano", "descricao": "Pão sírio artesanal, filé de carne, salada, vinagrete da casa, batata frita, molho de alho cremoso e barbecue defumado", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Shawarma cheddar cremoso", "descricao": "Pão sírio artesanal, filé de carne, salada, vinagrete da casa, batata frita, molho de alho cremoso e cheddar derretido", "preco": 0, "precoDe": 0, "foto": "" },
+      { "nome": "Shawarma misto", "descricao": "Pão sírio artesanal, filé de carne e frango, salada, vinagrete da casa, batata frita e molho de alho cremoso", "preco": 0, "precoDe": 0, "foto": "" }
+    ]},
+    { "nome": "Bebidas", "produtos": [
+      { "nome": "Coca pequena", "descricao": "", "preco": 4.5, "precoDe": 0, "foto": "" },
+      { "nome": "Guaraná pequeno", "descricao": "", "preco": 4.5, "precoDe": 0, "foto": "" },
+      { "nome": "Refri lata", "descricao": "Coca, Guaraná ou Fanta Uva", "preco": 8.0, "precoDe": 0, "foto": "" },
+      { "nome": "Coca 1,5L", "descricao": "", "preco": 17.0, "precoDe": 0, "foto": "" },
+      { "nome": "Água com gás", "descricao": "", "preco": 6.5, "precoDe": 0, "foto": "" },
+      { "nome": "Água sem gás", "descricao": "", "preco": 6.5, "precoDe": 0, "foto": "" }
+    ]}
+  ]
+}
