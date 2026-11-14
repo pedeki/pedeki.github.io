@@ -1,0 +1,212 @@
+{
+ "nome": "Passaporte do Urso",
+ "tipo": "Lanchonete",
+ "bairro": "",
+ "cidade": "",
+ "cor": "#E01B1B",
+ "logo": "img/passaporte-do-urso-h7t2/logo.jpg",
+ "capa": "img/passaporte-do-urso-h7t2/capa.jpg",
+ "pagamentos": "💳 Cartão · 💵 Dinheiro",
+ "whatsapp": "5582988682430",
+ "instagram": "",
+ "criadoEm": "2026-11-14",
+ "expiraEm": "2026-12-14",
+ "categorias": [
+  {
+   "nome": "Especiais da Casa",
+   "produtos": [
+    {
+     "nome": "X-Urso",
+     "preco": 20,
+     "descricao": "Pão bola, bacon, hambúrguer, batata palha, frango em cubos, queijo, presunto, salada e molhos",
+     "foto": "img/passaporte-do-urso-h7t2/burger.jpg"
+    },
+    {
+     "nome": "X-Charque",
+     "preco": 22,
+     "descricao": "Pão bola, charque, queijo, hambúrguer, presunto, salada e molhos"
+    },
+    {
+     "nome": "X-Carne de Sol",
+     "preco": 22,
+     "descricao": "Pão bola, carne de sol em cubos, hambúrguer, presunto, salada e molhos"
+    },
+    {
+     "nome": "Misturado",
+     "preco": 23,
+     "descricao": "Pão seda, frango, bacon, calabresa, ovos, queijo, presunto, molhos, alface e tomate"
+    },
+    {
+     "nome": "X-Boladão",
+     "preco": 23,
+     "descricao": "Pão bola, porco em tiras, batata palha, presunto, queijo mussarela, repolho desfiado, salada, ovo e molhos"
+    },
+    {
+     "nome": "X-Balada",
+     "preco": 23,
+     "descricao": "Pão bola, calabresa, ovo, charque acebolado, queijo mussarela, presunto, salada e molho"
+    },
+    {
+     "nome": "X-Coração",
+     "preco": 22,
+     "descricao": "Pão bola, coração em rodelas, queijo mussarela, presunto, salada e molhos"
+    },
+    {
+     "nome": "X-Filé",
+     "preco": 24,
+     "descricao": "Pão bola, filé em tiras acebolado, queijo coalho, presunto, salada e molhos"
+    },
+    {
+     "nome": "X-Alcatra",
+     "preco": 24,
+     "descricao": "Pão bola, alcatra, bacon, queijo coalho, presunto, salada e molhos"
+    }
+   ]
+  },
+  {
+   "nome": "Lanches",
+   "produtos": [
+    {
+     "nome": "Passaporte de Carne",
+     "preco": 16,
+     "descricao": "Pão seda, carne moída, salsicha, vinagrete, batata palha, queijo ralado e molhos"
+    },
+    {
+     "nome": "Passaporte de Frango",
+     "preco": 17,
+     "descricao": "Pão seda, frango desfiado, salsicha, vinagrete, batata palha, queijo ralado e molhos"
+    },
+    {
+     "nome": "Passaporte Misto",
+     "preco": 20,
+     "descricao": "Pão seda, carne ou frango, queijo, presunto, salsicha, molhos, batata palha e queijo ralado"
+    },
+    {
+     "nome": "Minuano",
+     "preco": 15,
+     "descricao": "Pão bola, hambúrguer, ovo, queijo, presunto, salada e molho"
+    },
+    {
+     "nome": "Americano",
+     "preco": 13,
+     "descricao": "Pão bola, ovo, queijo, presunto, salada e molho"
+    },
+    {
+     "nome": "Hambúrguer",
+     "preco": 12,
+     "descricao": "Pão redondo, hambúrguer e salada"
+    },
+    {
+     "nome": "Bauru",
+     "preco": 11,
+     "descricao": "Pão bola, queijo, presunto, salada e molho"
+    },
+    {
+     "nome": "X-Burguer",
+     "preco": 13,
+     "descricao": "Pão bola, hambúrguer, queijo, presunto, salada e molhos"
+    },
+    {
+     "nome": "X-Bacon",
+     "preco": 18,
+     "descricao": "Pão bola, bacon, hambúrguer, queijo, presunto, salada e molhos"
+    },
+    {
+     "nome": "X-Calabresa",
+     "preco": 16,
+     "descricao": "Pão bola, calabresa, hambúrguer, presunto, queijo, salada e molhos"
+    },
+    {
+     "nome": "X-Frango",
+     "preco": 18,
+     "descricao": "Pão bola, frango desfiado, queijo, hambúrguer, salada, molhos e presunto"
+    },
+    {
+     "nome": "Misto Quente",
+     "preco": 10,
+     "descricao": "Pão seda, queijo, presunto e molhos"
+    },
+    {
+     "nome": "Duplo Ano",
+     "preco": 22,
+     "descricao": "Pão bola, 2 ovos, 2 queijos, 2 hambúrgueres, 2 presuntos, salada e molhos"
+    },
+    {
+     "nome": "X-Tudo",
+     "preco": 24,
+     "descricao": "Pão bola, ovo, salsicha, bacon, salada, hambúrguer, frango desfiado, queijo, carne moída, calabresa, presunto e molho"
+    }
+   ]
+  },
+  {
+   "nome": "Salgados e Fatias",
+   "produtos": [
+    {
+     "nome": "Coxinha",
+     "preco": 6
+    },
+    {
+     "nome": "Pastel",
+     "preco": 6
+    },
+    {
+     "nome": "Enroladinho",
+     "preco": 6
+    },
+    {
+     "nome": "Empadinha",
+     "preco": 3
+    },
+    {
+     "nome": "Tortilete",
+     "preco": 2
+    },
+    {
+     "nome": "Pizza",
+     "preco": 10
+    },
+    {
+     "nome": "Lasanha",
+     "preco": 14
+    },
+    {
+     "nome": "Torta",
+     "preco": 6
+    },
+    {
+     "nome": "Bolo (fatia)",
+     "preco": 6
+    }
+   ]
+  },
+  {
+   "nome": "Bebidas",
+   "produtos": [
+    {
+     "nome": "Suco (litro)",
+     "preco": 7
+    },
+    {
+     "nome": "Suco 500ml",
+     "preco": 4
+    },
+    {
+     "nome": "Suco (copo)",
+     "preco": 3
+    },
+    {
+     "nome": "Coca-Cola (litro)",
+     "preco": 9
+    },
+    {
+     "nome": "Fanta (litro)",
+     "preco": 8
+    },
+    {
+     "nome": "Guaraná",
+     "preco": 8
+    }
+   ]
+  }
+ ]
+}
